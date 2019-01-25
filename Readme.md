@@ -1,6 +1,6 @@
 # DevOps For AI
 
-DevOps for AI template will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release pipelines along with Azure ML services for ML/AI model management and operationalization. 
+[DevOps for AI template](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning) will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release pipelines along with Azure ML services for ML/AI model management and operationalization. 
 
 This template contains code and pipeline definition for a machine learning project demonstrating how to automate the end to end ML/AI project. The build pipelines include DevOps tasks for data sanity test, unit test, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod, integration testing and functional testing.
 
@@ -9,6 +9,11 @@ This template contains code and pipeline definition for a machine learning proje
 - Minimum contributor access to Azure subscription
 
 ## Getting Started:
+
+### Import the DevOps for AI solution template: [Click here](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning)
+
+Skip above step if already done.
+
 Once the template is imported for personal Azure DevOps account using DevOps demo generator, you need to follow below steps to get the pipeline running:
 
 ### Update Pipeline Config:
