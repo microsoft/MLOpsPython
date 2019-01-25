@@ -10,7 +10,7 @@ This template contains code and pipeline definition for a machine learning proje
 
 ## Getting Started:
 
-### Import the DevOps for AI solution template: [Click here](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning)
+### Import the DevOps for AI solution template from Azure DevOps Demo Generator: [Click here](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning)
 
 Skip above step if already done.
 
