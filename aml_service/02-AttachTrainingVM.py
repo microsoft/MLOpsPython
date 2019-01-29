@@ -42,18 +42,21 @@ ws = Workspace.from_config()
 with open("aml_config/security_config.json") as f:
     config = json.load(f)
 
-remote_vm_name = config['remote_vm_name']
-remote_vm_username = config['remote_vm_username']
-remote_vm_password = config['remote_vm_password']
-remote_vm_ip = config['remote_vm_ip']
+remote_vm_name = config["remote_vm_name"]
+remote_vm_username = config["remote_vm_username"]
+remote_vm_password = config["remote_vm_password"]
+remote_vm_ip = config["remote_vm_ip"]
 
 try:
-    dsvm_compute = RemoteCompute.attach(ws, name=remote_vm_name, 
-                                        username=remote_vm_username, 
-                                        address=remote_vm_ip, 
-                                        ssh_port=22, 
-                                        password=remote_vm_password)
-    dsvm_compute.wait_for_completion(show_output =True)
+    dsvm_compute = RemoteCompute.attach(
+        ws,
+        name=remote_vm_name,
+        username=remote_vm_username,
+        address=remote_vm_ip,
+        ssh_port=22,
+        password=remote_vm_password,
+    )
+    dsvm_compute.wait_for_completion(show_output=True)
 
 except Exception as e:
     print("Caught = {}".format(e.message))
