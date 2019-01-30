@@ -1,3 +1,5 @@
+### Authors: Praneet Singh Solanki
+
 # DevOps For AI
 
 [DevOps for AI template](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning) will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release pipelines along with Azure ML services for ML/AI model management and operationalization. 
