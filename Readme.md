@@ -1,4 +1,4 @@
-### Authors: Praneet Singh Solanki
+### Author: Praneet Singh Solanki
 
 # DevOps For AI
 
