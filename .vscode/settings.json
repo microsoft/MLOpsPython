@@ -1,6 +1,0 @@
-{
-    "python.pythonPath": "C:\\Users\\prsol\\.azureml\\envs\\azuremlsdk-0112\\python.exe",
-    "python.linting.pep8Enabled": false,
-    "python.linting.enabled": false,
-    "python.linting.flake8Enabled": true
-}
