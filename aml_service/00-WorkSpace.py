@@ -24,8 +24,9 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 from azureml.core import Workspace
-import os, json
+import os, json, sys
 import azureml.core
+from azureml.core.authentication import AzureCliAuthentication
 
 print("SDK Version:", azureml.core.VERSION)
 # print('current dir is ' +os.curdir)
@@ -36,12 +37,15 @@ workspace_name = config["workspace_name"]
 resource_group = config["resource_group"]
 subscription_id = config["subscription_id"]
 location = config["location"]
-# location = 'southcentralus'
+
+cli_auth = AzureCliAuthentication()
+
 try:
     ws = Workspace.get(
         name=workspace_name,
         subscription_id=subscription_id,
         resource_group=resource_group,
+        auth=cli_auth
     )
 
 except:
@@ -53,6 +57,8 @@ except:
         resource_group=resource_group,
         # create_resource_group=True,
         location=location,
+        auth=cli_auth
+
     )
 
 # print Workspace details
