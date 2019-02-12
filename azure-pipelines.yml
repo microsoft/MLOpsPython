@@ -18,7 +18,7 @@ steps:
 - task: Bash@3
   displayName: 'Install Requirements'
   inputs:
-    targetType: ./
+    targetType: filePath
     filePath: 'environment_setup/install_requirements.sh'
     workingDirectory: 'environment_setup'
 
