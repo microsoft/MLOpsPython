@@ -6,14 +6,10 @@ pool:
 #Your build pipeline references a secret variable named ‘subscription_id’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
 
 steps:
-- task: CondaEnvironment@1
-  displayName: 'Create Conda Environment '
+- task: UsePythonVersion@0
   inputs:
-    createCustomEnvironment: true
-    environmentName: azuremlsdk
-    packageSpecs: 'python=3.6'
-    updateConda: false
-    createOptions: 'cython numpy'
+    versionSpec: '3.6'
+    architecture: 'x64'
 
 - task: Bash@3
   displayName: 'Install Requirements'
