@@ -11,6 +11,11 @@ steps:
     versionSpec: '3.6'
     architecture: 'x64'
 
+- script: |
+    python -m pip install flake8
+    flake8 .
+    displayName: 'Run lint tests'
+
 - task: Bash@3
   displayName: 'Install Requirements'
   inputs:
