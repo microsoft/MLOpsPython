@@ -15,6 +15,7 @@ steps:
     python -m pip install flake8
     flake8 .
     displayName: 'Run lint tests'
+    enabled: false    
 
 - task: Bash@3
   displayName: 'Install Requirements'
@@ -35,6 +36,12 @@ steps:
 
 - script: 'python code/testing/data_test.py data/diabetes.csv && python code/testing/data_test.py data/diabetes_bad_dist.csv && python code/testing/data_test.py data/diabetes_bad_schema.csv && python code/testing/data_test.py data/diabetes_missing_values.csv'
   displayName: 'Data Quality Check'
+
+- script: |
+    pip install pytest
+    pip install pytest-cov
+    pytest tests --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+  displayName: 'Test with pytest'
 
 - script: 'python aml_service/00-WorkSpace.py'
   displayName: 'Get or Create workspace copy'
