@@ -30,9 +30,11 @@ from azureml.core import Experiment
 from azureml.core.model import Model
 
 from azureml.core.runconfig import RunConfiguration
+from azureml.core.authentication import AzureCliAuthentication
+cli_auth = AzureCliAuthentication()
 
 # Get workspace
-ws = Workspace.from_config()
+ws = Workspace.from_config(auth=cli_auth)
 
 # Get the latest evaluation result
 try:
