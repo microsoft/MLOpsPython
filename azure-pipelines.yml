@@ -18,7 +18,7 @@ steps:
     filePath: 'environment_setup/install_requirements.sh'
     workingDirectory: 'environment_setup'
 
-- script: |
+- script: | 
    az login --service-principal -u $(sp_username) -p $(sp_password) --tenant $(sp_tenantid)
    
   displayName: 'Login to Azure'
@@ -30,12 +30,6 @@ steps:
 
 - script: 'python code/testing/data_test.py data/diabetes.csv && python code/testing/data_test.py data/diabetes_bad_dist.csv && python code/testing/data_test.py data/diabetes_bad_schema.csv && python code/testing/data_test.py data/diabetes_missing_values.csv'
   displayName: 'Data Quality Check'
-
-- script: |
-    pip install pytest
-    pip install pytest-cov
-    pytest tests --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-  displayName: 'Test with pytest'
 
 - script: 'python aml_service/00-WorkSpace.py'
   displayName: 'Get or Create workspace copy'
