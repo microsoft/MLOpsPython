@@ -45,7 +45,7 @@ try:
         name=workspace_name,
         subscription_id=subscription_id,
         resource_group=resource_group,
-        auth=cli_auth
+        auth=cli_auth,
     )
 
 except:
@@ -57,8 +57,7 @@ except:
         resource_group=resource_group,
         # create_resource_group=True,
         location=location,
-        auth=cli_auth
-
+        auth=cli_auth,
     )
 
 # print Workspace details

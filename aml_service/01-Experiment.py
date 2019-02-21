@@ -27,7 +27,9 @@ import os
 from azureml.core import Experiment
 from azureml.core import Workspace
 from azureml.core.authentication import AzureCliAuthentication
+
 cli_auth = AzureCliAuthentication()
+
 
 def getExperiment():
     ws = Workspace.from_config(auth=cli_auth)
