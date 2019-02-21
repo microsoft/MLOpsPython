@@ -33,10 +33,11 @@ import os, json
 from azureml.core.compute import RemoteCompute
 from azureml.core.compute import DsvmCompute
 from azureml.core.compute_target import ComputeTargetException
-
+from azureml.core.authentication import AzureCliAuthentication
+cli_auth = AzureCliAuthentication()
 
 # Get workspace
-ws = Workspace.from_config()
+ws = Workspace.from_config(auth=cli_auth)
 
 # Read the New VM Config
 with open("aml_config/security_config.json") as f:

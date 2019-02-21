@@ -30,10 +30,11 @@ from azureml.core import Workspace
 from azureml.core.model import Model
 from azureml.core.image import Image
 from azureml.core.webservice import Webservice
+from azureml.core.authentication import AzureCliAuthentication
 
-
+cli_auth = AzureCliAuthentication()
 # Get workspace
-ws = Workspace.from_config()
+ws = Workspace.from_config(auth=cli_auth)
 
 # Get the AKS Details
 try:
