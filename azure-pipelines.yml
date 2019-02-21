@@ -28,7 +28,7 @@ steps:
    
   displayName: 'replace subscription value'
 
-- script: 'python code/testing/data_test.py data/diabetes.csv && python code/testing/data_test.py data/diabetes_bad_dist.csv && python code/testing/data_test.py data/diabetes_bad_schema.csv && python code/testing/data_test.py data/diabetes_missing_values.csv'
+- script: 'pytest tests/unit/data_test.py'
   displayName: 'Data Quality Check'
 
 - script: 'python aml_service/00-WorkSpace.py'
