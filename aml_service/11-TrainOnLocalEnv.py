@@ -32,8 +32,12 @@ from azureml.core import Workspace
 from azureml.core import Experiment
 from azureml.core import ScriptRunConfig
 
+from azureml.core.authentication import AzureCliAuthentication
+
+cli_auth = AzureCliAuthentication()
+
 # Get workspace
-ws = Workspace.from_config()
+ws = Workspace.from_config(auth=cli_auth)
 
 # Attach Experiment
 experiment_name = "devops-ai-demo"

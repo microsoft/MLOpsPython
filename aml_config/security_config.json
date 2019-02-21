@@ -5,5 +5,10 @@
     "remote_vm_name" : "<>",
     "remote_vm_username" : "<>",
     "remote_vm_password" : "<>",
-    "remote_vm_ip" : "<>"
+    "remote_vm_ip" : "<>",
+    "experiment_name" : "<>",
+    "aml_cluster_name" : "<>",
+    "vnet_resourcegroup_name" : "<>", 
+    "vnet_name" : "<>", 
+    "subnet_name" : "<>"
 }

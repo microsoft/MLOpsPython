@@ -31,6 +31,7 @@ from azureml.core.model import Model
 
 from azureml.core.runconfig import RunConfiguration
 from azureml.core.authentication import AzureCliAuthentication
+
 cli_auth = AzureCliAuthentication()
 
 # Get workspace

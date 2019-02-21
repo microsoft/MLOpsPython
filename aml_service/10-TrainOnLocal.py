@@ -30,6 +30,7 @@ from azureml.core import Experiment
 from azureml.core import ScriptRunConfig
 import json
 from azureml.core.authentication import AzureCliAuthentication
+
 cli_auth = AzureCliAuthentication()
 
 # Get workspace

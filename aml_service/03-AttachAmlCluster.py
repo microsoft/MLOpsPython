@@ -1,6 +1,6 @@
 """
 Copyright (C) Microsoft Corporation. All rights reserved.​
- ​
+
 Microsoft Corporation (“Microsoft”) grants you a nonexclusive, perpetual,
 royalty-free right to use, copy, and modify the software code provided by us
 ("Software Code"). You may not sublicense the Software Code or any use of it
@@ -11,7 +11,7 @@ data you may have shared with Microsoft in the creation of the Software Code.
 Unless applicable law gives you more rights, Microsoft reserves all other
 rights not expressly granted herein, whether by implication, estoppel or
 otherwise. ​
- ​
+
 THE SOFTWARE CODE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -25,18 +25,12 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 
 from azureml.core import Workspace
-from azureml.core import Run
-from azureml.core import Experiment
-from azureml.core.conda_dependencies import CondaDependencies
-from azureml.core.runconfig import RunConfiguration
-import os, json
-from azureml.core.compute import RemoteCompute
-from azureml.core.compute import DsvmCompute
+from azureml.core.compute import ComputeTarget, AmlCompute
 from azureml.core.compute_target import ComputeTargetException
 from azureml.core.authentication import AzureCliAuthentication
+import os, json
 
 cli_auth = AzureCliAuthentication()
-
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
@@ -44,35 +38,29 @@ ws = Workspace.from_config(auth=cli_auth)
 with open("aml_config/security_config.json") as f:
     config = json.load(f)
 
-remote_vm_name = config["remote_vm_name"]
-remote_vm_username = config["remote_vm_username"]
-remote_vm_password = config["remote_vm_password"]
-remote_vm_ip = config["remote_vm_ip"]
+aml_cluster_name = config["aml_cluster_name"]
 
+# un-comment the below lines if you want to put AML Compute under Vnet. Also update /aml_config/security_config.json
+# vnet_resourcegroup_name = config['vnet_resourcegroup_name']
+# vnet_name = config['vnet_name']
+# subnet_name = config['subnet_name']
+
+# Verify that cluster does not exist already
 try:
-    dsvm_compute = RemoteCompute.attach(
-        ws,
-        name=remote_vm_name,
-        username=remote_vm_username,
-        address=remote_vm_ip,
-        ssh_port=22,
-        password=remote_vm_password,
+    cpu_cluster = ComputeTarget(workspace=ws, name=aml_cluster_name)
+    print("Found existing cluster, use it.")
+except ComputeTargetException:
+    compute_config = AmlCompute.provisioning_configuration(
+        vm_size="STANDARD_D2_V2",
+        vm_priority="dedicated",
+        min_nodes=1,
+        max_nodes=3,
+        idle_seconds_before_scaledown="300",
+        #    #Uncomment the below lines for VNet support
+        #    vnet_resourcegroup_name=vnet_resourcegroup_name,
+        #    vnet_name=vnet_name,
+        #    subnet_name=subnet_name
     )
-    dsvm_compute.wait_for_completion(show_output=True)
+    cpu_cluster = ComputeTarget.create(ws, aml_cluster_name, compute_config)
 
-except Exception as e:
-    print("Caught = {}".format(e.message))
-    print("Compute config already attached.")
-
-
-## Create VM if not available
-# compute_target_name = remote_vm_name
-
-# try:
-#     dsvm_compute = DsvmCompute(workspace=ws, name=compute_target_name)
-#     print('found existing:', dsvm_compute.name)
-# except ComputeTargetException:
-#     print('creating new.')
-#     dsvm_config = DsvmCompute.provisioning_configuration(vm_size="Standard_D2_v2")
-#     dsvm_compute = DsvmCompute.create(ws, name=compute_target_name, provisioning_configuration=dsvm_config)
-#     dsvm_compute.wait_for_completion(show_output=True)
+cpu_cluster.wait_for_completion(show_output=True)
