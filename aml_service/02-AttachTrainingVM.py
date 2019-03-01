@@ -34,6 +34,7 @@ from azureml.core.compute import RemoteCompute
 from azureml.core.compute import DsvmCompute
 from azureml.core.compute_target import ComputeTargetException
 from azureml.core.authentication import AzureCliAuthentication
+
 cli_auth = AzureCliAuthentication()
 
 # Get workspace

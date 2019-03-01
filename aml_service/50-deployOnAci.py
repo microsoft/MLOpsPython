@@ -34,7 +34,7 @@ from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
 # Get workspace
-ws = Workspace.from_config(auth=cli_auth)# Get the Image to deploy details
+ws = Workspace.from_config(auth=cli_auth)  # Get the Image to deploy details
 try:
     with open("aml_config/image.json") as f:
         config = json.load(f)
