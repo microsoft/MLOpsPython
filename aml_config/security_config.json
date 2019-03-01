@@ -6,8 +6,8 @@
     "remote_vm_username" : "<>",
     "remote_vm_password" : "<>",
     "remote_vm_ip" : "<>",
-    "experiment_name" : "<>",
-    "aml_cluster_name" : "<>",
+    "experiment_name" : "devops-ai-demo",
+    "aml_cluster_name" : "aml-compute",
     "vnet_resourcegroup_name" : "<>", 
     "vnet_name" : "<>", 
     "subnet_name" : "<>"
