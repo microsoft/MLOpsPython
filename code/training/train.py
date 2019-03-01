@@ -27,6 +27,7 @@ import pickle
 from azureml.core import Workspace
 from azureml.core.run import Run
 import os
+import argparse
 from sklearn.datasets import load_diabetes
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
@@ -37,13 +38,28 @@ import json
 import subprocess
 from typing import Tuple, List
 
-# run_history_name = 'devops-ai'
-# os.makedirs('./outputs', exist_ok=True)
-# #ws.get_details()
-# Start recording results to AML
-# run = Run.start_logging(workspace = ws, history_name = run_history_name)
-run = Run.get_submitted_run()
 
+parser = argparse.ArgumentParser("train")
+parser.add_argument(
+    "--config_suffix", type=str, help="Datetime suffix for json config files"
+)
+parser.add_argument(
+    "--json_config",
+    type=str,
+    help="Directory to write all the intermediate json configs",
+)
+args = parser.parse_args()
+
+print("Argument 1: %s" % args.config_suffix)
+print("Argument 2: %s" % args.json_config)
+
+if not (args.json_config is None):
+    os.makedirs(args.json_config, exist_ok=True)
+    print("%s created" % args.json_config)
+
+run = Run.get_context()
+exp = run.experiment
+ws = run.experiment.workspace
 
 X, y = load_diabetes(return_X_y=True)
 columns = ["age", "gender", "bmi", "bp", "s1", "s2", "s3", "s4", "s5", "s6"]
@@ -75,13 +91,19 @@ run.upload_file(name="./outputs/" + model_name, path_or_stream=model_name)
 print("Uploaded the model {} to experiment {}".format(model_name, run.experiment.name))
 dirpath = os.getcwd()
 print(dirpath)
-
+print("Following files are uploaded ")
+print(run.get_file_names())
 
 # register the model
 # run.log_model(file_name = model_name)
 # print('Registered the model {} to run history {}'.format(model_name, run.history.name))
 
+run_id = {}
+run_id["run_id"] = run.id
+run_id["experiment_name"] = run.experiment.name
+filename = "run_id_{}.json".format(args.config_suffix)
+output_path = os.path.join(args.json_config, filename)
+with open(output_path, "w") as outfile:
+    json.dump(run_id, outfile)
 
-print("Following files are uploaded ")
-print(run.get_file_names())
 run.complete()
