@@ -50,7 +50,7 @@ parser.add_argument(
     choices=["pipeline-test", "publish"],
     help="Determines if pipeline needs to run on small data set \
                                         or pipeline needs to be republished",
-    default="pipeline-test",
+    #default="pipeline-test",
 )
 
 args = parser.parse_args()
@@ -153,6 +153,7 @@ print("Pipeline is built")
 # Validate Pipeline
 pipeline1.validate()
 print("Pipeline validation complete")
+
 
 # Submit unpublished pipeline with small data set for test
 if args.pipeline_action == "pipeline-test":
