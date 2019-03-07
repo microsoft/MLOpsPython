@@ -32,19 +32,16 @@ steps:
   displayName: 'Data Quality Check'
 
 - script: 'python aml_service/00-WorkSpace.py'
-  displayName: 'Get or Create workspace copy'
+  displayName: 'Get or Create Workspace'
 
-- script: 'python aml_service/10-TrainOnLocal.py'
-  displayName: 'Train on Local'
+- script: 'python aml_service/03-AttachAmlCluster.py'
+  displayName: 'Create AML Compute Cluster'
 
-- script: 'python aml_service/15-EvaluateModel.py'
-  displayName: 'Evaluate Model'
+- script: 'python aml_service/04-AmlPipelines.py'
+  displayName: 'Create and Test AML Pipeline'
 
-- script: 'python aml_service/20-RegisterModel.py'
-  displayName: 'Register Model'
-
-- script: 'python aml_service/30-CreateScoringImage.py'
-  displayName: 'Creating scoring image'
+- script: 'python aml_service/04-AmlPipelines.py --pipeline_action publish'
+  displayName: 'Publish AML Pipeline as Endpoint'
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
