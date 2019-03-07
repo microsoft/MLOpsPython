@@ -78,7 +78,7 @@ print(
     )
 )
 
-os.chdir("./code/scoring")
+os.chdir("scoring")
 image_name = "diabetes-model-score"
 
 image_config = ContainerImage.image_configuration(
@@ -94,7 +94,7 @@ image = Image.create(
 )
 
 image.wait_for_creation(show_output=True)
-os.chdir("../..")
+os.chdir("..")
 
 if image.creation_state != "Succeeded":
     raise Exception("Image creation status: {image.creation_state}")

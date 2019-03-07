@@ -47,9 +47,10 @@ parser = argparse.ArgumentParser("Pipeline")
 parser.add_argument(
     "--pipeline_action",
     type=str,
-    choices=["unpublish-test", "publish"],
+    choices=["pipeline-test", "publish"],
     help="Determines if pipeline needs to run on small data set \
                                         or pipeline needs to be republished",
+    default="pipeline-test",
 )
 
 args = parser.parse_args()
@@ -140,9 +141,9 @@ print("Packed the model into a Scoring Image")
 # Create Steps dependency such that they run in sequence
 evaluate.run_after(train)
 register_model.run_after(evaluate)
-create_scoring_image.run_after(register_model)
+package_model.run_after(register_model)
 
-steps = [create_scoring_image]
+steps = [package_model]
 
 
 # Build Pipeline
@@ -154,7 +155,7 @@ pipeline1.validate()
 print("Pipeline validation complete")
 
 # Submit unpublished pipeline with small data set for test
-if args.pipeline_action == "unpublish-test":
+if args.pipeline_action == "pipeline-test":
     pipeline_run1 = Experiment(ws, experiment_name).submit(
         pipeline1, regenerate_outputs=True
     )
@@ -164,7 +165,6 @@ if args.pipeline_action == "unpublish-test":
 
 # RunDetails(pipeline_run1).show()
 
-## Publish Pipeline
 
 # Define pipeline parameters
 # run_env = PipelineParameter(
@@ -177,22 +177,19 @@ if args.pipeline_action == "unpublish-test":
 
 
 # Publish Pipeline
-
-published_pipeline1 = pipeline1.publish(
-    name=aml_pipeline_name, description="Model training/retraining pipeline"
-)
-
-
-# # Run a piblished pipeline
-# cli_auth = AzureCliAuthentication()
-# aad_token = cli_auth.get_authentication_header()
-# rest_endpoint1 = published_pipeline1.endpoint
-# print(rest_endpoint1)
-
-# response = requests.post(published_pipeline1.endpoint,
-#     headers=aad_token,
-#     json={"ExperimentName": "devops-ai",
-#         "ParameterAssignments": {"dev_flag": True}})
-
-# run_id = response.json()["Id"]
-# print(run_id)
+if args.pipeline_action == "publish":
+    published_pipeline1 = pipeline1.publish(
+        name=aml_pipeline_name, description="Model training/retraining pipeline"
+    )
+    print(
+        "Pipeline is published as rest_endpoint {} ".format(
+            published_pipeline1.endpoint
+        )
+    )
+    # write published pipeline details as build artifact
+    pipeline_config = {}
+    pipeline_config["pipeline_name"] = published_pipeline1.name
+    pipeline_config["rest_endpoint"] = published_pipeline1.endpoint
+    pipeline_config["experiment_name"] = "published-pipeline-exp"  # experiment_name
+    with open("aml_config/pipeline_config.json", "w") as outfile:
+        json.dump(pipeline_config, outfile)
