@@ -23,7 +23,7 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-#%%
+
 import os, json, requests, datetime
 import argparse
 from azureml.core import Workspace, Experiment, Datastore
@@ -35,7 +35,7 @@ from azureml.pipeline.core import PublishedPipeline
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.core.compute import ComputeTarget
 
-from azureml.widgets import RunDetails
+# from azureml.widgets import RunDetails
 from azureml.core.authentication import AzureCliAuthentication
 
 print("Pipeline SDK-specific imports completed")
