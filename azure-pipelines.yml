@@ -59,6 +59,7 @@ steps:
     TargetPath: '$(Build.ArtifactStagingDirectory)'
   
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: AML Pipeline Config'
   inputs:
     ArtifactName: 'devops-for-ai-aml-pipeline'
     publishLocation: 'container'

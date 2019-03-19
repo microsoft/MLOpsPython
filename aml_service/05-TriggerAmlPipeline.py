@@ -24,7 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os, json, requests, datetime
+import os, json, requests, datetime, sys
 import argparse
 from azureml.core.authentication import AzureCliAuthentication
 
