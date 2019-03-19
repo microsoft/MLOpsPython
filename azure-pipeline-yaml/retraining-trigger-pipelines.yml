@@ -11,10 +11,10 @@ steps:
     versionSpec: '3.6'
     architecture: 'x64'   
 
-- task: DownloadPipelineArtifact@0
-  inputs:
-    artifactName: 'devops-for-ai-aml-pipeline'
-    targetPath: '$(System.DefaultWorkingDirectory)/aml_config/pipeline_config.json'
+# - task: DownloadPipelineArtifact@0
+#   inputs:
+#     artifactName: 'devops-for-ai-aml-pipeline'
+#     targetPath: '$(System.DefaultWorkingDirectory)/aml_config/pipeline_config.json'
 
 - task: Bash@3
   displayName: 'Install Requirements'
@@ -44,9 +44,9 @@ steps:
     Contents: '**'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: devops-for-ai'
+  displayName: 'Publish Artifact: AML Pipeline Run'
   inputs:
-    ArtifactName: 'devops-for-ai'
+    ArtifactName: 'aml-pipeline-run'
     publishLocation: 'container'
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
     TargetPath: '$(Build.ArtifactStagingDirectory)'
