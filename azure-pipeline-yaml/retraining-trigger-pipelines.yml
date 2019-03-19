@@ -11,6 +11,11 @@ steps:
     versionSpec: '3.6'
     architecture: 'x64'   
 
+- task: DownloadPipelineArtifact@0
+  inputs:
+    artifactName: 'devops-for-ai-aml-pipeline'
+    targetPath: '$(System.DefaultWorkingDirectory)/aml_config/pipeline_config.json'
+
 - task: Bash@3
   displayName: 'Install Requirements'
   inputs:

@@ -57,5 +57,11 @@ steps:
     publishLocation: 'container'
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
     TargetPath: '$(Build.ArtifactStagingDirectory)'
-
+  
+- task: PublishBuildArtifacts@1
+  inputs:
+    ArtifactName: 'devops-for-ai-aml-pipeline'
+    publishLocation: 'container'
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)/aml_config/pipeline_config.json'
+    TargetPath: '$(Build.ArtifactStagingDirectory)/aml_config/pipeline_config.json'
 
