@@ -1,6 +1,6 @@
 {
     "subscription_id": "<>",
-    "resource_group": "DevOps_AzureML_Demo",
-    "workspace_name": "AzureML_Demo_ws",
+    "resource_group": "DevOps_AzureML_test",
+    "workspace_name": "AzureML_Demo_test",
     "location": "southcentralus"
 }
