@@ -5,6 +5,9 @@ pool:
 #Your build pipeline references a secret variable named ‘sp_tenantid’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
 #Your build pipeline references a secret variable named ‘subscription_id’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
 
+variables:
+- group: AzureKeyVaultSecrets
+
 steps:
 - task: UsePythonVersion@0
   inputs:
@@ -19,7 +22,7 @@ steps:
     workingDirectory: 'environment_setup'
 
 - script: | 
-   az login --service-principal -u $(sp_username) -p $(sp_password) --tenant $(sp_tenantid)
+   az login --service-principal -u $(spidentity) -p $(spsecret) --tenant $(sptenant)
    
   displayName: 'Login to Azure'
 
