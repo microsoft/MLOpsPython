@@ -33,8 +33,10 @@ import pandas as pd
 def get_absPath(filename):
     """Returns the path of the notebooks folder"""
     path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), os.path.pardir, 
-                     os.path.pardir, "data", filename))
+        os.path.join(
+            os.path.dirname(__file__), os.path.pardir, os.path.pardir, "data", filename
+        )
+    )
     return path
 
 
@@ -81,42 +83,42 @@ shift_tolerance = 3
 def test_check_schema():
     datafile = get_absPath("diabetes.csv")
     # check that file exists
-    assert(os.path.exists(datafile))
+    assert os.path.exists(datafile)
     dataset = pd.read_csv(datafile)
     header = dataset[dataset.columns[:-1]]
     actual_columns = header.shape[1]
     # check header has expected number of columns
-    assert(actual_columns == expected_columns)
+    assert actual_columns == expected_columns
 
 
 def test_check_bad_schema():
     datafile = get_absPath("diabetes_bad_schema.csv")
     # check that file exists
-    assert(os.path.exists(datafile))
+    assert os.path.exists(datafile)
     dataset = pd.read_csv(datafile)
     header = dataset[dataset.columns[:-1]]
     actual_columns = header.shape[1]
     # check header has expected number of columns
-    assert(actual_columns != expected_columns)
+    assert actual_columns != expected_columns
 
 
 def test_check_missing_values():
     datafile = get_absPath("diabetes_missing_values.csv")
     # check that file exists
-    assert(os.path.exists(datafile))
+    assert os.path.exists(datafile)
     dataset = pd.read_csv(datafile)
     n_nan = np.sum(np.isnan(dataset.values))
-    assert(n_nan > 0)
+    assert n_nan > 0
 
 
 def test_check_distribution():
     datafile = get_absPath("diabetes_bad_dist.csv")
     # check that file exists
-    assert(os.path.exists(datafile))
+    assert os.path.exists(datafile)
     dataset = pd.read_csv(datafile)
     mean = np.mean(dataset.values, axis=0)
     std = np.mean(dataset.values, axis=0)
-    assert(np.sum(abs(mean - historical_mean) > shift_tolerance *
-                  abs(historical_mean)) or
-           np.sum(abs(std - historical_std) > shift_tolerance * 
-                  abs(historical_std)) > 0)
+    assert (
+        np.sum(abs(mean - historical_mean) > shift_tolerance * abs(historical_mean))
+        or np.sum(abs(std - historical_std) > shift_tolerance * abs(historical_std)) > 0
+    )

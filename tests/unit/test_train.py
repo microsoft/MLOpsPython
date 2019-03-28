@@ -23,15 +23,15 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-from azureml.core.run import Run
+
+# test the training script
+
 import os
-import argparse
-from sklearn.datasets import load_diabetes
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
-from sklearn.externals import joblib
 import numpy as np
+import pandas as pd
+
+from sklearn.datasets import load_diabetes
+
 
 # using diabetes dataset from scikit-learn
 X, y = load_diabetes(return_X_y=True)
@@ -39,43 +39,46 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 data = {"train": {"X": X_train, "y": y_train}, "test": {"X": X_test, "y": y_test}}
 
 
-def experiment_code(data_split):
-    run = Run.get_submitted_run()
-    # Randomly pic alpha
-    alphas = np.arange(0.0, 1.0, 0.05)
-    alpha = alphas[np.random.choice(alphas.shape[0], 1, replace=False)][0]
-    print(alpha)
-    # Log alpha metric
-    run.log("alpha", alpha)
-    # train the model with selected value of alpha and log mse
-    reg = Ridge(alpha=alpha)
-    reg.fit(data["train"]["X"], data_split["train"]["y"])
-    preds = reg.predict(data["test"]["X"])
-    run.log("mse", mean_squared_error(preds, data_split["test"]["y"]))
 
-    # Write model name to the config file
-    model_name = "sklearn_regression_model.pkl"
-    with open(model_name, "wb"):
-        joblib.dump(value=reg, filename=model_name)
+def test_check_schema():
+    datafile = get_absPath("diabetes.csv")
+    # check that file exists
+    assert(os.path.exists(datafile))
+    dataset = pd.read_csv(datafile)
+    header = dataset[dataset.columns[:-1]]
+    actual_columns = header.shape[1]
+    # check header has expected number of columns
+    assert(actual_columns == expected_columns)
 
-    # upload the model file explicitly into artifacts
-    run.upload_file(name="./outputs/" + model_name, path_or_stream=model_name)
-    print("Uploaded the model {} to experiment {}".format(model_name, run.experiment.name))
-    dirpath = os.getcwd()
-    print(dirpath)
 
-    print("Following files are uploaded ")
-    print(run.get_file_names())
-    run.complete()
+def test_check_bad_schema():
+    datafile = get_absPath("diabetes_bad_schema.csv")
+    # check that file exists
+    assert(os.path.exists(datafile))
+    dataset = pd.read_csv(datafile)
+    header = dataset[dataset.columns[:-1]]
+    actual_columns = header.shape[1]
+    # check header has expected number of columns
+    assert(actual_columns != expected_columns)
 
-run_id = {}
-run_id["run_id"] = run.id
-run_id["experiment_name"] = run.experiment.name
-filename = "run_id_{}.json".format(args.config_suffix)
-output_path = os.path.join(args.json_config, filename)
-with open(output_path, "w") as outfile:
-    json.dump(run_id, outfile)
 
-if __name__ == "__main__":
-    print("Running train.py")
-    experiment_code(data)
+def test_check_missing_values():
+    datafile = get_absPath("diabetes_missing_values.csv")
+    # check that file exists
+    assert(os.path.exists(datafile))
+    dataset = pd.read_csv(datafile)
+    n_nan = np.sum(np.isnan(dataset.values))
+    assert(n_nan > 0)
+
+
+def test_check_distribution():
+    datafile = get_absPath("diabetes_bad_dist.csv")
+    # check that file exists
+    assert(os.path.exists(datafile))
+    dataset = pd.read_csv(datafile)
+    mean = np.mean(dataset.values, axis=0)
+    std = np.mean(dataset.values, axis=0)
+    assert(np.sum(abs(mean - historical_mean) > shift_tolerance *
+                  abs(historical_mean)) or
+           np.sum(abs(std - historical_std) > shift_tolerance * 
+                  abs(historical_std)) > 0)

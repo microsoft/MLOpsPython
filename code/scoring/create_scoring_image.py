@@ -24,20 +24,43 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os, json, sys
+import argparse
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
+from azureml.core import Run
 from azureml.core.model import Model
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
 
-# Get workspace
-ws = Workspace.from_config(auth=cli_auth)
+run = Run.get_context()
+if "OfflineRun" in run.id:
+    print("offline run")
+    # Get workspace
+    ws = Workspace.from_config(auth=cli_auth)
+else:
+    exp = run.experiment
+    ws = run.experiment.workspace
 
 # Get the latest model details
 
+parser = argparse.ArgumentParser("scoring_image")
+parser.add_argument(
+    "--config_suffix", type=str, help="Datetime suffix for json config files"
+)
+parser.add_argument(
+    "--json_config",
+    type=str,
+    help="Directory to write all the intermediate json configs",
+)
+args = parser.parse_args()
+
+register_model_json = "model_{}.json".format(args.config_suffix)
+register_output_path = os.path.join(args.json_config, register_model_json)
+
+
 try:
-    with open("aml_config/model.json") as f:
+    with open(register_output_path) as f:
         config = json.load(f)
 except:
     print("No new model to register thus no need to create new scoring image")
@@ -47,7 +70,6 @@ except:
 model_name = config["model_name"]
 model_version = config["model_version"]
 
-
 model_list = Model.list(workspace=ws)
 model, = (m for m in model_list if m.version == model_version and m.name == model_name)
 print(
@@ -56,7 +78,7 @@ print(
     )
 )
 
-os.chdir("./code/scoring")
+os.chdir("scoring")
 image_name = "diabetes-model-score"
 
 image_config = ContainerImage.image_configuration(
@@ -72,7 +94,7 @@ image = Image.create(
 )
 
 image.wait_for_creation(show_output=True)
-os.chdir("../..")
+os.chdir("..")
 
 if image.creation_state != "Succeeded":
     raise Exception("Image creation status: {image.creation_state}")
@@ -92,8 +114,11 @@ image_json = {}
 image_json["image_name"] = image.name
 image_json["image_version"] = image.version
 image_json["image_location"] = image.image_location
-with open("aml_config/image.json", "w") as outfile:
+# with open("aml_config/image.json", "w") as outfile:
+#     json.dump(image_json, outfile)
+filename = "image_{}.json".format(args.config_suffix)
+output_path = os.path.join(args.json_config, filename)
+with open(output_path, "w") as outfile:
     json.dump(image_json, outfile)
-
 
 # How to fix the schema for a model, like if we have multiple models expecting different schema,
