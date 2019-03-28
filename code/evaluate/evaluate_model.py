@@ -31,7 +31,7 @@ import azureml.core
 from azureml.core import Run
 import argparse
 
-"""
+
 # Get workspace
 # ws = Workspace.from_config()
 run = Run.get_context()
@@ -124,4 +124,3 @@ filename = "run_id_{}.json".format(args.config_suffix)
 output_path = os.path.join(args.json_config, filename)
 with open(output_path, "w") as outfile:
     json.dump(run_id, outfile)
-"""
