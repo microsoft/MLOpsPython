@@ -23,10 +23,8 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import pickle
 import json
 import numpy
-from sklearn.ensemble import RandomForestClassifier
 from azureml.core.model import Model
 
 
