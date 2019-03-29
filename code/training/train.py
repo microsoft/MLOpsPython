@@ -23,6 +23,8 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
+import pickle
+from azureml.core import Workspace
 from azureml.core.run import Run
 import os
 import argparse
@@ -32,41 +34,69 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
 import numpy as np
+import json
+import subprocess
+from typing import Tuple, List
 
-# using diabetes dataset from scikit-learn
+
+parser = argparse.ArgumentParser("train")
+parser.add_argument(
+    "--config_suffix", type=str, help="Datetime suffix for json config files"
+)
+parser.add_argument(
+    "--json_config",
+    type=str,
+    help="Directory to write all the intermediate json configs",
+)
+args = parser.parse_args()
+
+print("Argument 1: %s" % args.config_suffix)
+print("Argument 2: %s" % args.json_config)
+
+if not (args.json_config is None):
+    os.makedirs(args.json_config, exist_ok=True)
+    print("%s created" % args.json_config)
+
+run = Run.get_context()
+exp = run.experiment
+ws = run.experiment.workspace
+
 X, y = load_diabetes(return_X_y=True)
+columns = ["age", "gender", "bmi", "bp", "s1", "s2", "s3", "s4", "s5", "s6"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 data = {"train": {"X": X_train, "y": y_train}, "test": {"X": X_test, "y": y_test}}
 
+print("Running train.py")
 
-def experiment_code(data_split):
-    run = Run.get_submitted_run()
-    # Randomly pic alpha
-    alphas = np.arange(0.0, 1.0, 0.05)
-    alpha = alphas[np.random.choice(alphas.shape[0], 1, replace=False)][0]
-    print(alpha)
-    # Log alpha metric
-    run.log("alpha", alpha)
-    # train the model with selected value of alpha and log mse
-    reg = Ridge(alpha=alpha)
-    reg.fit(data["train"]["X"], data_split["train"]["y"])
-    preds = reg.predict(data["test"]["X"])
-    run.log("mse", mean_squared_error(preds, data_split["test"]["y"]))
+# Randomly pic alpha
+alphas = np.arange(0.0, 1.0, 0.05)
+alpha = alphas[np.random.choice(alphas.shape[0], 1, replace=False)][0]
+print(alpha)
+run.log("alpha", alpha)
+reg = Ridge(alpha=alpha)
+reg.fit(data["train"]["X"], data["train"]["y"])
+preds = reg.predict(data["test"]["X"])
+run.log("mse", mean_squared_error(preds, data["test"]["y"]))
 
-    # Write model name to the config file
-    model_name = "sklearn_regression_model.pkl"
-    with open(model_name, "wb"):
-        joblib.dump(value=reg, filename=model_name)
 
-    # upload the model file explicitly into artifacts
-    run.upload_file(name="./outputs/" + model_name, path_or_stream=model_name)
-    print("Uploaded the model {} to experiment {}".format(model_name, run.experiment.name))
-    dirpath = os.getcwd()
-    print(dirpath)
+# Save model as part of the run history
+model_name = "sklearn_regression_model.pkl"
+# model_name = "."
 
-    print("Following files are uploaded ")
-    print(run.get_file_names())
-    run.complete()
+with open(model_name, "wb") as file:
+    joblib.dump(value=reg, filename=model_name)
+
+# upload the model file explicitly into artifacts
+run.upload_file(name="./outputs/" + model_name, path_or_stream=model_name)
+print("Uploaded the model {} to experiment {}".format(model_name, run.experiment.name))
+dirpath = os.getcwd()
+print(dirpath)
+print("Following files are uploaded ")
+print(run.get_file_names())
+
+# register the model
+# run.log_model(file_name = model_name)
+# print('Registered the model {} to run history {}'.format(model_name, run.history.name))
 
 run_id = {}
 run_id["run_id"] = run.id
@@ -76,6 +106,4 @@ output_path = os.path.join(args.json_config, filename)
 with open(output_path, "w") as outfile:
     json.dump(run_id, outfile)
 
-if __name__ == "__main__":
-    print("Running train.py")
-    experiment_code(data)
+run.complete()
