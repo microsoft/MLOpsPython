@@ -1,96 +1,74 @@
-### Author: Praneet Singh Solanki
+### Author: | Praneet Singh Solanki | Richin Jain |
 
 # DevOps For AI
 
 [![Build Status](https://dev.azure.com/customai/DevopsForAI-AML/_apis/build/status/Microsoft.DevOpsForAI?branchName=master)](https://dev.azure.com/customai/DevopsForAI-AML/_build/latest?definitionId=1&branchName=master)
 
-[DevOps for AI template](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning) will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release pipelines along with Azure ML services for ML/AI model management and operationalization. 
+
+
+DevOps for AI will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release/deployment pipelines along with Azure ML services for model retraining pipeline, model management and operationalization. 
 
 This template contains code and pipeline definition for a machine learning project demonstrating how to automate the end to end ML/AI project. The build pipelines include DevOps tasks for data sanity test, unit test, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod, integration testing and functional testing.
 
+
 ## Prerequisite
 - Active Azure subscription
-- Minimum contributor access to Azure subscription
+- At least contributor access to Azure subscription
 
 ## Getting Started:
-
-### Import the DevOps for AI solution template from Azure DevOps Demo Generator: [Click here](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning)
-
 Skip above step if already done.
 
 Once the template is imported for personal Azure DevOps account using DevOps demo generator, you need to follow below steps to get the pipeline running:
 
-### Update Pipeline Config:
 
-#### Build Pipeline
-1. Go to the **Pipelines -> Builds** on the newly created project and click **Edit** on top right
-![EditPipeline1](/docs/images/EditPipeline1.png)
-2. Click on **Create or Get Workspace** task, select the Azure subscription where you want to deploy and run the solution, and click **Authorize**
-![EditPipeline2](/docs/images/EditPipeline2.png)
-3. Click all other tasks below it and select the same subscription (no need to authorize again)
-4. Once the tasks are updated with subscription, click on **Save & queue** and select **Save**
-![EditPipeline3](/docs/images/EditPipeline3.png)
 
-#### Release Pipeline
-1. Go to the **Pipelines -> Releases** and click **Edit** on top  
-![EditPipeline4](/docs/images/EditPipeline4.png)
-2. Click on **1 job, 4 tasks** to open the tasks in **QA stage**
-![EditPipeline5](/docs/images/EditPipeline5.png)
-3. Update the subscription details in two tasks 
-![EditPipeline6](/docs/images/EditPipeline6.png)
-4. Click on **Tasks** on the top to switch to the Prod stage, update the subscription details for the two tasks in prod
-![EditPipeline7](/docs/images/EditPipeline7.png)
-5. Once you fix all the missing subscription, the **Save** is no longer grayed, click on save to save the changes in release pepeline
-![EditPipeline8](/docs/images/EditPipeline8.png)
+## Architecture Diagram
 
-### Update Repo config:
-1. Go to the **Repos** on the newly created Azure DevOps project
-2. Open the config file [/aml_config/config.json](/aml_config/config.json) and edit it
-3. Put your Azure subscription ID in place of <>
-4. Change resource group and AML workspace name if you want
-5. Put the location where you want to deploy your Azure ML service workspace
-6. Save the changes and commit these changes to master branch 
-7. The commit will trigger the build pipeline to run deploying AML end to end solution
-8. Go to **Pipelines -> Builds** to see the pipeline run
+This reference architecture shows how to implement continuous integration (CI), continuous delivery (CD), and retraining pipeline for an AI application using Azure DevOps and Azure Machine Learning. The solution is built on the scikit-learn diabetes dataset but can be easily adapted for any AI scenario and other popular build systems such as Jenkins and Travis. 
 
-## Steps Performed in the Build Pipeline:
+![Architecture](as/docs/images/Architecture_DevOps_AI.png)
 
-1. Prepare the python environment
-2. Get or Create the workspace
-3. Submit Training job on the remote DSVM / Local Python Env
-4. Register model to workspace
-5. Create Docker Image for Scoring Webservice
-6. Copy and Publish the Artifacts to Release Pipeline
 
-## Steps Performed in the Release Pipeline
-In Release pipeline we deploy the image created from the build pipeline to Azure Container Instance and Azure Kubernetes Services
+## Architecture Flow
 
-### Deploy on ACI - QA Stage
-1. Prepare the python environment
-2. Create ACI and Deploy webservice image created in Build Pipeline
-3. Test the scoring image
+1. Data Scientist writes/updates the code and push it to git repo. This triggers the Azure DevOps build pipeline (contineous integration).
+2. Once the Azure DevOps build pipeline is triggered, it runs following type of tasks:
+    - Run for new code: Everytime new code is commited to the repo, build pipeline performs data sanity test and unit tests the new code.
 
-### Deploy on AKS - PreProd/Prod Stage
-1. Prepare the python environment
-2. Deploy on AKS
-    - Create AKS and create a new webservice on AKS with the scoring docker image
+    - One-time run: These tasks runs only for the first time build pipeline run, they create [Azure ML Service Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#workspace), [Azure ML Compute](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute) used as model training compute and publish a [Azure ML Pipeline](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-ml-pipelines) with code. This published Azure ML pipeline is the model training/retraining pipeline.
 
-        OR
+    `Note: The task Publish Azure ML pipeline currently runs for every code change`
 
-    - Get the existing AKS and update the webservice with new image created in Build Pipeline
-3. Test the scoring image
+3. The Azure ML Retraining pipeline is triggered once the Azure DevOps build pipeline completes. All the tasks in this pipeline runs on Azure ML Compute created earlier. Following are the tasks in this pipeline:
+
+    - **Train Model** task executes model training script on Azure ML Compute. It outputs a [model](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#model) file which is stored in the [run history](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#run)
+
+    - **Evaluate Model** task evaluates the performance of newly trained model with the model in production. If new trained model performs better than the production model, next steps are executed. Else next steps are skipped.
+
+    - **Register Model** task takes the new trained better performing model and registers it with the [Azure ML Model registry](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#model-registry) to version control it.
+
+    - **Package Model** task packages the new trained model along with scoring file and python dependencies into a docker [image](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#image) and pushes it to [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-intro). This image is used to deploy model as [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service).
+    
+4. Once a new model scoring image is pushed to Azure Container Registry, Azure DevOps Release/Deployment pipeline is triggered. This pipeline deploys the model scoring image into Staging/QA and PROD environments.
+
+    - In the Staging/QA, one task creates [Azure Container Instance](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-overview) and deploy scoring image as [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service) on it. 
+    
+    - The second task test this web service by calling its REST endpoint with dummy data.
+
+    
+5. 
 
 ### Repo Details
 
-You can find the details of the code ans scripts in the repository [here](/docs/code_description.md)
+You can find the details of the code and scripts in the repository [here](/docs/code_description.md)
 
 ### References
-
 - [Azure Machine Learning(Azure ML) Service Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/service/overview-what-is-azure-ml)
 
 - [Azure ML Samples](https://docs.microsoft.com/en-us/azure/machine-learning/service/samples-notebooks)
 - [Azure ML Python SDK Quickstart](https://docs.microsoft.com/en-us/azure/machine-learning/service/quickstart-create-workspace-with-python)
 - [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/?view=vsts)
+- [DevOps for AI template (Old Version)](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning)
 
 # Contributing
 
