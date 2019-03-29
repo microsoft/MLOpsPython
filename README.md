@@ -1,6 +1,6 @@
 ### Author: | Praneet Singh Solanki | Richin Jain |
 
-# DevOps For AI
+# DevOps for AI
 
 [![Build Status](https://dev.azure.com/customai/DevopsForAI-AML/_apis/build/status/Microsoft.DevOpsForAI?branchName=master)](https://dev.azure.com/customai/DevopsForAI-AML/_build/latest?definitionId=1&branchName=master)
 
@@ -8,7 +8,7 @@
 
 DevOps for AI will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release/deployment pipelines along with Azure ML services for model retraining pipeline, model management and operationalization. 
 
-This template contains code and pipeline definition for a machine learning project demonstrating how to automate the end to end ML/AI project. The build pipelines include DevOps tasks for data sanity test, unit test, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod, integration testing and functional testing.
+This template contains code and pipeline definition for a machine learning project demonstrating how to automate the end to end ML/AI project. The build pipelines include DevOps tasks for data sanity test, unit test, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod and integration testing.
 
 
 ## Prerequisite
@@ -16,24 +16,22 @@ This template contains code and pipeline definition for a machine learning proje
 - At least contributor access to Azure subscription
 
 ## Getting Started:
-Skip above step if already done.
 
-Once the template is imported for personal Azure DevOps account using DevOps demo generator, you need to follow below steps to get the pipeline running:
-
+To deploy this solution in your subscription, follow the manual instructions in the [getting started](docs/getting_started.md) doc
 
 
 ## Architecture Diagram
 
 This reference architecture shows how to implement continuous integration (CI), continuous delivery (CD), and retraining pipeline for an AI application using Azure DevOps and Azure Machine Learning. The solution is built on the scikit-learn diabetes dataset but can be easily adapted for any AI scenario and other popular build systems such as Jenkins and Travis. 
 
-![Architecture](as/docs/images/Architecture_DevOps_AI.png)
+![Architecture](/docs/images/Architecture_DevOps_AI.png)
 
 
 ## Architecture Flow
 
-1. Data Scientist writes/updates the code and push it to git repo. This triggers the Azure DevOps build pipeline (contineous integration).
+1. Data Scientist writes/updates the code and push it to git repo. This triggers the Azure DevOps build pipeline (continuous integration).
 2. Once the Azure DevOps build pipeline is triggered, it runs following type of tasks:
-    - Run for new code: Everytime new code is commited to the repo, build pipeline performs data sanity test and unit tests the new code.
+    - Run for new code: Every time new code is committed to the repo, build pipeline performs data sanity test and unit tests the new code.
 
     - One-time run: These tasks runs only for the first time build pipeline run, they create [Azure ML Service Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#workspace), [Azure ML Compute](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute) used as model training compute and publish a [Azure ML Pipeline](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-ml-pipelines) with code. This published Azure ML pipeline is the model training/retraining pipeline.
 
@@ -56,7 +54,7 @@ This reference architecture shows how to implement continuous integration (CI), 
     - The second task test this web service by calling its REST endpoint with dummy data.
 
     
-5. 
+5. The deployment in production is a [gated release](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/approvals/gates?view=azure-devops). Which means, once the model web service deployment in Staging/QA environment is successful, a notification is sent to approvers to manually review and approve the release. Once the release is approved, the model scoring web service is deployed to [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) and the deployment is tested.
 
 ### Repo Details
 
