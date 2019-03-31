@@ -566,7 +566,7 @@
         }
     },
     "id": 5,
-    "name": "rjtest-release",
+    "name": "releasedeploymentpipeline",
     "path": "\\",
     "projectReference": null,
     "url": "https://youaccount.vsrm.visualstudio.com/c9414c5b-b8f8-4d50-a8bf-eae8dbbb6a2a/_apis/Release/definitions/5",

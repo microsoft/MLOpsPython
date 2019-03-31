@@ -58,20 +58,103 @@ We now have 3 pipelines that we would set up
 2. Once you are in the right devops project, click Pipelines on the left hand menu and select Builds
 3. In the Build Menu, click **New** dropdown and then select **New build pipeline**
    ![new build pipeline](./images/new-build-pipeline.png)   
-4. Select Connect and link to your GitHub repository where you cloned this repo.
-   ![build connnect step](./images/buuo)
+4. On the Connect option page, select **GitHub**
+   ![build connnect step](./images/build-connect.png)
+   
+5. On the Select option page, select the GitHub repository where you forked the code.
+![select repo](./images/build-selectrepo.png)
+
+6. Since the repository contains azure-pipelines.yml at the root level, Azure DevOps recognizes it and auto imports it. Click run and this will start the build pipeline.
+![select repo](./images/build-createpipeline.png) 
+
+7. Your build run would look similar to the following image
+![select repo](./images/build-run.png)
+
+Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch.
 
 ### 6. Set up Retraining trigger release pipeline
 
+**Note:** For setting up release pipelines, first download the [release-pipelines](../release-pipelines) to your local filesystem so you can import it.
+
+1. Select the Release tab from the menu on the left, then click the New dropdown on top and click on **Import Release pipeline**
+![import release pipeline](./images/release-import.png)
+
+1. On the next screen, navigate to release-pipelines folder and select retrainingtrigger.json pipeline file, click import. You should now see the following screen. Under Stages click on the Retrain stage, where it shows the red error sign.
+![release retraining triggger](./images/release-retrainingtrigger.png)
+
+   Click on agent job and then from the drop down for Agent Pool on the right side select **Hosted Ubuntu 1604** agent to execute your run and click **Save** button on top right.
+![release retraining agent](./images/release-retrainingagent.png)
+
+1. We want the retraining pipeline to be triggered every time build pipeline is complete. To create this dependency, we will link the artifact from build pipeline as a trigger for retraining trigger release pipeline. To do so, click on the pipeline tab and then hit **Add an artifact** option under Artifacts.
+![release pipeline view](./images/release-retrainingpipeline.png)
+
+1. This will open up a pop up window, on this screen:
+    - for source type, select **Build**
+    - for project, select your project in Azure DevOps that you created in previous steps.
+    - For Source select the source build pipeline.
+    - Other fields will get auto populated, you can leave them as it is.
+  ![release retraining artifact](./images/release-retrainingartifact.png)
+
+1. Artifact is now added for retraining trigger pipeline, hit the **save** button on top right and then click **ok**. You now have the retraining trigger pipeline all set up and it will get executed everytime your build pipeline finishes its run. If you want to run this pipeline on a schedule, you can set one by clicking on **Schedule set** in Artifacts section.
+![release retraining artifact](./images/release-retrainingartifactsuccess.png)
+
+To view the newly created pipeline, click on the release tab on the left hand side and it will show the retraining trigger pipeline.
 
 ### 7. Set up release (Deployment) pipeline
 
+**Note:** For setting up release pipelines, first download the [release-pipelines](../release-pipelines) to your local filesystem so you can import it. 
+
+**Also Note:** Before creating this pipeline, make sure that the build pipeline and retraining trigger release pipeline have been executed, as they will be creating resources during their run like docker images that we will deploy as part of this pipeline. So it is important for them to have successful runs before the setup here. 
+
+Let's set up the release deployment pipeline now.
+1. As done in previous step, Select the Release tab from the menu on the left, then click the New dropdown on top and click on **Import Release pipeline**
+![import release pipeline](./images/release-import.png)
+
+1. On the next screen, navigate to release-pipelines folder and select **releasedeployment.json** pipeline file, click import. You should now see the following screen. Under Stages click on the QA environment's **view stage task", where it shows the red error sign.
+![release retraining triggger](./images/release-deployment.png)
+
+    Click on agent job and then from the drop down for Agent Pool on the right side select **Hosted Ubuntu 1604** agent to execute your run and click **Save** button on top right.
+![release retraining agent](./images/release-deploymentqaagent.png)
+
+   Follow the same steps for **Prod Environment** and select **Hosted Ubuntu 1604** for agent pool and save the pipeline.
+   ![release retraining agent](./images/release-deploymentprodagent.png)
+
+1. We now need to add artifact that will trigger this pipeline, it gets triggered everytime there is a new image that gets published to Azure container registry (ACR) as part of retraining pipeline. We will also add our build output as artifact since that contains our configuration and code files that we require in this pipeline.
+   
+   ![release retraining agent](./images/release-deploymentacr.png)
+   
+   Here are the steps to add ACR as an artifact
+    - Click on pipeline tab to go back to pipeline view and click **Add an artifact**. This will open a pop up window
+    - For Source type, click on **more artifact types** dropdown and select **Azure Container Registry**
+    - For service connection, select an existing service connection to Azure, if you don't see anything in the dropdown, click on Manage and create one.
+    **Note:** You must have sufficient privileges to create a service connection, if not contact your subscription adminstrator.
+    - For Resource Group, select **DevOps_AzureML_Demo**, this is the default resource group name that we are using and if the previous pipelines executed properly you will see this resource group in the drop down.
+    - Under Azure container registry dropdown, select the container registry, there should be only one container registry entry.
+    - For repository, select **diabetes-model-score** repository.
+    - For Default version, keep it to **latest**  
+    - For Source alias, keep the default generated name.
+    - Click Add
+    - Click on lighting sign to enable the **Continous Deployment Trigger**, click Save.
+    ![release retraining artifact](./images/release-deploymentcitrigger.png)
+
+   Here are the steps to add build output as artifact
+ ![release retraining artifact](./images/release-retrainingartifact.png)
+   - Click on pipeline tab to go back to pipeline view and click **Add an artifact**. This will open a pop up window
+    - For source type, select **Build**
+    - For project, select your project in Azure DevOps that you created in previous steps.
+    - For Source, select the source build pipeline.
+    - Other fields will get auto populated, you can leave them as it is.
+ 
+   
+1. We now have QA environment continously deployed each time there is a new image available in container registry. You can select pre-deployment conditions for prod environment, normally you don't want it to be auto deployed, so select manual only trigger here.
+
+    ![release retraining artifact](./images/release-deploymentprodtrigger.png)
+
+    To deploy a release manually, follow the document [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started-designer?view=azure-devops&tabs=new-nav#deploy-a-release)
 
 
-### Testing end to end flow
-
-Now you have all the pipelines setup, each time you make a commit to the repository the following should happen automatically for first time
-
-- build pipeline should run tests for you and set up the infrastructure (Azure ML workspace, Azure ML pipeline)
-- A new retraining job will be triggered on Azure ML pipelines, you can view this job by going to portal.azure.com > your AML workspace > and then pipelines tab.
-- A new docker image will get deployed to Azure container instance and prod deployment to AKS will also be created but won't be triggered.
+Congratulations, you now have three pipelines set up end to end.
+   - Build pipeline: triggered on code change to master branch on GitHub.
+   - Release Trigger pipeline: triggered on build pipeline execution and produces a new model image if better than previous one.
+   - Release Deployment pipeline: QA environment is auto triggered when there is a new image.
+    Prod is manual only and user decides when to release to this environment.

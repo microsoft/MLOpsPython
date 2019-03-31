@@ -276,8 +276,8 @@
         }
     },
     "id": 6,
-    "name": "rj-retraining",
-    "path": "\\rjtest",
+    "name": "retrainingtriggerpipeline",
+    "path": "\\",
     "projectReference": null,
     "url": "https://vsrm.dev.azure.com/userorg/420d3eaf-7dbb-46cb-a7c9-93662c745570/_apis/Release/definitions/6",
     "_links": {
