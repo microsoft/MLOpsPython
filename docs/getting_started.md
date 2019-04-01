@@ -8,7 +8,7 @@
 ### 2. Create Azure DevOps account
 We use Azure DevOps for running our build(CI), retraining trigger and release (CD) pipelines. If you don't already have Azure DevOps account, create one by following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops)
 
-If you already have Azure DevOps account, create a new project.
+If you already have Azure DevOps account, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
 **Note:** Make sure you have the right permissions in Azure DevOps to do so.
 
@@ -17,10 +17,9 @@ If you already have Azure DevOps account, create a new project.
 To create service principal, register an application entity in Azure Active Directory (Azure AD) and grant it the Contributor or Owner role of the subscription or the resource group where the web service belongs to. See [how to create service principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) and assign permissions to manage Azure resource.
 Please make note the following values after creating a service principal, we will need them in subsequent steps
 - Azure subscription id (subscriptionid)
-- Service principal username (spidentity)(application id)
-- Service principal password (spsecret) (auth_key)
-- Service principal tenant id (sptenant)
-- 
+- Service principal username (spidentity)([application id](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-application-id-and-authentication-key))
+- Service principal password (spsecret) ([auth_key](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-application-id-and-authentication-key))
+- Service principal [tenant id](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-tenant-id) (sptenant)
 
 **Note:** You must have sufficient permissions to register an application with your Azure AD tenant, and assign the application to a role in your Azure subscription. Contact your subscription adminstator if you don't have the permissions. Normally a subscription admin can create a Service principal and can provide you the details.
 
@@ -36,41 +35,46 @@ We noted the value of these variables in previous steps.
 
 **NOTE:** These values should be treated as secret as they allow access to your subscription. 
 
-We make use of variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines. You can either store the values directly here or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#link-secrets-from-an-azure-key-vault) to learn more about how to create a variable group and [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#link-secrets-from-an-azure-key-vault) it to your pipeline.
+We make use of variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines. You can either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to learn more about how to create a variable group and [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline.
  
 Please name your variable group **AzureKeyVaultSecrets**, we are using this name within our build yaml file. 
 
 Up until now you shouls have 
-- forked (or cloned) the repo, 
-- created a devops account or use an existing one
--  got service principal details and subscription id.
--  set them as variable group within devops.
+- Forked (or cloned) the repo
+- Created a devops account or use an existing one
+- Got service principal details and subscription id
+- Set them as variable group within devops
 
 We now have 3 pipelines that we would set up
-- Build Pipeline (azure-pipelines.yml): Runs tests and sets up infrastructure 
-- Retraining trigger pipeline(/template/retraining-template.json): This pipeline submits a pipeline job to Azure ML Pipelines and trains a new model and publishes image, if new model is better after evaluation.
-- Release pipeline(/template/release-template.json) : This pipeline releases our image and deploys it to QA and Prod environment.
+- **Build Pipeline (azure-pipelines.yml)**: Runs tests and sets up infrastructure 
+- **Retraining trigger pipeline(/template/retraining-template.json)**: This pipeline triggers Azure ML Pipeline (training/retraining) which trains a new model and publishes model image, if new model performs better
+- **Release pipeline(/template/release-template.json)**: This pipeline deploys and tests model image as web service in QA and Prod environment
 
 
 
 ### 5. Set up Build Pipeline
 1. Select your devops organization and project by clicking dev.azure.com
 2. Once you are in the right devops project, click Pipelines on the left hand menu and select Builds
-3. In the Build Menu, click **New** dropdown and then select **New build pipeline**
-   ![new build pipeline](./images/new-build-pipeline.png)   
+3. Click **New pipeline** to create new pipeline
+   ![new build pipeline](./images/new-build-pipeline1.png)   
 4. On the Connect option page, select **GitHub**
    ![build connnect step](./images/build-connect.png)
    
 5. On the Select option page, select the GitHub repository where you forked the code.
 ![select repo](./images/build-selectrepo.png)
 
-6. Since the repository contains azure-pipelines.yml at the root level, Azure DevOps recognizes it and auto imports it. Click run and this will start the build pipeline.
-![select repo](./images/build-createpipeline.png) 
+6. Authorize Azure Pipelines to access your git account
+![select repo](./images/Install_Azure_pipeline.png)
 
-7. Your build run would look similar to the following image
+7. Since the repository contains azure-pipelines.yml at the root level, Azure DevOps recognizes it and auto imports it. Click **Run** and this will start the build pipeline.
+![select repo](./images/build-createpipeline1.png) 
+
+8. Your build run would look similar to the following image
 ![select repo](./images/build-run.png)
 
 Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch.
+
+**Note:** The build pipeline will perform basic test on the code and provision infrastructure on azure. This can take around 10 mins to complete.
 
 ### 6. Set up Retraining trigger release pipeline
 
