@@ -80,29 +80,42 @@ Great, you now have the build pipeline setup, you can either manually trigger it
 
 **Note:** For setting up release pipelines, first download the [release-pipelines](../release-pipelines) to your local filesystem so you can import it.
 
-1. Select the Release tab from the menu on the left, then click the New dropdown on top and click on **Import Release pipeline**
+1. Select the Release tab from the menu on the left, then click on **New Pipeline**![import release pipeline](./images/release-new-pipeline.png)
+
+2. <<TODO: Create a empty release pipeline definition, such that we can get option to import the pipeline Json>>
+
+2. Select the Release tab from the menu on the left, then click the New dropdown on top and click on **Import Release pipeline**
 ![import release pipeline](./images/release-import.png)
 
-1. On the next screen, navigate to release-pipelines folder and select retrainingtrigger.json pipeline file, click import. You should now see the following screen. Under Stages click on the Retrain stage, where it shows the red error sign.
+3. On the next screen, navigate to release-pipelines folder and select retrainingtrigger.json pipeline file, click import. You should now see the following screen. Under Stages click on the Retrain stage, where it shows the red error sign.
 ![release retraining triggger](./images/release-retrainingtrigger.png)
 
    Click on agent job and then from the drop down for Agent Pool on the right side select **Hosted Ubuntu 1604** agent to execute your run and click **Save** button on top right.
 ![release retraining agent](./images/release-retrainingagent.png)
 
-1. We want the retraining pipeline to be triggered every time build pipeline is complete. To create this dependency, we will link the artifact from build pipeline as a trigger for retraining trigger release pipeline. To do so, click on the pipeline tab and then hit **Add an artifact** option under Artifacts.
+4. We want the retraining pipeline to be triggered every time build pipeline is complete. To create this dependency, we will link the artifact from build pipeline as a trigger for retraining trigger release pipeline. To do so, click on the pipeline tab and then hit **Add an artifact** option under Artifacts.
 ![release pipeline view](./images/release-retrainingpipeline.png)
 
-1. This will open up a pop up window, on this screen:
+5. This will open up a pop up window, on this screen:
     - for source type, select **Build**
     - for project, select your project in Azure DevOps that you created in previous steps.
     - For Source select the source build pipeline.
     - Other fields will get auto populated, you can leave them as it is.
   ![release retraining artifact](./images/release-retrainingartifact.png)
 
-1. Artifact is now added for retraining trigger pipeline, hit the **save** button on top right and then click **ok**. You now have the retraining trigger pipeline all set up and it will get executed everytime your build pipeline finishes its run. If you want to run this pipeline on a schedule, you can set one by clicking on **Schedule set** in Artifacts section.
+6. Artifact is now added for retraining trigger pipeline, hit the **save** button on top right and then click **ok**. You now have the retraining trigger pipeline all set up and it will get executed everytime your build pipeline finishes its run. If you want to run this pipeline on a schedule, you can set one by clicking on **Schedule set** in Artifacts section.
 ![release retraining artifact](./images/release-retrainingartifactsuccess.png)
 
+1. <<TODO: Link Variable group to the release pipeline>>
+
+7. You can also run this pipeline on a schedule. Click on **Schedule set** to set the pipeline run schedule
+
+
 To view the newly created pipeline, click on the release tab on the left hand side and it will show the retraining trigger pipeline.
+
+1. <<TODO: Trigger the retraining pipeline trigger>>
+
+1. <<TODO: The artifact name is defined by the name of build pipeline. If people fork it, the build pipeline name will change, this will change the artifact name and the workingDirectory path will change causing release pipelines to fail >>
 
 ### 7. Set up release (Deployment) pipeline
 
@@ -122,6 +135,8 @@ Let's set up the release deployment pipeline now.
 
    Follow the same steps for **Prod Environment** and select **Hosted Ubuntu 1604** for agent pool and save the pipeline.
    ![release retraining agent](./images/release-deploymentprodagent.png)
+
+1. <<TODO: Add steps to create a Service connection>>
 
 1. We now need to add artifact that will trigger this pipeline, it gets triggered everytime there is a new image that gets published to Azure container registry (ACR) as part of retraining pipeline. We will also add our build output as artifact since that contains our configuration and code files that we require in this pipeline.
    
