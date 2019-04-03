@@ -74,6 +74,8 @@ We now have 3 pipelines that we would set up
 
 Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch.
 
+9. <<TODO: Make sure that the build trigger is not enabled for PR>>
+
 **Note:** The build pipeline will perform basic test on the code and provision infrastructure on azure. This can take around 10 mins to complete.
 
 ### 6. Set up Retraining trigger release pipeline
@@ -113,7 +115,9 @@ Great, you now have the build pipeline setup, you can either manually trigger it
 
 To view the newly created pipeline, click on the release tab on the left hand side and it will show the retraining trigger pipeline.
 
-1. <<TODO: Trigger the retraining pipeline trigger>>
+1. <<TODO: Enable the continuous deployment trigger on the build artifact>>
+
+1. <<TODO: Manual Trigger the retraining pipeline trigger>>
 
 1. <<TODO: The artifact name is defined by the name of build pipeline. If people fork it, the build pipeline name will change, this will change the artifact name and the workingDirectory path will change causing release pipelines to fail >>
 
@@ -164,7 +168,10 @@ Let's set up the release deployment pipeline now.
     - For Source, select the source build pipeline.
     - Other fields will get auto populated, you can leave them as it is.
  
-   
+1. <<TODO: Add the build artifacts from the build pipeline to use the deployment code>>
+
+1. <<TODO: Update the working directory for all steps and install-setup.py file path>>
+
 1. We now have QA environment continously deployed each time there is a new image available in container registry. You can select pre-deployment conditions for prod environment, normally you don't want it to be auto deployed, so select manual only trigger here.
 
     ![release retraining artifact](./images/release-deploymentprodtrigger.png)
