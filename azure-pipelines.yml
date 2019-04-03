@@ -32,7 +32,7 @@ steps:
   displayName: 'Login to Azure'
 
 - script: |
-   sed -i 's#"subscription_id": "<>"#"subscription_id": "$(subscription_id)"#g' aml_config/config.json
+   sed -i 's#"subscription_id": "<>"#"subscription_id": "$(subscriptionid)"#g' aml_config/config.json
    
   displayName: 'replace subscription value'
 
