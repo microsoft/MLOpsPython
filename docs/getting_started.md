@@ -168,7 +168,6 @@ Let's set up the release deployment pipeline now.
     - For Source, select the source build pipeline.
     - Other fields will get auto populated, you can leave them as it is.
  
-1. <<TODO: Add the build artifacts from the build pipeline to use the deployment code>>
 
 1. <<TODO: Update the working directory for all steps and install-setup.py file path>>
 
