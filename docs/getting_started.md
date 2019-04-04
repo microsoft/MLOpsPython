@@ -110,24 +110,17 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
 1. This will open up a pop up window, on this screen:
     - for source type, select **Build**
     - for project, select your project in Azure DevOps that you created in previous steps.
-    - For Source select the source build pipeline.
+    - For Source select the source build pipeline. If you have forked the git repo, the build pipeline may named ``yourgitusername.DevOpsForAI``
+    - In the Source alias, replace the auto-populated value with 
+    **``DevOpsForAI``**
     - Other fields will get auto populated, you can leave them as it is.
   ![release retraining artifact](./images/release-retrainingartifact.png)
 
-1. Artifact is now added for retraining trigger pipeline, hit the **save** button on top right and then click **ok**. You now have the retraining trigger pipeline all set up. To trigger this pipeline every time build pipeline executes, click on the lighting sign to enable the **Continous Deployment Trigger**, click Save.
-    ![release retraining artifact](./images/release-deploymentcitrigger.png)
-   
-1. We now need to update one of the tasks in the pipeline to correct the script path as it is dependent on the artifact name. The artifact name is based of your GitHub username since you cloned the repo. To make the change
-     - From the release pipeline view, click on the highlighted section.
-  ![release retraining task](./images/release-retraintask.png)
-     -  On the next screen, select the **install requirements** task and click on three dots in the highlighted section.
-  ![release env task](./images/release-envtask.png).
-      - This will open a pop up for the linked artifact and you can select the file.
-  ![release env task](./images/release-envtask-scriptpath.png)
-    Also update the path for **Working Directory** (under Advanced) and select **environment_setup** as working directoy from the linked artifact.
-     - Similarly for **Run AML Pipeline** task, change the working directory to **devops-for-ai** under your artifact.
-  ![release env task](./images/release-workingdir.png)
-   
+1. Artifact is now added for retraining trigger pipeline, hit the **save** button on top right and then click **ok**. 
+
+1. To trigger this pipeline every time build pipeline executes, click on the lighting sign to enable the **Continous Deployment Trigger**, click Save.
+    ![release retraining artifact](./images/release-retrainingtrigger1.png)
+    
 2. If you want to run this pipeline on a schedule, you can set one by clicking on **Schedule set** in Artifacts section.
 ![release retraining artifact](./images/release-retrainingartifactsuccess.png)
 
@@ -137,8 +130,6 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
    - Click **Create Release**
   ![release create ](./images/release-create.png)
    - On the next screen click on **Create** button, this creates a manual release for you.
-
-2. <<TODO: The artifact name is defined by the name of build pipeline. If people fork it, the build pipeline name will change, this will change the artifact name and the workingDirectory path will change causing release pipelines to fail >>
 
 ### 7. Set up release (Deployment) pipeline
 
