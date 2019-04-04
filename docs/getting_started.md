@@ -113,7 +113,8 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
     - For Source select the source build pipeline. If you have forked the git repo, the build pipeline may named ``yourgitusername.DevOpsForAI``
     - In the Source alias, replace the auto-populated value with 
     **``DevOpsForAI``**
-    - Other fields will get auto populated, you can leave them as it is.
+    - Field **Devault version** will get auto populated **Latest**, you can leave them as it is.
+    - Click on **Add**, and then **Save** the pipeline
   ![release retraining artifact](./images/release-retrainingartifact.png)
 
 1. Artifact is now added for retraining trigger pipeline, hit the **save** button on top right and then click **ok**. 
@@ -171,15 +172,17 @@ Let's set up the release deployment pipeline now.
     ![release retraining artifact](./images/release-deploymentcitrigger.png)
 
    Here are the steps to add build output as artifact
- ![release retraining artifact](./images/release-retrainingartifact.png)
-   - Click on pipeline tab to go back to pipeline view and click **Add an artifact**. This will open a pop up window
-    - For source type, select **Build**
-    - For project, select your project in Azure DevOps that you created in previous steps.
-    - For Source, select the source build pipeline.
-    - Other fields will get auto populated, you can leave them as it is.
- 
 
-1. <<TODO: Update the working directory for all steps and install-setup.py file path>>
+   - Click on pipeline tab to go back to pipeline view and click **Add an artifact**. This will open a pop up window
+    - for source type, select **Build**
+    - for project, select your project in Azure DevOps that you created in previous steps.
+    - For Source select the source build pipeline. If you have forked the git repo, the build pipeline may named ``yourgitusername.DevOpsForAI``
+    - In the Source alias, replace the auto-populated value with 
+    **``DevOpsForAI``**
+    - Field **Devault version** will get auto populated **Latest**, you can leave them as it is.
+    - Click on **Add**, and then **Save** the pipeline
+  ![release retraining artifact](./images/release-retrainingartifact.png)
+
 
 1. We now have QA environment continously deployed each time there is a new image available in container registry. You can select pre-deployment conditions for prod environment, normally you don't want it to be auto deployed, so select manual only trigger here.
 
