@@ -151,10 +151,10 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "targetType": "filePath",
-                                "filePath": "$(System.DefaultWorkingDirectory)",
+                                "filePath": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai/environment_setup/install_requirements.sh",
                                 "arguments": "",
                                 "script": "# Write your commands here\n\n# Use the environment variables input below to pass secret variables to this script",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai/environment_setup/install_requirements.sh",
                                 "failOnStderr": "false",
                                 "noProfile": "true",
                                 "noRc": "true"
@@ -194,7 +194,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/05-TriggerAmlPipeline.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai/environment_setup/install_requirements.sh",
                                 "failOnStderr": "false"
                             }
                         }
