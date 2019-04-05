@@ -37,7 +37,7 @@ We noted the value of these variables in previous steps.
 
 We make use of variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines. You can either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to learn more about how to create a variable group and [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline.
  
-Please name your variable group **AzureKeyVaultSecrets**, we are using this name within our build yaml file. 
+Please name your variable group **``AzureKeyVaultSecrets``**, we are using this name within our build yaml file. 
 
 Up until now you shouls have 
 - Forked (or cloned) the repo
@@ -74,7 +74,6 @@ We now have 3 pipelines that we would set up
 
 Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch.
 
-9. <<TODO: Make sure that the build trigger is not enabled for PR>>
 
 **Note:** The build pipeline will perform basic test on the code and provision infrastructure on azure. This can take around 10 mins to complete.
 
@@ -96,7 +95,7 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
 1. Select the Release tab from the menu on the left, then click the New dropdown on top and click on **Import Release pipeline**
 ![import release pipeline](./images/release-import.png)
 
-1. On the next screen, navigate to release-pipelines folder and select retrainingtrigger.json pipeline file, click import. You should now see the following screen. Under Stages click on the Retrain stage, where it shows the red error sign.
+1. On the next screen, navigate to **release-pipelines** folder and select **retrainingtrigger.json** pipeline file, click import. You should now see the following screen. Under Stages click on the Retrain stage, where it shows the red error sign.
 ![release retraining triggger](./images/release-retrainingtrigger.png)
 
     Click on agent job and then from the drop down for Agent Pool on the right side select **Hosted Ubuntu 1604** agent to execute your run and click **Save** button on top right.
@@ -119,7 +118,7 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
 
 1. Artifact is now added for retraining trigger pipeline, hit the **save** button on top right and then click **ok**. 
 
-1. To trigger this pipeline every time build pipeline executes, click on the lighting sign to enable the **Continous Deployment Trigger**, click Save.
+1. To trigger this pipeline every time build pipeline executes, click on the lighting sign to enable the **Continous Deployment Trigger**, click **Save**.
     ![release retraining artifact](./images/release-retrainingtrigger1.png)
     
 2. If you want to run this pipeline on a schedule, you can set one by clicking on **Schedule set** in Artifacts section.
@@ -132,17 +131,19 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
   ![release create ](./images/release-create.png)
    - On the next screen click on **Create** button, this creates a manual release for you.
 
+  **Note**: This release pipeline will call the published AML pipeline. The AML pipeline will train the model and package it into image. It will take around 10 mins to complete. The next steps need this pipeline to complete successfully.
+
 ### 7. Set up release (Deployment) pipeline
 
 **Note:** For setting up release pipelines, first download the [release-pipelines](../release-pipelines) to your local filesystem so you can import it. 
 
-**Also Note:** Before creating this pipeline, make sure that the build pipeline and retraining trigger release pipeline have been executed, as they will be creating resources during their run like docker images that we will deploy as part of this pipeline. So it is important for them to have successful runs before the setup here. 
+**Also Note:** Before creating this pipeline, make sure that the build pipeline, retraining trigger release pipeline and AML retraining pipeline have been executed, as they will be creating resources during their run like docker images that we will deploy as part of this pipeline. So it is important for them to have successful runs before the setup here. 
 
 Let's set up the release deployment pipeline now.
 1. As done in previous step, Select the Release tab from the menu on the left, then click the New dropdown on top and click on **Import Release pipeline**
 ![import release pipeline](./images/release-import.png)
 
-1. On the next screen, navigate to release-pipelines folder and select **releasedeployment.json** pipeline file, click import. You should now see the following screen. Under Stages click on the QA environment's **view stage task", where it shows the red error sign.
+1. On the next screen, navigate to **release-pipelines** folder and select **releasedeployment.json** pipeline file, click import. You should now see the following screen. Under Stages click on the QA environment's **view stage task", where it shows the red error sign.
 ![release retraining triggger](./images/release-deployment.png)
 
     Click on agent job and then from the drop down for Agent Pool on the right side select **Hosted Ubuntu 1604** agent to execute your run and click **Save** button on top right.
@@ -151,25 +152,9 @@ Let's set up the release deployment pipeline now.
    Follow the same steps for **Prod Environment** and select **Hosted Ubuntu 1604** for agent pool and save the pipeline.
    ![release retraining agent](./images/release-deploymentprodagent.png)
 
-1. <<TODO: Add steps to create a Service connection>>
-
-1. We now need to add artifact that will trigger this pipeline, it gets triggered everytime there is a new image that gets published to Azure container registry (ACR) as part of retraining pipeline. We will also add our build output as artifact since that contains our configuration and code files that we require in this pipeline.
-   
-   ![release retraining agent](./images/release-deploymentacr.png)
-   
-   Here are the steps to add ACR as an artifact
-    - Click on pipeline tab to go back to pipeline view and click **Add an artifact**. This will open a pop up window
-    - For Source type, click on **more artifact types** dropdown and select **Azure Container Registry**
-    - For service connection, select an existing service connection to Azure, if you don't see anything in the dropdown, click on Manage and create one.
-    **Note:** You must have sufficient privileges to create a service connection, if not contact your subscription adminstrator.
-    - For Resource Group, select **DevOps_AzureML_Demo**, this is the default resource group name that we are using and if the previous pipelines executed properly you will see this resource group in the drop down.
-    - Under Azure container registry dropdown, select the container registry, there should be only one container registry entry.
-    - For repository, select **diabetes-model-score** repository.
-    - For Default version, keep it to **latest**  
-    - For Source alias, keep the default generated name.
-    - Click Add
-    - Click on lighting sign to enable the **Continous Deployment Trigger**, click Save.
-    ![release retraining artifact](./images/release-deploymentcitrigger.png)
+   1. We now need to add artifact that will trigger this pipeline. We will add two artifacts:
+      - Build pipeline output as artifact since that contains our configuration and code files that we require in this pipeline.
+      - ACR artifact to trigger this pipeline everytime there is a new image that gets published to Azure container registry (ACR) as part of retraining pipeline. 
 
    Here are the steps to add build output as artifact
 
@@ -182,6 +167,24 @@ Let's set up the release deployment pipeline now.
     - Field **Devault version** will get auto populated **Latest**, you can leave them as it is.
     - Click on **Add**, and then **Save** the pipeline
   ![release retraining artifact](./images/release-retrainingartifact.png)
+
+   Here are the steps to add ACR as an artifact
+
+   ![release retraining agent](./images/release-deployment-service-conn.png)
+   
+   
+    - Click on pipeline tab to go back to pipeline view and click **Add an artifact**. This will open a pop up window
+    - For Source type, click on **more artifact types** dropdown and select **Azure Container Registry**
+    - For **service connection**, select an existing service connection to Azure, if you don't see anything in the dropdown, click on **Manage** and [create new **Azure Resource Manager**](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops#create-a-service-connection) service connection for your subscription.
+    **Note:** You must have sufficient privileges to create a service connection, if not contact your subscription adminstrator.
+    - For Resource Group, select **DevOps_AzureML_Demo**, this is the default resource group name that we are using and if the previous pipelines executed properly you will see this resource group in the drop down.
+    - Under Azure container registry dropdown, select the container registry, there should be only one container registry entry.
+    - For repository, select **diabetes-model-score** repository.
+    - For Default version, keep it to **latest**  
+    - For Source alias, keep the default generated name.
+    - Click Add
+    - Click on lighting sign to enable the **Continous Deployment Trigger**, click Save.
+    ![release retraining artifact](./images/release-deploymentcitrigger.png)
 
 
 1. We now have QA environment continously deployed each time there is a new image available in container registry. You can select pre-deployment conditions for prod environment, normally you don't want it to be auto deployed, so select manual only trigger here.
