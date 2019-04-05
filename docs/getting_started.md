@@ -10,6 +10,9 @@ We use Azure DevOps for running our build(CI), retraining trigger and release (C
 
 If you already have Azure DevOps account, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
+#### Enable Azure DevOps Preview
+The steps below uses the latest DevOps features. Thus, please enable the feature **New YAML pipeline creation experience** by following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/project/navigation/preview-features?view=azure-devops). 
+
 **Note:** Make sure you have the right permissions in Azure DevOps to do so.
 
 ### 3. Create Service Principal to Login to Azure and create resources
