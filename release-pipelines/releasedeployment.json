@@ -149,10 +149,10 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "targetType": "filePath",
-                                "filePath": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai/environment_setup/install_requirements.sh",
+                                "filePath": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai/environment_setup/install_requirements.sh",
                                 "arguments": "",
                                 "script": "# Write your commands here\n\n# Use the environment variables input below to pass secret variables to this script",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai/environment_setup",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai/environment_setup",
                                 "failOnStderr": "false",
                                 "noProfile": "true",
                                 "noRc": "true"
@@ -192,7 +192,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/30-CreateScoringImage.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai",
                                 "failOnStderr": "false"
                             }
                         },
@@ -211,7 +211,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/34-GetScoringImageName.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai",
                                 "failOnStderr": "false"
                             }
                         },
@@ -230,7 +230,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/50-deployOnAci.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai",
                                 "failOnStderr": "false"
                             }
                         },
@@ -249,7 +249,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/60-AciWebserviceTest.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai",
                                 "failOnStderr": "false"
                             }
                         }
@@ -420,10 +420,10 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "targetType": "filePath",
-                                "filePath": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai/environment_setup/install_requirements.sh",
+                                "filePath": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai/environment_setup/install_requirements.sh",
                                 "arguments": "",
                                 "script": "# Write your commands here\n\n# Use the environment variables input below to pass secret variables to this script",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai/environment_setup",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai/environment_setup",
                                 "failOnStderr": "false",
                                 "noProfile": "true",
                                 "noRc": "true"
@@ -463,7 +463,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/34-GetScoringImageName.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai",
                                 "failOnStderr": "false"
                             }
                         },
@@ -482,7 +482,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/51-deployOnAks.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai",
                                 "failOnStderr": "false"
                             }
                         },
@@ -501,7 +501,7 @@
                             "condition": "succeeded()",
                             "inputs": {
                                 "script": "python aml_service/61-AksWebserviceTest.py",
-                                "workingDirectory": "$(System.DefaultWorkingDirectory)/_Microsoft.DevOpsForAI/devops-for-ai",
+                                "workingDirectory": "$(System.DefaultWorkingDirectory)/DevOpsForAI/devops-for-ai",
                                 "failOnStderr": "false"
                             }
                         }
