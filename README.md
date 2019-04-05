@@ -66,7 +66,7 @@ You can find the details of the code and scripts in the repository [here](/docs/
 - [Azure ML Samples](https://docs.microsoft.com/en-us/azure/machine-learning/service/samples-notebooks)
 - [Azure ML Python SDK Quickstart](https://docs.microsoft.com/en-us/azure/machine-learning/service/quickstart-create-workspace-with-python)
 - [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/?view=vsts)
-- [DevOps for AI template (Old Version)](https://azuredevopsdemogenerator.azurewebsites.net/?name=azure%20machine%20learning)
+- [DevOps for AI template (Old Version)](https://azuredevopsdemogenerator.azurewebsites.net/?name=machinelearning)
 
 # Contributing
 
