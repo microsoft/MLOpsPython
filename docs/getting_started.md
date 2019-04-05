@@ -152,7 +152,10 @@ Let's set up the release deployment pipeline now.
    Follow the same steps for **Prod Environment** and select **Hosted Ubuntu 1604** for agent pool and save the pipeline.
    ![release retraining agent](./images/release-deploymentprodagent.png)
 
-   1. We now need to add artifact that will trigger this pipeline. We will add two artifacts:
+1. We would now link the variable group we created earlier to this release pipeline. To do so click on the **Variables** tab, then click on **Variable** groups and then select **Link variable group** and select the variable group that we created in previous step and click **Link** followed by **Save** button.
+![release retraining artifact](./images/release-link-vg.png)
+
+1. We now need to add artifact that will trigger this pipeline. We will add two artifacts:
       - Build pipeline output as artifact since that contains our configuration and code files that we require in this pipeline.
       - ACR artifact to trigger this pipeline everytime there is a new image that gets published to Azure container registry (ACR) as part of retraining pipeline. 
 
