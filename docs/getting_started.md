@@ -2,7 +2,7 @@
 
 ### 1. Get the source code
 - Either clone the repository to your workspace and create your own repo with the code in GitHub.
-- An easier way is to just fork the project, so you have the repoitory under your username on GitHub itslef.
+- An easier way is to just fork the project, so you have the repository under your username on GitHub itself.
 
 
 ### 2. Create Azure DevOps account
