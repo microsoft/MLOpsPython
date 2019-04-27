@@ -28,7 +28,6 @@ This reference architecture shows how to implement continuous integration (CI), 
 1. Data Scientist writes/updates the code and push it to git repo. This triggers the Azure DevOps build pipeline (continuous integration).
 2. Once the Azure DevOps build pipeline is triggered, it runs following types of tasks:
     - Run for new code: Every time new code is committed to the repo, the build pipeline performs data sanity tests and unit tests on the new code.
-
     - One-time run: These tasks runs only for the first time the build pipeline runs. It will programatically create an [Azure ML Service Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#workspace), provision [Azure ML Compute](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute) (used for model training compute), and publish an [Azure ML Pipeline](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-ml-pipelines). This published Azure ML pipeline is the model training/retraining pipeline.
 
     > Note: The Publish Azure ML pipeline task currently runs for every code change
@@ -58,11 +57,10 @@ You can find the details of the code and scripts in the repository [here](/docs/
 
 ### References
 - [Azure Machine Learning(Azure ML) Service Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/service/overview-what-is-azure-ml)
-
+- [Azure ML CLI](https://docs.microsoft.com/en-us/azure/machine-learning/service/reference-azure-machine-learning-cli)
 - [Azure ML Samples](https://docs.microsoft.com/en-us/azure/machine-learning/service/samples-notebooks)
 - [Azure ML Python SDK Quickstart](https://docs.microsoft.com/en-us/azure/machine-learning/service/quickstart-create-workspace-with-python)
 - [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/?view=vsts)
-- [DevOps for AI template (Old Version)](https://azuredevopsdemogenerator.azurewebsites.net/?name=machinelearning)
 
 # Contributing
 
