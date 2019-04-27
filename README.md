@@ -1,14 +1,10 @@
-### Author: | Praneet Singh Solanki | Richin Jain |
-
-# DevOps for AI
+# MLOps with Azure ML
 
 [![Build Status](https://dev.azure.com/customai/DevopsForAI-AML/_apis/build/status/Microsoft.DevOpsForAI?branchName=master)](https://dev.azure.com/customai/DevopsForAI-AML/_build/latest?definitionId=1&branchName=master)
 
+MLOps will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release/deployment pipelines along with Azure ML services for model retraining pipeline, model management and operationalization. 
 
-
-DevOps for AI will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release/deployment pipelines along with Azure ML services for model retraining pipeline, model management and operationalization. 
-
-This template contains code and pipeline definition for a machine learning project demonstrating how to automate the end to end ML/AI project. The build pipelines include DevOps tasks for data sanity test, unit test, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod and integration testing.
+This template contains code and pipeline definition for a machine learning project demonstrating how to automate an end to end ML/AI workflow. The build pipelines include DevOps tasks for data sanity test, unit test, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod and integration testing.
 
 
 ## Prerequisite
