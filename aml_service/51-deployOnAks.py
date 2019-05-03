@@ -78,7 +78,7 @@ except:
     aks_name = "aks" + datetime.datetime.now().strftime("%m%d%H")
     aks_service_name = "akswebservice" + datetime.datetime.now().strftime("%m%d%H")
     prov_config = AksCompute.provisioning_configuration(
-        agent_count=6, vm_size="Standard_F2", location="eastus"
+        agent_count=6, vm_size="Standard_F4s", location="eastus"
     )
     print(
         "No AKS found in aks_webservice.json. Creating new Aks: {} and AKS Webservice: {}".format(
