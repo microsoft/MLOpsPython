@@ -1,0 +1,51 @@
+# 
+# To create the conda environment:
+# $ conda env create -f reco_full.yaml
+# 
+# To update the conda environment:
+# $ conda env update -f reco_full.yaml
+# 
+# To register the conda environment in Jupyter:
+# $ conda activate reco_full
+# $ python -m ipykernel install --user --name reco_full --display-name "Python (reco_full)"
+# 
+name: reco_full
+channels:
+- defaults
+- conda-forge
+- pytorch
+- fastai
+dependencies:
+- scipy>=1.0.0
+- mock==2.0.0
+- scikit-surprise>=1.0.6
+- fastparquet>=0.1.6
+- scikit-learn==0.19.1
+- pyspark==2.3.1
+- tensorflow-gpu==1.12.0
+- seaborn>=0.8.1
+- matplotlib>=2.2.2
+- pandas>=0.23.4
+- pytorch>=1.0.0
+- ipykernel>=4.6.1
+- jupyter>=1.0.0
+- gitpython>=2.1.8
+- dask>=0.17.1
+- numpy>=1.13.3
+- python==3.6.8
+- pymongo>=3.6.1
+- pytest>=3.6.4
+- pyarrow>=0.8.0
+- numba>=0.38.1
+- pip:
+  - azureml-sdk[notebooks,contrib]
+  - black>=18.6b4
+  - dataclasses>=0.6
+  - azure-storage>=0.36.0
+  - hyperopt==0.1.1
+  - nvidia-ml-py3>=7.352.0
+  - pydocumentdb>=2.3.3
+  - papermill>=0.15.0
+  - fastai==1.0.46
+  - idna==2.7
+  - memory-profiler>=0.54.0
