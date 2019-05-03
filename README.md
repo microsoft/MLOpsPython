@@ -27,6 +27,7 @@ This reference architecture shows how to implement continuous integration (CI), 
 
 ## Architecture Flow
 
+### Train Model
 1. Data Scientist writes/updates the code and push it to git repo. This triggers the Azure DevOps build pipeline (continuous integration).
 2. Once the Azure DevOps build pipeline is triggered, it runs following types of tasks:
     - Run for new code: Every time new code is committed to the repo, the build pipeline performs data sanity tests and unit tests on the new code.
@@ -42,14 +43,18 @@ This reference architecture shows how to implement continuous integration (CI), 
 
     - **Register Model** task takes the improved model and registers it with the [Azure ML Model registry](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#model-registry). This allows us to version control it.
 
-    - **Package Model** task packages the new model along with the scoring file and its python dependencies into a [docker image](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#image) and pushes it to [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-intro). This image is used to deploy the model as [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service).
-    
-4. Once a new model scoring image is pushed to Azure Container Registry, the Azure DevOps Release/Deployment pipeline is triggered. This pipeline deploys the model scoring image into Staging/QA and PROD environments.
+### Deploy Model
 
-    - In the Staging/QA environment, one task creates an [Azure Container Instance](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-overview) and deploys the scoring image as a [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service) on it. 
-    
-    - The second task tests this web service by calling its REST endpoint with dummy data.
+Once you have registered your ML model, you can use Azure ML + Azure DevOps to deploy it.
 
+The **Package Model** task packages the new model along with the scoring file and its python dependencies into a [docker image](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#image) and pushes it to [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-intro). This image is used to deploy the model as [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service).
+    
+The **Deploy Model** task handles deploying your Azure ML model to the cloud (ACI or AKS).
+This pipeline deploys the model scoring image into Staging/QA and PROD environments.
+
+ In the Staging/QA environment, one task creates an [Azure Container Instance](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-overview) and deploys the scoring image as a [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service) on it. 
+    
+The second task invokes the web service by calling its REST endpoint with dummy data.
     
 5. The deployment in production is a [gated release](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/approvals/gates?view=azure-devops). This means that once the model web service deployment in the Staging/QA environment is successful, a notification is sent to approvers to manually review and approve the release. Once the release is approved, the model scoring web service is deployed to [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) and the deployment is tested.
 
