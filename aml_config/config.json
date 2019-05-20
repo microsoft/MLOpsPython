@@ -1,5 +1,6 @@
 {
     "subscription_id": "9aa7299f-fdd4-47b8-acaf-825d2bdc8bba",
     "resource_group": "PavResourceGroup",
-    "workspace_name": "pavmlflows"
+    "workspace_name": "pavmlflows",
+    "location": "eastus2"
 }
