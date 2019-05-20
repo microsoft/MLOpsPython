@@ -26,7 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 from azureml.core import Workspace
 import os, json, sys
 import azureml.core
-from azureml.core.authentication import AzureCliAuthentication
+from azureml.core.authentication import InteractiveLoginAuthentication
 
 print("SDK Version:", azureml.core.VERSION)
 # print('current dir is ' +os.curdir)
@@ -37,15 +37,15 @@ workspace_name = config["workspace_name"]
 resource_group = config["resource_group"]
 subscription_id = config["subscription_id"]
 location = config["location"]
+interactive_auth = InteractiveLoginAuthentication(tenant_id="72f988bf-86f1-41af-91ab-2d7cd011db47")
 
-cli_auth = AzureCliAuthentication()
 
 try:
     ws = Workspace.get(
         name=workspace_name,
         subscription_id=subscription_id,
         resource_group=resource_group,
-        auth=cli_auth,
+        auth=interactive_auth,
     )
 
 except:
@@ -57,7 +57,7 @@ except:
         resource_group=resource_group,
         # create_resource_group=True,
         location=location,
-        auth=cli_auth,
+        auth=interactive_auth,
     )
 
 # print Workspace details
