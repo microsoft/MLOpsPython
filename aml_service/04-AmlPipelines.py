@@ -125,25 +125,26 @@ register_model = PythonScriptStep(
 )
 print("Step register model created")
 
-package_model = PythonScriptStep(
-    name="Package Model as Scoring Image",
-    script_name="scoring/create_scoring_image.py",
-    compute_target=aml_compute,
-    source_directory=source_directory,
-    arguments=["--config_suffix", config_suffix, "--json_config", jsonconfigs],
-    runconfig=run_config,
-    inputs=[jsonconfigs],
-    # outputs=[jsonconfigs],
-    allow_reuse=False,
-)
-print("Packed the model into a Scoring Image")
+# Package model step is moved to Azure DevOps Release Pipeline
+# package_model = PythonScriptStep(
+#     name="Package Model as Scoring Image",
+#     script_name="scoring/create_scoring_image.py",
+#     compute_target=aml_compute,
+#     source_directory=source_directory,
+#     arguments=["--config_suffix", config_suffix, "--json_config", jsonconfigs],
+#     runconfig=run_config,
+#     inputs=[jsonconfigs],
+#     # outputs=[jsonconfigs],
+#     allow_reuse=False,
+# )
+# print("Packed the model into a Scoring Image")
 
 # Create Steps dependency such that they run in sequence
 evaluate.run_after(train)
 register_model.run_after(evaluate)
-package_model.run_after(register_model)
+#package_model.run_after(register_model)
 
-steps = [package_model]
+steps = [register_model]
 
 
 # Build Pipeline
