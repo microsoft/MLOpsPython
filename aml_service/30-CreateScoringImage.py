@@ -36,32 +36,35 @@ ws = Workspace.from_config(auth=cli_auth)
 
 # Get the latest model details
 
-try:
-    with open("aml_config/model.json") as f:
-        config = json.load(f)
-except:
-    print("No new model to register thus no need to create new scoring image")
-    # raise Exception('No new model to register as production model perform better')
-    sys.exit(0)
+# try:
+#     with open("aml_config/model.json") as f:
+#         config = json.load(f)
+# except:
+#     print("No new model to register thus no need to create new scoring image")
+#     # raise Exception('No new model to register as production model perform better')
+#     sys.exit(0)
 
-model_name = config["model_name"]
-model_version = config["model_version"]
+# model_name = config["model_name"]
+# model_version = config["model_version"]
 
 
-model_list = Model.list(workspace=ws)
-model, = (m for m in model_list if m.version == model_version and m.name == model_name)
-print(
-    "Model picked: {} \nModel Description: {} \nModel Version: {}".format(
-        model.name, model.description, model.version
-    )
-)
+# model_list = Model.list(workspace=ws)
+# model, = (m for m in model_list if m.version == model_version and m.name == model_name)
+# print(
+#     "Model picked: {} \nModel Description: {} \nModel Version: {}".format(
+#         model.name, model.description, model.version
+#     )
+# )
+
+model_name = "sklearn_regression_model.pkl"
+model = Model(ws, name=model_name)
 
 os.chdir("./code/scoring")
 image_name = "diabetes-model-score"
 
 image_config = ContainerImage.image_configuration(
     execution_script="score.py",
-    runtime="python-slim",
+    runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
     tags={"area": "diabetes", "type": "regression"},
