@@ -42,7 +42,7 @@ cli_auth = AzureCliAuthentication()
 aad_token = cli_auth.get_authentication_header()
 rest_endpoint1 = config["rest_endpoint"]
 experiment_name = config["experiment_name"]
-model_name = security_config["experiment_name"]
+model_name = security_config["model_name"]
 
 print(rest_endpoint1)
 
