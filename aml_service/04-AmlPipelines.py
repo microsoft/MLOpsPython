@@ -67,6 +67,8 @@ with open("aml_config/security_config.json") as f:
 experiment_name = config["experiment_name"]
 aml_cluster_name = config["aml_cluster_name"]
 aml_pipeline_name = "training-pipeline"
+#model_name = config["model_name"]
+model_name = PipelineParameter(name="model_name", default_value="sklearn_regression_model.pkl")
 
 source_directory = "code"
 
@@ -76,8 +78,9 @@ source_directory = "code"
 cd = CondaDependencies("aml_config/conda_dependencies.yml")
 
 run_config = RunConfiguration(conda_dependencies=cd)
-
 aml_compute = ws.compute_targets[aml_cluster_name]
+run_config.environment.docker.enabled = True
+run_config.environment.spark.precache_packages = False
 
 jsonconfigs = PipelineData("jsonconfigs", datastore=def_blob_store)
 
@@ -91,7 +94,11 @@ train = PythonScriptStep(
     script_name="training/train.py",
     compute_target=aml_compute,
     source_directory=source_directory,
-    arguments=["--config_suffix", config_suffix, "--json_config", jsonconfigs],
+    arguments=[
+        "--config_suffix", config_suffix, 
+        "--json_config", jsonconfigs, 
+        "--model_name", model_name,
+        ],
     runconfig=run_config,
     # inputs=[jsonconfigs],
     outputs=[jsonconfigs],
@@ -104,7 +111,10 @@ evaluate = PythonScriptStep(
     script_name="evaluate/evaluate_model.py",
     compute_target=aml_compute,
     source_directory=source_directory,
-    arguments=["--config_suffix", config_suffix, "--json_config", jsonconfigs],
+    arguments=[
+                "--config_suffix", config_suffix, 
+                "--json_config", jsonconfigs,
+                ],
     runconfig=run_config,
     inputs=[jsonconfigs],
     # outputs=[jsonconfigs],
@@ -117,7 +127,11 @@ register_model = PythonScriptStep(
     script_name="register/register_model.py",
     compute_target=aml_compute,
     source_directory=source_directory,
-    arguments=["--config_suffix", config_suffix, "--json_config", jsonconfigs],
+    arguments=[
+        "--config_suffix", config_suffix, 
+        "--json_config", jsonconfigs,
+        "--model_name", model_name,
+        ],
     runconfig=run_config,
     inputs=[jsonconfigs],
     # outputs=[jsonconfigs],
@@ -125,25 +139,26 @@ register_model = PythonScriptStep(
 )
 print("Step register model created")
 
-package_model = PythonScriptStep(
-    name="Package Model as Scoring Image",
-    script_name="scoring/create_scoring_image.py",
-    compute_target=aml_compute,
-    source_directory=source_directory,
-    arguments=["--config_suffix", config_suffix, "--json_config", jsonconfigs],
-    runconfig=run_config,
-    inputs=[jsonconfigs],
-    # outputs=[jsonconfigs],
-    allow_reuse=False,
-)
-print("Packed the model into a Scoring Image")
+# Package model step is moved to Azure DevOps Release Pipeline
+# package_model = PythonScriptStep(
+#     name="Package Model as Scoring Image",
+#     script_name="scoring/create_scoring_image.py",
+#     compute_target=aml_compute,
+#     source_directory=source_directory,
+#     arguments=["--config_suffix", config_suffix, "--json_config", jsonconfigs],
+#     runconfig=run_config,
+#     inputs=[jsonconfigs],
+#     # outputs=[jsonconfigs],
+#     allow_reuse=False,
+# )
+# print("Packed the model into a Scoring Image")
 
 # Create Steps dependency such that they run in sequence
 evaluate.run_after(train)
 register_model.run_after(evaluate)
-package_model.run_after(register_model)
+#package_model.run_after(register_model)
 
-steps = [package_model]
+steps = [register_model]
 
 
 # Build Pipeline

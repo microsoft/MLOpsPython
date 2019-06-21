@@ -134,7 +134,7 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
   ![release create ](./images/release-create.png)
    - On the next screen click on **Create** button, this creates a manual release for you.
 
-  **Note**: This release pipeline will call the published AML pipeline. The AML pipeline will train the model and package it into image. It will take around 10 mins to complete. The next steps need this pipeline to complete successfully.
+  **Note**: This release pipeline will call the published AML pipeline. The AML pipeline will train the model and package it into image. It will take around 10 mins to complete. The next steps need this pipeline to complete successfully. At this point, you can go to the Azure Portal AML WOrkspace resource created inside resource group "DevOps_AzureML_Demo" and click on the **Pipeline** tab to see the running pipeline.
 
 ### 7. Set up release (Deployment) pipeline
 
@@ -174,26 +174,34 @@ Let's set up the release deployment pipeline now.
     - Click on **Add**, and then **Save** the pipeline
   ![release retraining artifact](./images/release-retrainingartifact.png)
 
-   Here are the steps to add ACR as an artifact
+   **Here are the steps to add [Azure ML Model as an artifact](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml)**
 
-   ![release retraining agent](./images/release-deployment-service-conn.png)
-   
-   
+
+    - Install the Azure Machine Learning extension for your DevOps organization from [here](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml). You need to have admin rights to install it.
+
+    - Create Service Connection
+    1. Go to your DevOps project and click on Project settings on bottom left corner
+    2. Under Project Settings -> Pipelines, click on Service connections, click on "New service connection" and select Azure Resource Manager
+    ![release retraining agent](./images/service-connection.png)
+    
+    3. Provide following info and click Ok once done:
+    ![release retraining agent](./images/service-connection-add.png)
+    
+       
     - Click on pipeline tab to go back to pipeline view and click **Add an artifact**. This will open a pop up window
-    - For Source type, click on **more artifact types** dropdown and select **Azure Container Registry**
-    - For **service connection**, select an existing service connection to Azure, if you don't see anything in the dropdown, click on **Manage** and [create new **Azure Resource Manager**](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops#create-a-service-connection) service connection for your subscription.
+    - For Source type, click on **more artifact types** dropdown and select **AzureML Model Artifact**
+    - For **Service Endpoint**, select an existing endpoint **MLOpsPython**, if you don't see anything in the dropdown, click on **Manage** and [create new **Azure Resource Manager**](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops#create-a-service-connection) service connection for your subscription.
+    ![release retraining agent](./images/model-artifact.png)
     **Note:** You must have sufficient privileges to create a service connection, if not contact your subscription adminstrator.
-    - For Resource Group, select **DevOps_AzureML_Demo**, this is the default resource group name that we are using and if the previous pipelines executed properly you will see this resource group in the drop down.
-    - Under Azure container registry dropdown, select the container registry, there should be only one container registry entry.
-    - For repository, select **diabetes-model-score** repository.
-    - For Default version, keep it to **latest**  
+    - For Model Names, select **sklearn_regression_model.pkl**, this is the name of the newly trained model and if the previous pipelines executed properly you will see this model name in the drop down.
+    - For Default version, keep it to **Latest version**  
     - For Source alias, keep the default generated name.
     - Click Add
-    - Click on lighting sign to enable the **Continous Deployment Trigger**, click Save.
-    ![release retraining artifact](./images/release-deploymentcitrigger.png)
+    - Click on lighting sign to enable the **Continous Deployment Trigger**, click **Save**.
+    ![release retraining artifact](./images/model-artifact-cd-trigger.png)
 
 
-1. We now have QA environment continously deployed each time there is a new image available in container registry. You can select pre-deployment conditions for prod environment, normally you don't want it to be auto deployed, so select manual only trigger here.
+1. We now have QA environment continously deployed each time there is a new ml model registered in AML Model Management. You can select pre-deployment conditions for prod environment, normally you don't want it to be auto deployed, so select manual only trigger here.
 
     ![release retraining artifact](./images/release-deploymentprodtrigger.png)
 
@@ -202,6 +210,6 @@ Let's set up the release deployment pipeline now.
 
 Congratulations, you now have three pipelines set up end to end.
    - Build pipeline: triggered on code change to master branch on GitHub.
-   - Release Trigger pipeline: triggered on build pipeline execution and produces a new model image if better than previous one.
-   - Release Deployment pipeline: QA environment is auto triggered when there is a new image.
+   - Release Trigger pipeline: triggered on build pipeline execution and registers a new ML model to AML Model Management if better than previous one.
+   - Release Deployment pipeline: QA environment is auto triggered when there is a new model.
     Prod is manual only and user decides when to release to this environment.

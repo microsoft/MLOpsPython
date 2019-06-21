@@ -50,6 +50,13 @@ parser.add_argument(
     type=str,
     help="Directory to write all the intermediate json configs",
 )
+parser.add_argument(
+    "--model_name",
+    type=str,
+    help="Name of the Model",
+    default="sklearn_regression_model.pkl",
+)
+
 args = parser.parse_args()
 
 print("Argument 1: %s" % args.config_suffix)
@@ -61,6 +68,7 @@ if not (args.json_config is None):
 
 evaluate_run_id_json = "run_id_{}.json".format(args.config_suffix)
 evaluate_output_path = os.path.join(args.json_config, evaluate_run_id_json)
+model_name = args.model_name
 
 # Get the latest evaluation result
 try:
@@ -85,7 +93,7 @@ model_local_dir = "model"
 os.makedirs(model_local_dir, exist_ok=True)
 
 # Download Model to Project root directory
-model_name = "sklearn_regression_model.pkl"
+# model_name = "sklearn_regression_model.pkl"
 run.download_file(
     name="./outputs/" + model_name, output_file_path="./model/" + model_name
 )

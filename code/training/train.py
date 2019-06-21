@@ -48,10 +48,19 @@ parser.add_argument(
     type=str,
     help="Directory to write all the intermediate json configs",
 )
+parser.add_argument(
+    "--model_name",
+    type=str,
+    help="Name of the Model",
+    default="sklearn_regression_model.pkl",
+)
+
 args = parser.parse_args()
 
 print("Argument 1: %s" % args.config_suffix)
 print("Argument 2: %s" % args.json_config)
+
+model_name = args.model_name
 
 if not (args.json_config is None):
     os.makedirs(args.json_config, exist_ok=True)
@@ -80,7 +89,7 @@ run.log("mse", mean_squared_error(preds, data["test"]["y"]))
 
 
 # Save model as part of the run history
-model_name = "sklearn_regression_model.pkl"
+
 # model_name = "."
 
 with open(model_name, "wb") as file:
