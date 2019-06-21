@@ -56,7 +56,16 @@ ws = Workspace.from_config(auth=cli_auth)
 #     )
 # )
 
-model_name = "sklearn_regression_model.pkl"
+try:
+    with open("aml_config/security_config.json") as f:
+        security_config = json.load(f)
+except:
+    print("No Security Config found")
+    sys.exit(0)
+
+# Run a published pipeline
+#model_name = "sklearn_regression_model.pkl"
+model_name = security_config["model_name"]
 model = Model(ws, name=model_name)
 
 os.chdir("./code/scoring")
