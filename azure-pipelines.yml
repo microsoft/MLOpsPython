@@ -1,7 +1,7 @@
 pool:
   vmImage: 'Ubuntu 16.04'
 
-container: dtzar/conda3mlops
+container: dtzar/conda3mlops:latest
 
 variables:
 - group: AzureKeyVaultSecrets
