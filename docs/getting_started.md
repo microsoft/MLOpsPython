@@ -112,10 +112,10 @@ On the next screen, click on **Save** and then click **Ok** to save the empty re
 1. This will open up a pop up window, on this screen:
     - for source type, select **Build**
     - for project, select your project in Azure DevOps that you created in previous steps.
-    - For Source select the source build pipeline. If you have forked the git repo, the build pipeline may named ``yourgitusername.DevOpsForAI``
+    - For Source select the source build pipeline. If you have forked the git repo, the build pipeline may named ``yourgitusername.MLOpsPython``
     - In the Source alias, replace the auto-populated value with 
     **``DevOpsForAI``**
-    - Field **Devault version** will get auto populated **Latest**, you can leave them as it is.
+    - Field **Default version** will get auto populated **Latest**, you can leave them as it is.
     - Click on **Add**, and then **Save** the pipeline
   ![release retraining artifact](./images/release-retrainingartifact.png)
 
