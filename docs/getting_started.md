@@ -27,7 +27,7 @@ Please make note the following values after creating a service principal, we wil
 **Note:** You must have sufficient permissions to register an application with your Azure AD tenant, and assign the application to a role in your Azure subscription. Contact your subscription adminstator if you don't have the permissions. Normally a subscription admin can create a Service principal and can provide you the details.
 
 
-### 4. Store secret in Key Vault and link it as variable group in Azure DevOps to be used by piplines.
+### 4. Store secret in Key Vault and link it as variable group in Azure DevOps to be used by pipelines.
 Our pipeline require the following variables to autheticate with Azure.
 - spidentity 
 - spsecret
