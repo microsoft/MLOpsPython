@@ -41,7 +41,7 @@ def get_absPath(filename):
 
 
 # number of features
-expected_columns = 10
+expected_columns = 11
 
 # distribution of features in the training set
 historical_mean = np.array(
