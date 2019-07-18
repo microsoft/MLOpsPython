@@ -26,7 +26,6 @@ POSSIBILITY OF SUCH DAMAGE.
 import pickle
 import json
 import numpy
-from sklearn.ensemble import RandomForestClassifier
 from azureml.core.model import Model
 
 

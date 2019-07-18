@@ -74,8 +74,6 @@ except Exception as message:
     sys.exit(0)
 
 run_id = config["run_id"]
-experiment_name = config["experiment_name"]
-# exp = Experiment(workspace=ws, name=experiment_name)
 
 run = Run(experiment=exp, run_id=run_id)
 names = run.get_file_names
@@ -93,7 +91,7 @@ print("Downloaded model {} to Project root directory".format(model_name))
 os.chdir("./model")
 model = Model.register(
     model_path=model_name,  # this points to a local file
-    model_name=model_name,  # this is the name the model is registered as
+    model_name=model_name,
     tags={"area": "diabetes", "type": "regression", "run_id": run_id},
     description="Regression model for diabetes dataset",
     workspace=ws,
@@ -104,9 +102,6 @@ print(
         model.name, model.description, model.version
     )
 )
-
-# Remove the evaluate.json as we no longer need it
-# os.remove("aml_config/evaluate.json")
 
 # Writing the registered model details to /aml_config/model.json
 model_json = {}
