@@ -67,10 +67,10 @@ try:
     with open(evaluate_output_path) as f:
         config = json.load(f)
     if not config["run_id"]:
-        raise Exception("No new model to register as production model perform better")
-except:
-    print("No new model to register as production model perform better")
-    # raise Exception('No new model to register as production model perform better')
+        raise Exception("No new model to register, since production model performs better")
+except Exception as message:
+    print('New model not registered. Reason:')
+    print(message)
     sys.exit(0)
 
 run_id = config["run_id"]
