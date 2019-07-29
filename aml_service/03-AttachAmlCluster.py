@@ -28,17 +28,16 @@ from azureml.core import Workspace
 from azureml.core.compute import ComputeTarget, AmlCompute
 from azureml.core.compute_target import ComputeTargetException
 from azureml.core.authentication import AzureCliAuthentication
-import os, json
+import os
+from dotenv import load_dotenv
 
 cli_auth = AzureCliAuthentication()
+load_dotenv()
+
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
-# Read the New VM Config
-with open("aml_config/security_config.json") as f:
-    config = json.load(f)
-
-aml_cluster_name = config["aml_cluster_name"]
+aml_cluster_name = os.environ.get('AML_CLUSTER_NAME')
 
 # un-comment the below lines if you want to put AML Compute under Vnet. Also update /aml_config/security_config.json
 # vnet_resourcegroup_name = config['vnet_resourcegroup_name']
@@ -51,10 +50,10 @@ try:
     print("Found existing cluster, use it.")
 except ComputeTargetException:
     compute_config = AmlCompute.provisioning_configuration(
-        vm_size="STANDARD_D2_V2",
-        vm_priority="dedicated",
-        min_nodes=1,
-        max_nodes=3,
+        vm_size=os.environ.get('AML_CLUSTER_VM_SIZE'),
+        vm_priority=os.environ.get('AML_CLUSTER_PRIORITY'),
+        min_nodes=int(os.environ.get('AML_CLUSTER_MIN_NODES')),
+        max_nodes=int(os.environ.get('AML_CLUSTER_MAX_NODES')),
         idle_seconds_before_scaledown="300",
         #    #Uncomment the below lines for VNet support
         #    vnet_resourcegroup_name=vnet_resourcegroup_name,

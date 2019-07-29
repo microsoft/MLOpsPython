@@ -26,6 +26,11 @@ Please make note the following values after creating a service principal, we wil
 
 **Note:** You must have sufficient permissions to register an application with your Azure AD tenant, and assign the application to a role in your Azure subscription. Contact your subscription adminstator if you don't have the permissions. Normally a subscription admin can create a Service principal and can provide you the details.
 
+### 3(b). Configure local development environment variables
+
+For local development, this project makes use of [python-dotenv](https://pypi.org/project/python-dotenv/). This pip package allows you to use a `.env` file to manage your environment variables at runtime. 
+
+The .env.example file is a template. To run this code locally, create a file in the root of this project titled `.env`, and add in the key-value pairs for each of the environment variables found in the `.env.example`, as well as any environment variables needed for your custom scripts that will run on the build agent.
 
 ### 4. Store secret in Key Vault and link it as variable group in Azure DevOps to be used by piplines.
 Our pipeline require the following variables to autheticate with Azure.

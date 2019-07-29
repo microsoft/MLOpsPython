@@ -24,19 +24,20 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 from azureml.core import Workspace
-import os, json, sys
+import os
+import json
 import azureml.core
 from azureml.core.authentication import AzureCliAuthentication
+from dotenv import load_dotenv
+
+load_dotenv()
 
 print("SDK Version:", azureml.core.VERSION)
-# print('current dir is ' +os.curdir)
-with open("aml_config/config.json") as f:
-    config = json.load(f)
 
-workspace_name = config["workspace_name"]
-resource_group = config["resource_group"]
-subscription_id = config["subscription_id"]
-location = config["location"]
+workspace_name = os.environ.get('WORKSPACE_NAME')
+resource_group = os.environ.get('RESOURCE_GROUP')
+subscription_id = os.environ.get('SUBSCRIPTION_ID')
+location = os.environ.get('LOCATION')
 
 cli_auth = AzureCliAuthentication()
 
@@ -59,6 +60,9 @@ except:
         location=location,
         auth=cli_auth,
     )
+
+# Save the details of this workspace to config
+ws.write_config()
 
 # print Workspace details
 print(ws.name, ws.resource_group, ws.location, ws.subscription_id, sep="\n")

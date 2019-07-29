@@ -26,6 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import os, json, requests, datetime
 import argparse
+from dotenv import load_dotenv
 from azureml.core import Workspace, Experiment, Datastore
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
 from azureml.data.data_reference import DataReference
@@ -41,7 +42,7 @@ from azureml.core.authentication import AzureCliAuthentication
 print("Pipeline SDK-specific imports completed")
 
 cli_auth = AzureCliAuthentication()
-
+load_dotenv()
 
 parser = argparse.ArgumentParser("Pipeline")
 parser.add_argument(

@@ -34,8 +34,10 @@ from azureml.core.compute import RemoteCompute
 from azureml.core.compute import DsvmCompute
 from azureml.core.compute_target import ComputeTargetException
 from azureml.core.authentication import AzureCliAuthentication
+from dotenv import load_dotenv
 
 cli_auth = AzureCliAuthentication()
+load_dotenv()
 
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
@@ -44,10 +46,10 @@ ws = Workspace.from_config(auth=cli_auth)
 with open("aml_config/security_config.json") as f:
     config = json.load(f)
 
-remote_vm_name = config["remote_vm_name"]
-remote_vm_username = config["remote_vm_username"]
-remote_vm_password = config["remote_vm_password"]
-remote_vm_ip = config["remote_vm_ip"]
+remote_vm_name = os.environ.get('REMOTE_VM_NAME')
+remote_vm_username = os.environ.get('REMOTE_VM_USERNAME')
+remote_vm_password = os.environ.get('REMOTE_VM_PASSWORD')
+remote_vm_ip = os.environ.get('REMOTE_VM_IP')
 
 try:
     dsvm_compute = RemoteCompute.attach(
