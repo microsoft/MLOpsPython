@@ -15,7 +15,11 @@ trigger:
 
 variables:
   containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
+<<<<<<< HEAD
   imageName: $[coalesce(variables['agentImageName'], 'public/mlops/mlopspython')]  
+=======
+  imageName: $[coalesce(variables['imageName'], 'public/mlops/mlopspython')]  
+>>>>>>> 176319a31930500d855b0a1183f32de2c567ce07
 
 steps:
   - task: Docker@2
