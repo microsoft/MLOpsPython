@@ -1,0 +1,27 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - environment_setup/arm-templates/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  baseName: $[coalesce(variables['baseNameOverride'], 'mlops')]
+  location: $[coalesce(variables['locationOverride'], 'centralus')]
+  azuresub: $[coalesce(variables['azuresubOverride'], 'davete02_sub')]
+
+
+steps:
+- task: AzureResourceGroupDeployment@2
+  inputs:
+    azureSubscription: $(azuresub)
+    action: 'DeleteRG'
+    resourceGroupName: '$(baseName)-AML-RG'
+    location: $(location)
+  displayName: 'Delete resources in Azure'
+
+  
