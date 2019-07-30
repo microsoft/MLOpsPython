@@ -24,6 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os, json
+from dotenv import load_dotenv
 from azureml.core import Workspace
 from azureml.core import Experiment
 from azureml.core.model import Model
@@ -32,7 +33,7 @@ from azureml.core import Run
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
-
+load_dotenv()
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
@@ -41,12 +42,12 @@ ws = Workspace.from_config(auth=cli_auth)
 # Add golden data set on which all the model performance can be evaluated
 
 # Get the latest run_id
-with open("aml_config/run_id.json") as f:
-    config = json.load(f)
-
-new_model_run_id = config["run_id"]
-experiment_name = config["experiment_name"]
+experiment_name = os.environ["EXPERIMENT_NAME"]
 exp = Experiment(workspace=ws, name=experiment_name)
+
+runs = exp.get_runs()
+new_model_run = next(runs)
+new_model_run_id = new_model_run.id
 
 
 try:
@@ -64,7 +65,6 @@ try:
 
     # Get the run history for both production model and newly trained model and compare mse
     production_model_run = Run(exp, run_id=production_model_run_id)
-    new_model_run = Run(exp, run_id=new_model_run_id)
 
     production_model_mse = production_model_run.get_metrics().get("mse")
     new_model_mse = new_model_run.get_metrics().get("mse")

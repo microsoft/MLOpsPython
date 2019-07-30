@@ -24,6 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os, json
+from dotenv import load_dotenv
 from azureml.core import Workspace
 from azureml.core import Experiment
 from azureml.core.compute import RemoteCompute
@@ -33,18 +34,17 @@ import azureml.core
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
+load_dotenv()
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
 
 # Read the New VM Config
-with open("aml_config/security_config.json") as f:
-    config = json.load(f)
-remote_vm_name = config["remote_vm_name"]
+remote_vm_name = os.environ['REMOTE_VM_NAME']
 
 
 # Attach Experiment
-experiment_name = "devops-ai-demo"
+experiment_name = os.environ['EXPERIMENT_NAME']
 exp = Experiment(workspace=ws, name=experiment_name)
 print(exp.name, exp.workspace.name, sep="\n")
 
@@ -57,7 +57,9 @@ run_config.environment.python.user_managed_dependencies = True
 
 
 src = ScriptRunConfig(
-    source_directory="./code", script="training/train.py", run_config=run_config
+    source_directory=os.environ['SCRIPT_FOLDER'],
+    script="training/train.py",
+    run_config=run_config
 )
 run = exp.submit(src)
 

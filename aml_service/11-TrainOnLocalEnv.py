@@ -25,7 +25,9 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 ## Create a new Conda environment on local and train the model
 ## System-managed environment
-
+import os
+import json
+from dotenv import load_dotenv
 from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.runconfig import RunConfiguration
 from azureml.core import Workspace
@@ -35,12 +37,12 @@ from azureml.core import ScriptRunConfig
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
-
+load_dotenv()
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
 # Attach Experiment
-experiment_name = "devops-ai-demo"
+experiment_name = os.environ['EXPERIMENT_NAME']
 exp = Experiment(workspace=ws, name=experiment_name)
 print(exp.name, exp.workspace.name, sep="\n")
 
@@ -57,9 +59,9 @@ run_config_system_managed.prepare_environment = True
 
 print("Submitting an experiment to new conda virtual env")
 src = ScriptRunConfig(
-    source_directory="./code",
+    source_directory=os.environ['SCRIPT_FOLDER'],
     script="training/train.py",
-    run_config=run_config_user_managed,
+    run_config=run_config_system_managed,
 )
 run = exp.submit(src)
 

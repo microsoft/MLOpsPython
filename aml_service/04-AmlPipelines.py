@@ -58,25 +58,23 @@ args = parser.parse_args()
 
 
 # Get workspace
-ws = Workspace.from_config(path="aml_config/config.json", auth=cli_auth)
-def_blob_store = Datastore(ws, "workspaceblobstore")
+ws = Workspace.from_config(auth=cli_auth)
+blob_store_name = os.environ['BLOB_STORE_NAME']
+def_blob_store = Datastore(ws, blob_store_name)
 
 # Get AML Compute name and Experiment Name
-with open("aml_config/security_config.json") as f:
-    config = json.load(f)
+experiment_name = os.environ['EXPERIMENT_NAME']
+aml_cluster_name = os.environ['AML_CLUSTER_NAME']
+aml_pipeline_name = os.environ['TRAINING_PIPELINE_NAME']
+default_model_name = os.environ['MODEL_NAME']
+model_name = PipelineParameter(name="model_name", default_value=default_model_name)
 
-experiment_name = config["experiment_name"]
-aml_cluster_name = config["aml_cluster_name"]
-aml_pipeline_name = "training-pipeline"
-#model_name = config["model_name"]
-model_name = PipelineParameter(name="model_name", default_value="sklearn_regression_model.pkl")
-
-source_directory = "code"
+source_directory = os.environ.get('TRAINING_CODE_SOURCE_DIR', 'code')
 
 # Run Config
 # Declare packages dependencies required in the pipeline (these can also be expressed as a YML file)
 # cd = CondaDependencies.create(pip_packages=["azureml-defaults", 'tensorflow==1.8.0'])
-cd = CondaDependencies("aml_config/conda_dependencies.yml")
+cd = CondaDependencies(os.environ['PIPELINE_CONDA_PATH'])
 
 run_config = RunConfiguration(conda_dependencies=cd)
 aml_compute = ws.compute_targets[aml_cluster_name]

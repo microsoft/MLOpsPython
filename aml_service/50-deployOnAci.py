@@ -24,6 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os, json, datetime, sys
+from dotenv import load_dotenv
 from operator import attrgetter
 from azureml.core import Workspace
 from azureml.core.model import Model
@@ -33,6 +34,7 @@ from azureml.core.webservice import AciWebservice
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
+load_dotenv()
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)  # Get the Image to deploy details
 try:
@@ -44,8 +46,8 @@ except:
     sys.exit(0)
 
 
-image_name = config["image_name"]
-image_version = config["image_version"]
+image_name = os.environ["IMAGE_NAME"]
+image_version = int(os.environ['IMAGE_VERSION'])
 
 images = Image.list(workspace=ws)
 image, = (m for m in images if m.version == image_version and m.name == image_name)
@@ -58,12 +60,12 @@ print(
 # image = max(images, key=attrgetter('version'))
 # print('From Max Version, Image used to deploy webservice on ACI: {}\nImage Version: {}\nImage Location = {}'.format(image.name, image.version, image.image_location))
 
-
+# TODO: parameterize tagging
 aciconfig = AciWebservice.deploy_configuration(
-    cpu_cores=1,
-    memory_gb=1,
+    cpu_cores=int(os.environ['ACI_CPU_CORES']),
+    memory_gb=int(os.environ['ACI_MEM_GB']),
     tags={"area": "diabetes", "type": "regression"},
-    description="A sample description",
+    description=os.environ['ACI_DESCRIPTION'],
 )
 
 aci_service_name = "aciwebservice" + datetime.datetime.now().strftime("%m%d%H")

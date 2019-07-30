@@ -23,7 +23,8 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-
+import os
+from dotenv import load_dotenv
 from azureml.core.runconfig import RunConfiguration
 from azureml.core import Workspace
 from azureml.core import Experiment
@@ -32,12 +33,13 @@ import json
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
+load_dotenv()
 
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
 # Attach Experiment
-experiment_name = "devops-ai-demo"
+experiment_name = os.environ['EXPERIMENT_NAME']
 exp = Experiment(workspace=ws, name=experiment_name)
 print(exp.name, exp.workspace.name, sep="\n")
 
@@ -47,7 +49,7 @@ run_config_user_managed.environment.python.user_managed_dependencies = True
 
 print("Submitting an experiment.")
 src = ScriptRunConfig(
-    source_directory="./code",
+    source_directory=os.environ['SCRIPT_FOLDER'],
     script="training/train.py",
     run_config=run_config_user_managed,
 )

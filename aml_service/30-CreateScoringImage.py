@@ -24,13 +24,14 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os, json, sys
+from dotenv import load_dotenv
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
 from azureml.core.model import Model
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
-
+load_dotenv()
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
@@ -56,26 +57,20 @@ ws = Workspace.from_config(auth=cli_auth)
 #     )
 # )
 
-try:
-    with open("aml_config/security_config.json") as f:
-        security_config = json.load(f)
-except:
-    print("No Security Config found")
-    sys.exit(0)
-
 # Run a published pipeline
 #model_name = "sklearn_regression_model.pkl"
-model_name = security_config["model_name"]
+model_name = os.environ['MODEL_NAME']
 model = Model(ws, name=model_name)
 
 os.chdir("./code/scoring")
-image_name = "diabetes-model-score"
+image_name = os.environ['IMAGE_NAME']
 
+# TODO: Parameterize tagging
 image_config = ContainerImage.image_configuration(
     execution_script="score.py",
     runtime="python",
     conda_file="conda_dependencies.yml",
-    description="Image with ridge regression model",
+    description=os.environ['IMAGE_DESCRIPTION'],
     tags={"area": "diabetes", "type": "regression"},
 )
 

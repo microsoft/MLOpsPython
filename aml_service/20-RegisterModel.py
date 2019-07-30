@@ -24,6 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os, json, sys
+from dotenv import load_dotenv
 from azureml.core import Workspace
 from azureml.core import Run
 from azureml.core import Experiment
@@ -33,7 +34,7 @@ from azureml.core.runconfig import RunConfiguration
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
-
+load_dotenv()
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
@@ -49,7 +50,7 @@ except:
     sys.exit(0)
 
 run_id = config["run_id"]
-experiment_name = config["experiment_name"]
+experiment_name = os.environ['EXPERIMENT_NAME']
 exp = Experiment(workspace=ws, name=experiment_name)
 
 run = Run(experiment=exp, run_id=run_id)
@@ -60,12 +61,13 @@ model_local_dir = "model"
 os.makedirs(model_local_dir, exist_ok=True)
 
 # Download Model to Project root directory
-model_name = "sklearn_regression_model.pkl"
+model_name = os.environ['MODEL_NAME']
 run.download_file(
     name="./outputs/" + model_name, output_file_path="./model/" + model_name
 )
 print("Downloaded model {} to Project root directory".format(model_name))
 os.chdir("./model")
+# TODO: Parameterize tagging
 model = Model.register(
     model_path=model_name,  # this points to a local file
     model_name=model_name,  # this is the name the model is registered as

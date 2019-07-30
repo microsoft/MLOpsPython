@@ -24,6 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os, json, datetime, sys
+from dotenv import load_dotenv
 from operator import attrgetter
 from azureml.core import Workspace
 from azureml.core.model import Model
@@ -33,20 +34,13 @@ from azureml.core.webservice import Webservice, AksWebservice
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
+load_dotenv()
 # Get workspace
 ws = Workspace.from_config(auth=cli_auth)
 
 # Get the Image to deploy details
-try:
-    with open("aml_config/image.json") as f:
-        config = json.load(f)
-except:
-    print("No new model, thus no deployment on ACI")
-    # raise Exception('No new model to register as production model perform better')
-    sys.exit(0)
-
-image_name = config["image_name"]
-image_version = config["image_version"]
+image_name = os.environ['IMAGE_NAME']
+image_version = os.environ["IMAGE_VERSION"]
 
 images = Image.list(workspace=ws)
 image, = (m for m in images if m.version == image_version and m.name == image_name)
