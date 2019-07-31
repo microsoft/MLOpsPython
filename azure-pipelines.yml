@@ -1,7 +1,9 @@
 pool:
   vmImage: 'Ubuntu 16.04'
 
-container: dtzar/conda3mlops:latest
+container:
+  image: mlopscr.azurecr.io/public/mlops/mlopspython:latest
+  endpoint: acrconnection
 
 variables:
 - group: AzureKeyVaultSecrets

@@ -1,7 +1,13 @@
 FROM conda/miniconda3
 
-COPY . /setup
+LABEL org.label-schema.vendor = "Microsoft" \
+      org.label-schema.url = "https://hub.docker.com/r/microsoft/mlopspython" \
+      org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
-RUN ["apt", "update"]
-RUN apt install gcc -y && pip install -r /setup/requirements.txt
-RUN pip install azure-cli==2.0.65 && pip install --upgrade azureml-sdk[cli]
+       
+
+COPY environment_setup/requirements.txt  /setup/
+	
+RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt   
+
+CMD ["python"]

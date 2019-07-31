@@ -13,20 +13,17 @@ trigger:
     include:
     - environment_setup/*
 
+variables:
+  containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
+  imageName: $[coalesce(variables['agentImageName'], 'public/mlops/mlopspython')]  
+
 steps:
-
-- task: Docker@2
-  displayName: Login to Docker Hub
-  inputs:
-    command: login
-    containerRegistry: msftDockerHub
-
-- task: Docker@2
-  displayName: 'Build and push an image'
-  inputs:
-    command: buildAndPush
-    repository: dtzar/conda3mlops
-    buildContext: '$(Build.SourcesDirectory)/environment_setup'
-    tags: |
-      $(Build.BuildNumber)
-      latest
+  - task: Docker@2
+    displayName: Build and Push
+    inputs:
+      command: buildAndPush
+      containerRegistry: '$(containerRegistry)'
+      repository: '$(imageName)'
+      tags: 'latest'
+      buildContext: '$(Build.SourcesDirectory)' 
+      dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'

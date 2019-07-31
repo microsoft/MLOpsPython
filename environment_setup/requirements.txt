@@ -1,5 +1,7 @@
-scipy==1.0.0
-scikit-learn==0.19.1
-numpy==1.14.5
-pandas==0.23.1
 pytest==4.3.0
+requests>=2.22
+azureml>=0.2
+azureml-core>=1.0
+azureml-pipeline>=1.0 
+azure-cli==2.0.46
+azureml-sdk[cli]
