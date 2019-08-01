@@ -1,0 +1,10 @@
+scipy==1.0.0
+scikit-learn==0.19.1
+numpy==1.14.5
+pandas==0.23.1
+pytest==4.3.0
+requests>=2.22 #.0
+azureml>=0.2 #.7
+azureml-core>=1.0 #.45
+azureml-pipeline>=1.0 #.45
+python-dotenv>=0.10.3

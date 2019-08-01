@@ -1,0 +1,25 @@
+parameters:
+  requirementsPath: 'requirements.txt'
+  pipelineType: 'train'
+
+steps:
+- script: |
+   flake8 --output-file=$(Build.BinariesDirectory)/flake8_amlservice_testresults.xml aml_service
+   flake8 --output-file=$(Build.BinariesDirectory)/flake8_tests_testresults.xml tests
+  workingDirectory: '$(Build.SourcesDirectory)/Code'
+  displayName: 'Run code quality tests'
+  enabled: 'true'
+
+- script: |
+   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/Code/tests/unit/${{parameters.pipelineType}}
+  displayName: 'Run unit tests'
+  enabled: 'true'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(Build.BinariesDirectory)/*_testresults.xml'
+    testRunTitle: 'Unit tests'
+    failTaskOnFailedTests: true
+  displayName: 'Publish unit test results'
+  enabled: 'true'

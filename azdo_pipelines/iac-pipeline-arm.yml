@@ -1,0 +1,35 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - iac/arm-templates/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  baseName: $[coalesce(variables['baseNameOverride'], 'pepsiml')]
+  location: $[coalesce(variables['locationOverride'], 'centralus')]
+  azuresub: $[coalesce(variables['azuresubOverride'], 'davete02_TED')]
+  containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
+  imageName: $[coalesce(variables['builderImageName'], 'mlopsbuildagent')]  
+
+
+steps:
+- task: AzureResourceGroupDeployment@2
+  inputs:
+    azureSubscription: $(azuresub)
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: '$(baseName)-AML-RG'
+    location: $(location)
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Build.SourcesDirectory)/Code/iac/arm-templates/cloud-environment.json'
+    overrideParameters: '-baseName $(baseName)'
+    deploymentMode: 'Incremental'
+  displayName: 'Deploy MLOps resources to Azure'
+
+- template: templates/docker-builder-image-template.yml
+
+  

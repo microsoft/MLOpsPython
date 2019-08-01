@@ -1,0 +1,36 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+
+container:
+  image: $(FULL_AGENT_IMAGE_NAME)
+  endpoint: acrconnection
+
+
+variables:
+  SOURCES_DIR: $[coalesce(variables['SOURCES_DIR_OVERRIDE'], '$(Build.SourcesDirectory)/Code/src/train')]
+  TRAIN_SCRIPT_PATH: $[coalesce(variables['TRAIN_SCRIPT_PATH_OVERRIDE'], 'src/train/train.py')]
+
+
+steps:
+- template: base-pipeline.yml
+  parameters:
+    requirementsPath: 'requirements.txt'
+
+- bash: |
+   # Invoke the Python training pipeline
+      
+   python3 $(Build.SourcesDirectory)/Code/aml_service/pipelines/train_pipeline.py
+  failOnStderr: 'false'
+  env:
+    SOURCES_DIR: '$(Build.SourcesDirectory)'
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
+    BLOB_STORAGE_Key: '$(BLOB_STORAGE_Key)'
+  displayName: 'Train model using AML with Remote Compute'
+  enabled: 'true'
