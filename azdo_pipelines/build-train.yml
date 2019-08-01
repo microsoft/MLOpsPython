@@ -19,10 +19,6 @@ variables:
 
 
 steps:
-- template: base-pipeline.yml
-  parameters:
-    requirementsPath: 'requirements.txt'
-
 - bash: |
    # Invoke the Python training pipeline
       
