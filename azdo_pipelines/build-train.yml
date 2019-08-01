@@ -10,7 +10,7 @@ pool:
 
 container:
   image: pepsimlamlcr.azurecr.io/mlopsbuildagent:latest
-  endpoint: acrconnection
+  endpoint: acrbackupconnection
 
 
 variables:
