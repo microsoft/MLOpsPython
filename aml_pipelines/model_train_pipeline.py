@@ -32,22 +32,22 @@ def main():
     experiment_name = os.environ.get("EXPERIMENT_NAME")
 
     # Get Azure machine learning workspace
-    #aml_workspace = get_workspace(
-    #    workspace_name,
-    #    resource_group,
-    #    subscription_id,
-    #    tenant_id,
-    #    app_id,
-    #    app_secret)
-    #print(aml_workspace)    
+    aml_workspace = get_workspace(
+        workspace_name,
+        resource_group,
+        subscription_id,
+        tenant_id,
+        app_id,
+        app_secret)
+    print(aml_workspace)    
 
     # Get Azure machine learning cluster
-    #aml_compute_cpu = get_compute(
-    #    aml_workspace,
-    #    compute_name_cpu,
-    #    vm_size_cpu)
-    #if aml_compute_cpu is not None:
-    #    print(aml_compute_cpu)
+    aml_compute_cpu = get_compute(
+        aml_workspace,
+        compute_name_cpu,
+        vm_size_cpu)
+    if aml_compute_cpu is not None:
+        print(aml_compute_cpu)
 
     run_config = RunConfiguration(conda_dependencies=CondaDependencies.create(
         conda_packages=['numpy', 'pandas',
@@ -58,8 +58,6 @@ def main():
     )
     run_config.environment.docker.enabled = True
 
-    aml_compute_cpu=None
-    aml_workspace=None
     model_name = PipelineParameter(name="model_name", default_value="sklearn_regression_model.pkl")
     def_blob_store = Datastore(aml_workspace, "workspaceblobstore")
     jsonconfigs = PipelineData("jsonconfigs", datastore=def_blob_store)
