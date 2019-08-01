@@ -10,7 +10,7 @@ pool:
 
 container:
   image: pepsimlamlcr.azurecr.io/mlopsbuildagent:latest
-  endpoint: acrconnection
+  endpoint: acrbackupconnection
 
 
 variables:
@@ -19,10 +19,6 @@ variables:
 
 
 steps:
-- template: base-pipeline.yml
-  parameters:
-    requirementsPath: 'requirements.txt'
-
 - bash: |
    # Invoke the Python training pipeline
       
