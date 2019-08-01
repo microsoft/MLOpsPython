@@ -1,9 +1,9 @@
 pool:
   vmImage: 'Ubuntu 16.04'
-#Your build pipeline references a secret variable named ‘sp_username’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
-#Your build pipeline references a secret variable named ‘sp_password’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
-#Your build pipeline references a secret variable named ‘sp_tenantid’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
-#Your build pipeline references a secret variable named ‘subscription_id’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+
+container:
+  image: mlopscr.azurecr.io/public/mlops/mlopspython:latest
+  endpoint: acrconnection
 
 variables:
 - group: AzureKeyVaultSecrets
@@ -14,18 +14,6 @@ trigger:
 - develop
 
 steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.6'
-    architecture: 'x64'   
-
-- task: Bash@3
-  displayName: 'Install Requirements'
-  inputs:
-    targetType: filePath
-    filePath: 'environment_setup/install_requirements.sh'
-    workingDirectory: 'environment_setup'
-
 - script: | 
    az login --service-principal -u $(spidentity) -p $(spsecret) --tenant $(sptenant)
    
