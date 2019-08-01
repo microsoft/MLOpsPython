@@ -22,7 +22,7 @@ steps:
 - bash: |
    # Invoke the Python training pipeline
       
-   python3 $(Build.SourcesDirectory)/Code/aml_pipelines/model_train_pipeline.py
+   python3 $(Build.SourcesDirectory)/aml_pipelines/model_train_pipeline.py
   failOnStderr: 'false'
   env:
     SOURCES_DIR: '$(Build.SourcesDirectory)'
