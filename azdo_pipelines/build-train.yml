@@ -13,7 +13,7 @@ container:
 
 
 variables:
-- group: my-variable-group
+- group: devopsforai-aml-vg
 - name: SOURCES_DIR
   value: $[coalesce(variables['SOURCES_DIR_OVERRIDE'], '$(Build.SourcesDirectory)/Code/src/train')]
 - name: SOURCES_DIR  
