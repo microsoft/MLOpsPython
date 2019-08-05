@@ -25,8 +25,7 @@ steps:
    #python3 $(Build.SourcesDirectory)/aml_pipelines/model_train_pipeline.py
   failOnStderr: 'false'
   env:
-    SOURCES_DIR: '$(Build.SourcesDirectory)'
-    SP_APP_SECRET: $RESOURCE_GROUP
+    SOURCES_DIR: '$(Build.SourcesDirectory)'    
     BLOB_STORAGE_Key: '$(BLOB_STORAGE_Key)'
   displayName: 'Train model using AML with Remote Compute'
   enabled: 'true'
