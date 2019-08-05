@@ -26,7 +26,7 @@ steps:
   failOnStderr: 'false'
   env:
     SOURCES_DIR: '$(Build.SourcesDirectory)'
-    SP_APP_SECRET: '$(RESOURCE_GROUP)'
+    SP_APP_SECRET: $RESOURCE_GROUP
     BLOB_STORAGE_Key: '$(BLOB_STORAGE_Key)'
   displayName: 'Train model using AML with Remote Compute'
   enabled: 'true'
