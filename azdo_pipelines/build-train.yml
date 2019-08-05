@@ -21,7 +21,7 @@ variables:
 steps:
 - bash: |
    # Invoke the Python training pipeline
-   echo $SOURCES_DIR   
+   printenv
    #python3 $(Build.SourcesDirectory)/aml_pipelines/model_train_pipeline.py
   failOnStderr: 'false'
   env:
