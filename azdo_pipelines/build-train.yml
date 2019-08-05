@@ -14,20 +14,14 @@ container:
 
 variables:
 - group: devopsforai-aml-vg
-- name: SOURCES_DIR
-  value: $[coalesce(variables['SOURCES_DIR_OVERRIDE'], '$(Build.SourcesDirectory)/Code/src/train')]
-- name: SOURCES_DIR  
-  value: $[coalesce(variables['TRAIN_SCRIPT_PATH_OVERRIDE'], 'src/train/train.py')]
 
 
 steps:
 - bash: |
    # Invoke the Python training pipeline
-   printenv
    python3 $(Build.SourcesDirectory)/aml_pipelines/model_train_pipeline.py
   failOnStderr: 'false'
   env:
-    SOURCES_DIR: '$(Build.SourcesDirectory)'    
     BLOB_STORAGE_Key: '$(BLOB_STORAGE_Key)'
     SP_APP_SECRET: '$(SP_APP_SECRET)'
   displayName: 'Train model using AML with Remote Compute'

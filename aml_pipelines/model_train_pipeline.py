@@ -27,6 +27,9 @@ def main():
     app_id = os.environ.get("SP_APP_ID")
     app_secret = os.environ.get("SP_APP_SECRET")
     sources_directory_train = os.environ.get("SOURCES_DIR_TRAIN")
+    train_script_path = os.environ.get("TRAIN_SCRIPT_PATH")
+    evaluate_script_path = os.environ.get("EVALUATE_SCRIPT_PATH")
+    register_script_path = os.environ.get("REGISTER_SCRIPT_PATH")    
     vm_size_cpu = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
     compute_name_cpu = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
     experiment_name = os.environ.get("EXPERIMENT_NAME")
@@ -65,7 +68,7 @@ def main():
 
     train_step = PythonScriptStep(
         name="Train Model",
-        script_name="training/train.py",
+        script_name=train_script_path,
         compute_target=aml_compute_cpu,
         source_directory=sources_directory_train,
         arguments=[
@@ -82,7 +85,7 @@ def main():
 
     evaluate_step = PythonScriptStep(
         name="Evaluate Model ",
-        script_name="evaluate/evaluate_model.py",
+        script_name=evaluate_script_path,
         compute_target=aml_compute_cpu,
         source_directory=sources_directory_train,
         arguments=[
@@ -98,7 +101,7 @@ def main():
 
     register_model_step = PythonScriptStep(
         name="Register New Trained Model",
-        script_name="register/register_model.py",
+        script_name=register_script_path,
         compute_target=aml_compute_cpu,
         source_directory=sources_directory_train,
         arguments=[
