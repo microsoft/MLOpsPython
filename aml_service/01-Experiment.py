@@ -34,7 +34,10 @@ cli_auth = AzureCliAuthentication()
 
 def getExperiment():
     load_dotenv()
-    ws = Workspace.from_config(auth=cli_auth)
+    ws = Workspace.from_config(auth=cli_auth, path='./')
+
+
+
     script_folder = os.environ.get('SCRIPT_FOLDER')
     experiment_name = os.environ.get('EXPERIMENT_NAME')
     exp = Experiment(workspace=ws, name=experiment_name)

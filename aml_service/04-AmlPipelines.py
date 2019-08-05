@@ -58,9 +58,15 @@ args = parser.parse_args()
 
 
 # Get workspace
-ws = Workspace.from_config(auth=cli_auth)
+ws = Workspace.from_config(auth=cli_auth, path='./')
+
+
+
 blob_store_name = os.environ['BLOB_STORE_NAME']
-def_blob_store = Datastore(ws, blob_store_name)
+if blob_store_name is not None:
+    def_blob_store = Datastore(ws, blob_store_name)
+else:
+    def_blob_store = Datastore.get_default(ws)
 
 # Get AML Compute name and Experiment Name
 experiment_name = os.environ['EXPERIMENT_NAME']

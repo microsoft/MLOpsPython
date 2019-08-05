@@ -35,7 +35,10 @@ cli_auth = AzureCliAuthentication()
 load_dotenv()
 
 # Get workspace
-ws = Workspace.from_config(auth=cli_auth)
+ws = Workspace.from_config(auth=cli_auth, path='./')
+
+
+
 
 aml_cluster_name = os.environ.get('AML_CLUSTER_NAME')
 
@@ -62,4 +65,4 @@ except ComputeTargetException:
     )
     cpu_cluster = ComputeTarget.create(ws, aml_cluster_name, compute_config)
 
-cpu_cluster.wait_for_completion(show_output=True)
+    cpu_cluster.wait_for_completion(show_output=True)

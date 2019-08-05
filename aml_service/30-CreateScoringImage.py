@@ -33,7 +33,10 @@ from azureml.core.authentication import AzureCliAuthentication
 cli_auth = AzureCliAuthentication()
 load_dotenv()
 # Get workspace
-ws = Workspace.from_config(auth=cli_auth)
+ws = Workspace.from_config(auth=cli_auth, path='./')
+
+
+
 
 # Get the latest model details
 

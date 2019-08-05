@@ -62,7 +62,7 @@ except:
     )
 
 # Save the details of this workspace to config
-ws.write_config()
+ws.write_config(path='./')
 
 # print Workspace details
 print(ws.name, ws.resource_group, ws.location, ws.subscription_id, sep="\n")

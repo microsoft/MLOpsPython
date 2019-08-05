@@ -35,7 +35,10 @@ from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
 # Get workspace
-ws = Workspace.from_config(auth=cli_auth)
+ws = Workspace.from_config(auth=cli_auth, path='./')
+
+
+
 # Get the ACI Details
 try:
     with open("aml_config/aci_webservice.json") as f:
