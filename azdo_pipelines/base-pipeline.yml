@@ -5,7 +5,7 @@ steps:
 - script: |
    flake8 --output-file=$(Build.BinariesDirectory)/flake8_amlservice_testresults.xml aml_service
    flake8 --output-file=$(Build.BinariesDirectory)/flake8_tests_testresults.xml tests
-  workingDirectory: '$(Build.SourcesDirectory)/Code'
+  workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Run code quality tests'
   enabled: 'true'
 
