@@ -7,15 +7,17 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-
 container:
   image: pepsimlamlcr.azurecr.io/mlopsbuildagent:latest
   endpoint: acrbackupconnection
 
 
 variables:
-  SOURCES_DIR: $[coalesce(variables['SOURCES_DIR_OVERRIDE'], '$(Build.SourcesDirectory)/Code/src/train')]
-  TRAIN_SCRIPT_PATH: $[coalesce(variables['TRAIN_SCRIPT_PATH_OVERRIDE'], 'src/train/train.py')]
+- group: my-variable-group
+- name: SOURCES_DIR
+  value: $[coalesce(variables['SOURCES_DIR_OVERRIDE'], '$(Build.SourcesDirectory)/Code/src/train')]
+- name: SOURCES_DIR  
+  value: $[coalesce(variables['TRAIN_SCRIPT_PATH_OVERRIDE'], 'src/train/train.py')]
 
 
 steps:
