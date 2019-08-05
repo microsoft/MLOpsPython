@@ -1,6 +1,5 @@
 parameters:
-  requirementsPath: 'requirements.txt'
-  pipelineType: 'train'
+  pipelineType: 'training'
 
 steps:
 - script: |
@@ -10,10 +9,10 @@ steps:
   displayName: 'Run code quality tests'
   enabled: 'true'
 
-- script: |
-   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/Code/tests/unit/${{parameters.pipelineType}}
-  displayName: 'Run unit tests'
-  enabled: 'true'
+#- script: |
+#   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/Code/tests/unit/${{parameters.pipelineType}}
+#  displayName: 'Run unit tests'
+#  enabled: 'true'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
