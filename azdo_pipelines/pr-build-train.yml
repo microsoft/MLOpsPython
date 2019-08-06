@@ -1,0 +1,19 @@
+trigger: none
+pr:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+
+container:
+  image: $(FULL_AGENT_IMAGE_NAME)
+  endpoint: acrconnection
+
+
+steps:
+- template: base-pipeline.yml
+  parameters:
+    requirementsPath: 'requirements.txt'
