@@ -18,11 +18,7 @@ variables:
 
 steps:
 - script: |
-   ls -ltr
-   echo 'hi'
    flake8 --output-file=$(Build.BinariesDirectory)/flake8_testresults.xml --format junit-xml  
-   cat $(Build.BinariesDirectory)/flake8_testresults.xml
-   ls -ltr $(Build.BinariesDirectory)
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Run code quality tests'
   enabled: 'true'
