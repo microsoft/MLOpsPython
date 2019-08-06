@@ -26,13 +26,10 @@ POSSIBILITY OF SUCH DAMAGE.
 import os
 import json
 import sys
-from azureml.core import Workspace
 from azureml.core import Run
-from azureml.core import Experiment
 from azureml.core.model import Model
 import argparse
 
-from azureml.core.runconfig import RunConfiguration
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
@@ -79,7 +76,7 @@ try:
     if not config["run_id"]:
         raise Exception(
             "No new model to register as production model perform better")
-except:
+except Exception:
     print("No new model to register as production model perform better")
     # raise Exception('No new model to register as production model perform better')
     sys.exit(0)

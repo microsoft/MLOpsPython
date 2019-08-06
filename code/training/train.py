@@ -23,7 +23,6 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-from azureml.core import Workspace
 from azureml.core.run import Run
 import os
 import argparse
@@ -34,8 +33,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
 import numpy as np
 import json
-import subprocess
-from typing import Tuple, List
 
 
 parser = argparse.ArgumentParser("train")

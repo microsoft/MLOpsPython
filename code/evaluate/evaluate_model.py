@@ -25,7 +25,6 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 import os
 import json
-from azureml.core import Workspace
 from azureml.core.model import Model
 from azureml.core import Run
 import argparse
@@ -74,8 +73,10 @@ experiment_name = config["experiment_name"]
 
 
 try:
-    # Get most recently registered model, we assume that is the model in production.
-    #  Download this model and compare it with the recently trained model by running test with same data set.
+    # Get most recently registered model, we assume that 
+    # is the model in production.
+    # Download this model and compare it with the recently
+    # trained model by running test with same data set.
     model_list = Model.list(ws)
     production_model = next(
         filter(
@@ -104,7 +105,7 @@ try:
     if new_model_mse < production_model_mse:
         promote_new_model = True
         print("New trained model performs better, thus it will be registered")
-except:
+except Exception:
     promote_new_model = True
     print("This is the first model to be trained, thus nothing to evaluate for now")
 

@@ -1,13 +1,9 @@
-from azureml.core.authentication import AzureCliAuthentication
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline, PipelineData
-from azureml.data.data_reference import DataReference
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
-from azureml.core import Workspace, Datastore
-import argparse
+from azureml.core import Datastore
 import datetime
-import requests
 import os
 import sys
 from dotenv import load_dotenv
@@ -121,7 +117,7 @@ def main():
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
-    pipeline_run = train_pipeline.submit(experiment_name=experiment_name)
+    train_pipeline.submit(experiment_name=experiment_name)
 
 
 if __name__ == '__main__':

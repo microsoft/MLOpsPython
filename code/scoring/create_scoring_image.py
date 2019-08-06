@@ -64,7 +64,7 @@ register_output_path = os.path.join(args.json_config, register_model_json)
 try:
     with open(register_output_path) as f:
         config = json.load(f)
-except:
+except Exception:
     print("No new model to register thus no need to create new scoring image")
     # raise Exception('No new model to register as production model perform better')
     sys.exit(0)
