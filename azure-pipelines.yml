@@ -1,3 +1,4 @@
+# keeping this pipeline for now to get Microsoft.MLOpsPython working on https://dev.azure.com/customai/DevopsForAI-AML
 pool:
   vmImage: 'Ubuntu 16.04'
 
@@ -11,42 +12,7 @@ trigger:
 
 steps:
 - script: | 
-   az login --service-principal -u $(spidentity) -p $(spsecret) --tenant $(sptenant)
+   echo 'dummy step'
    
-  displayName: 'Login to Azure'
-
-- script: |
-   sed -i 's#"subscription_id": "<>"#"subscription_id": "$(subscriptionid)"#g' aml_config/config.json
-   
-  displayName: 'replace subscription value'
-
-- script: 'pytest tests/unit/data_test.py'
-  displayName: 'Data Quality Check'
-
-- script: 'python aml_service/00-WorkSpace.py'
-  displayName: 'Get or Create Workspace'
-
-- script: 'python aml_service/03-AttachAmlCluster.py'
-  displayName: 'Create AML Compute Cluster'
-
-- script: 'python aml_service/04-AmlPipelines.py'
-  displayName: 'Create and Test AML Pipeline'
-
-- script: 'python aml_service/04-AmlPipelines.py --pipeline_action publish'
-  displayName: 'Publish AML Pipeline as Endpoint'
-
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    Contents: '**'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: devops-for-ai'
-  inputs:
-    ArtifactName: 'devops-for-ai'
-    publishLocation: 'container'
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    TargetPath: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Dummy step'
 
