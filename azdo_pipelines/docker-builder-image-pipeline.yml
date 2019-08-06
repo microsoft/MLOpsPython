@@ -8,7 +8,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  baseName: $[coalesce(variables['baseNameOverride'],  'pepsiml')]
+  baseName: $[coalesce(variables['baseNameOverride'],  'pythonml')]
   containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
   imageName: $[coalesce(variables['builderImageName'], 'mlopsbuildagent')]  
 
