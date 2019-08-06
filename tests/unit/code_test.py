@@ -1,3 +1,4 @@
+import sys
 import os
 sys.path.append(os.path.abspath("./aml_service"))  # NOQA: E402
 from workspace import get_workspace
@@ -20,4 +21,5 @@ def test_get_workspace():
         app_id,
         app_secret)
 
+    print(aml_workspace.name)
     assert aml_workspace.name == workspace_name
