@@ -68,10 +68,6 @@ train_output_path = os.path.join(args.json_config, train_run_id_json)
 with open(train_output_path) as f:
     config = json.load(f)
 
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--train_run_id',type=str,default='',help='Run id of the newly trained model')
-# #parser.add_argument('--model_assets_path',type=str,default='outputs',help='Location of trained model.')
-
 
 new_model_run_id = config["run_id"]  # args.train_run_id
 experiment_name = config["experiment_name"]
@@ -91,7 +87,8 @@ try:
     run_list = exp.get_runs()
     # production_model_run = next(filter(lambda x: x.id == production_model_run_id, run_list))
 
-    # Get the run history for both production model and newly trained model and compare mse
+    # Get the run history for both production model and
+    # newly trained model and compare mse
     production_model_run = Run(exp, run_id=production_model_run_id)
     new_model_run = Run(exp, run_id=new_model_run_id)
 

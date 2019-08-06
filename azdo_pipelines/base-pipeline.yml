@@ -15,11 +15,11 @@ steps:
 #   displayName: 'Run unit tests'
 #   enabled: 'true'
 
-# - task: PublishTestResults@2
-#   condition: succeededOrFailed()
-#   inputs:
-#     testResultsFiles: '$(Build.BinariesDirectory)/*_testresults.xml'
-#     testRunTitle: 'Unit tests'
-#     failTaskOnFailedTests: true
-#   displayName: 'Publish unit test results'
-#   enabled: 'true'
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(Build.BinariesDirectory)/*_testresults.xml'
+    testRunTitle: 'Unit tests'
+    failTaskOnFailedTests: true
+  displayName: 'Publish unit test results'
+  enabled: 'true'
