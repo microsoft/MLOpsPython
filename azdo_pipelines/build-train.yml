@@ -33,7 +33,7 @@ steps:
   enabled: 'true'
   
 - script: |
-   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/Code/tests/unit
+   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/tests/unit
   displayName: 'Run unit tests'
   enabled: 'true'
 
