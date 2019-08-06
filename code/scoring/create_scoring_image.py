@@ -122,4 +122,3 @@ filename = "image_{}.json".format(args.config_suffix)
 output_path = os.path.join(args.json_config, filename)
 with open(output_path, "w") as outfile:
     json.dump(image_json, outfile)
-

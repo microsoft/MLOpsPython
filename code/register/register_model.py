@@ -77,7 +77,7 @@ try:
         raise Exception(
             "No new model to register as production model perform better")
 except Exception:
-    print("No new model to register as production model perform better")    
+    print("No new model to register as production model perform better")
     sys.exit(0)
 
 run_id = config["run_id"]
