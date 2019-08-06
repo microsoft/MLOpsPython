@@ -16,7 +16,9 @@ variables:
 - group: devopsforai-aml-vg
 
 
-steps:    
+steps:
+- template: base-pipeline.yml
+    
 - bash: |
    # Invoke the Python training pipeline
    python3 $(Build.SourcesDirectory)/aml_pipelines/model_train_pipeline.py
