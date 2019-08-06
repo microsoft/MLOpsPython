@@ -32,7 +32,19 @@ steps:
   displayName: 'Publish linting results'
   enabled: 'true'
   
+- script: |
+   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/Code/tests/unit
+  displayName: 'Run unit tests'
+  enabled: 'true'
 
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(Build.BinariesDirectory)/unittest-results.xml'
+    testRunTitle: 'Unt tests'
+    failTaskOnFailedTests: true
+  displayName: 'Publish unit test results'
+  enabled: 'true'
     
 - bash: |
    # Invoke the Python training pipeline
