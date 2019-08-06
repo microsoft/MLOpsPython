@@ -73,7 +73,7 @@ experiment_name = config["experiment_name"]
 
 
 try:
-    # Get most recently registered model, we assume that 
+    # Get most recently registered model, we assume that
     # is the model in production.
     # Download this model and compare it with the recently
     # trained model by running test with same data set.
@@ -107,7 +107,8 @@ try:
         print("New trained model performs better, thus it will be registered")
 except Exception:
     promote_new_model = True
-    print("This is the first model to be trained, thus nothing to evaluate for now")
+    print("This is the first model to be trained, \
+          thus nothing to evaluate for now")
 
 run_id = {}
 run_id["run_id"] = ""

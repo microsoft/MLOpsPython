@@ -102,10 +102,6 @@ print(dirpath)
 print("Following files are uploaded ")
 print(run.get_file_names())
 
-# register the model
-# run.log_model(file_name = model_name)
-# print('Registered the model {} to run history {}'.format(model_name, run.history.name))
-
 run_id = {}
 run_id["run_id"] = run.id
 run_id["experiment_name"] = run.experiment.name

@@ -66,7 +66,6 @@ try:
         config = json.load(f)
 except Exception:
     print("No new model to register thus no need to create new scoring image")
-    # raise Exception('No new model to register as production model perform better')
     sys.exit(0)
 
 model_name = config["model_name"]
@@ -124,4 +123,3 @@ output_path = os.path.join(args.json_config, filename)
 with open(output_path, "w") as outfile:
     json.dump(image_json, outfile)
 
-# How to fix the schema for a model, like if we have multiple models expecting different schema,
