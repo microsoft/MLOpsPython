@@ -1,11 +1,10 @@
 from azureml.core.authentication import AzureCliAuthentication
-from azureml.core.compute import ComputeTarget
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
-from azureml.pipeline.core import Pipeline, PipelineData, StepSequence
+from azureml.pipeline.core import Pipeline, PipelineData
 from azureml.data.data_reference import DataReference
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
-from azureml.core import Workspace, Experiment, Datastore
+from azureml.core import Workspace, Datastore
 import argparse
 import datetime
 import requests

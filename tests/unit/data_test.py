@@ -122,5 +122,6 @@ def test_check_distribution():
     assert (
         np.sum(abs(mean - historical_mean) >
                shift_tolerance * abs(historical_mean))
-        or np.sum(abs(std - historical_std) > shift_tolerance * abs(historical_std)) > 0
+        or np.sum(abs(std - historical_std) >
+                  shift_tolerance * abs(historical_std)) > 0
     )

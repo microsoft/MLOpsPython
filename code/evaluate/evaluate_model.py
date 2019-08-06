@@ -26,9 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 import os
 import json
 from azureml.core import Workspace
-from azureml.core import Experiment
 from azureml.core.model import Model
-import azureml.core
 from azureml.core import Run
 import argparse
 
@@ -76,7 +74,8 @@ experiment_name = config["experiment_name"]
 
 
 try:
-    # Get most recently registered model, we assume that is the model in production. Download this model and compare it with the recently trained model by running test with same data set.
+    # Get most recently registered model, we assume that is the model in production.
+    #  Download this model and compare it with the recently trained model by running test with same data set.
     model_list = Model.list(ws)
     production_model = next(
         filter(
@@ -87,7 +86,6 @@ try:
     )
     production_model_run_id = production_model.tags.get("run_id")
     run_list = exp.get_runs()
-    # production_model_run = next(filter(lambda x: x.id == production_model_run_id, run_list))
 
     # Get the run history for both production model and
     # newly trained model and compare mse
