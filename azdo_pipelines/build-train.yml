@@ -20,13 +20,22 @@ steps:
 - script: |
    ls -ltr
    echo 'hi'
-   flake8 --output-file=$(Build.BinariesDirectory)/flake8_amlservice_testresults.xml
-   #flake8 --output-file=$(Build.BinariesDirectory)/flake8_tests_testresults.xml tests
-   cat $(Build.BinariesDirectory)/flake8_amlservice_testresults.xml
+   flake8 --output-file=$(Build.BinariesDirectory)/flake8_testresults.xml   
+   cat $(Build.BinariesDirectory)/flake8_testresults.xml
    ls -ltr $(Build.BinariesDirectory)
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Run code quality tests'
   enabled: 'true'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(Build.BinariesDirectory)/*_testresults.xml'
+    testRunTitle: 'Linitnig'
+    failTaskOnFailedTests: true
+  displayName: 'Publish linting results'
+  enabled: 'true'
+  
 
     
 - bash: |
