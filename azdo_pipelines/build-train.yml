@@ -17,7 +17,15 @@ variables:
 
 
 steps:
-- template: base-pipeline.yml
+- script: |
+   echo 'hi'
+   flake8 --output-file=$(Build.BinariesDirectory)/flake8_amlservice_testresults.xml aml_service
+   #flake8 --output-file=$(Build.BinariesDirectory)/flake8_tests_testresults.xml tests
+   cat $(Build.BinariesDirectory)/flake8_amlservice_testresults.xml
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Run code quality tests'
+  enabled: 'true'
+
     
 - bash: |
    # Invoke the Python training pipeline
