@@ -23,7 +23,8 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import os, json
+import os
+import json
 from azureml.core import Workspace
 from azureml.core import Experiment
 from azureml.core.model import Model
@@ -79,7 +80,8 @@ try:
     model_list = Model.list(ws)
     production_model = next(
         filter(
-            lambda x: x.created_time == max(model.created_time for model in model_list),
+            lambda x: x.created_time == max(
+                model.created_time for model in model_list),
             model_list,
         )
     )

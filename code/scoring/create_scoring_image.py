@@ -23,7 +23,9 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import os, json, sys
+import os
+import json
+import sys
 import argparse
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
@@ -71,7 +73,8 @@ model_name = config["model_name"]
 model_version = config["model_version"]
 
 model_list = Model.list(workspace=ws)
-model, = (m for m in model_list if m.version == model_version and m.name == model_name)
+model, = (m for m in model_list if m.version ==
+          model_version and m.name == model_name)
 print(
     "Model picked: {} \nModel Description: {} \nModel Version: {}".format(
         model.name, model.description, model.version
