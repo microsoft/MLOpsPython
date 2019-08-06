@@ -20,7 +20,7 @@ steps:
 - script: |
    ls -ltr
    echo 'hi'
-   flake8 --output-file=$(Build.BinariesDirectory)/flake8_amlservice_testresults.xml aml_service
+   flake8 --output-file=$(Build.BinariesDirectory)/flake8_amlservice_testresults.xml
    #flake8 --output-file=$(Build.BinariesDirectory)/flake8_tests_testresults.xml tests
    cat $(Build.BinariesDirectory)/flake8_amlservice_testresults.xml
    ls -ltr $(Build.BinariesDirectory)
