@@ -36,6 +36,8 @@ steps:
    pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/tests/unit
   displayName: 'Run unit tests'
   enabled: 'true'
+  env:
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
