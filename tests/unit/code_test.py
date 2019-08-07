@@ -3,6 +3,7 @@ import os
 sys.path.append(os.path.abspath("./aml_service"))  # NOQA: E402
 from workspace import get_workspace
 
+
 # Just an example of a unit test against
 # a utility function common_scoring.next_saturday
 def test_get_workspace():
