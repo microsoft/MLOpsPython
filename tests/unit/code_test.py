@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath("./aml_service"))  # NOQA: E402
+sys.path.append(os.path.abspath("./aml_service"))
 from workspace import get_workspace
 
 

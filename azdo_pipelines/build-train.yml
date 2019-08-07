@@ -17,36 +17,7 @@ variables:
 
 
 steps:
-- script: |
-   flake8 --output-file=$(Build.BinariesDirectory)/flake8_testresults.xml --format junit-xml  
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Run code quality tests'
-  enabled: 'true'
-
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '$(Build.BinariesDirectory)/*_testresults.xml'
-    testRunTitle: 'Linitnig'
-    failTaskOnFailedTests: true
-  displayName: 'Publish linting results'
-  enabled: 'true'
-  
-- script: |
-   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/tests/unit
-  displayName: 'Run unit tests'
-  enabled: 'true'
-  env:
-    SP_APP_SECRET: '$(SP_APP_SECRET)'
-
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '$(Build.BinariesDirectory)/unittest-results.xml'
-    testRunTitle: 'Unt tests'
-    failTaskOnFailedTests: true
-  displayName: 'Publish unit test results'
-  enabled: 'true'
+- template: base-pipeline.yml
     
 - bash: |
    # Invoke the Python training pipeline
