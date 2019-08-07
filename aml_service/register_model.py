@@ -1,6 +1,6 @@
 import sys
+import os
 import os.path
-import argparse
 from dotenv import load_dotenv
 from azureml.core import Workspace
 from azureml.core.model import Model
@@ -10,26 +10,14 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 # is called outside an existing process
 load_dotenv()
 
-PARSER = argparse.ArgumentParser()
-PARSER.add_argument('--TENANT_ID')
-PARSER.add_argument('--APP_ID')
-PARSER.add_argument('--APP_SECRET')
-PARSER.add_argument('--MODEL_PATH')
-PARSER.add_argument('--MODEL_NAME')
-PARSER.add_argument('--AZUREML_ARM_WORKSPACE_NAME')
-PARSER.add_argument('--AZUREML_ARM_SUBSCRIPTION')
-PARSER.add_argument('--AZUREML_ARM_RESOURCEGROUP')
-
-
-ARGS = PARSER.parse_args()
-TENANT_ID = ARGS.TENANT_ID
-APP_ID = ARGS.APP_ID
-APP_SECRET = ARGS.APP_SECRET
-MODEL_PATH = ARGS.MODEL_PATH
-MODEL_NAME = ARGS.MODEL_NAME
-WORKSPACE_NAME = ARGS.AZUREML_ARM_WORKSPACE_NAME
-SUBSCRIPTION_ID = ARGS.AZUREML_ARM_SUBSCRIPTION
-RESOURCE_GROUP = ARGS.AZUREML_ARM_RESOURCEGROUP
+TENANT_ID = os.environ.get('TENANT_ID')
+APP_ID = os.environ.get('APP_ID')
+APP_SECRET = os.environ.get('APP_SECRET')
+MODEL_PATH = os.environ.get('MODEL_PATH')
+MODEL_NAME = os.environ.get('MODEL_NAME')
+WORKSPACE_NAME = os.environ.get('WORKSPACE_NAME')
+SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
+RESOURCE_GROUP = os.environ.get('RESOURCE_GROUP')
 
 
 if os.path.isfile(MODEL_PATH) is False:
@@ -52,7 +40,7 @@ try:
     MODEL = Model.register(
         model_path=MODEL_PATH,
         model_name=MODEL_NAME,
-        description="Pepsi Forecasting Model",
+        description="Forecasting Model",
         workspace=WORKSPACE)
 
     print("Model registered successfully. ID: " + MODEL.id)

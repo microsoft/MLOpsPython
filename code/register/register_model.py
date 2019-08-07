@@ -35,7 +35,10 @@ from azureml.core.authentication import AzureCliAuthentication
 cli_auth = AzureCliAuthentication()
 
 # Get workspace
-# ws = Workspace.from_config(auth=cli_auth)
+# ws = Workspace.from_config(auth=cli_auth, path='./')
+
+
+
 run = Run.get_context()
 exp = run.experiment
 ws = run.experiment.workspace
