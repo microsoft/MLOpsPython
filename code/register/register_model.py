@@ -38,7 +38,6 @@ cli_auth = AzureCliAuthentication()
 # ws = Workspace.from_config(auth=cli_auth, path='./')
 
 
-
 run = Run.get_context()
 exp = run.experiment
 ws = run.experiment.workspace

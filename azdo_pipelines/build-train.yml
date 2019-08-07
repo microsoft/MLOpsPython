@@ -32,7 +32,21 @@ steps:
   displayName: 'Publish linting results'
   enabled: 'true'
   
+- script: |
+   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/tests/unit
+  displayName: 'Run unit tests'
+  enabled: 'true'
+  env:
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
 
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(Build.BinariesDirectory)/unittest-results.xml'
+    testRunTitle: 'Unit tests'
+    failTaskOnFailedTests: true
+  displayName: 'Publish unit test results'
+  enabled: 'true'
     
 - bash: |
    # Invoke the Python training pipeline
