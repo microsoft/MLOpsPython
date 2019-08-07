@@ -23,7 +23,9 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import os, json, sys
+import os
+import json
+import sys
 import argparse
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
@@ -65,16 +67,16 @@ register_output_path = os.path.join(args.json_config, register_model_json)
 try:
     with open(register_output_path) as f:
         config = json.load(f)
-except:
+except Exception:
     print("No new model to register thus no need to create new scoring image")
-    # raise Exception('No new model to register as production model perform better')
     sys.exit(0)
 
 model_name = config["model_name"]
 model_version = config["model_version"]
 
 model_list = Model.list(workspace=ws)
-model, = (m for m in model_list if m.version == model_version and m.name == model_name)
+model, = (m for m in model_list if m.version ==
+          model_version and m.name == model_name)
 print(
     "Model picked: {} \nModel Description: {} \nModel Version: {}".format(
         model.name, model.description, model.version
@@ -123,5 +125,3 @@ filename = "image_{}.json".format(args.config_suffix)
 output_path = os.path.join(args.json_config, filename)
 with open(output_path, "w") as outfile:
     json.dump(image_json, outfile)
-
-# How to fix the schema for a model, like if we have multiple models expecting different schema,

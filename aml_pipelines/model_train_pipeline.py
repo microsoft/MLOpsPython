@@ -1,16 +1,9 @@
-from azureml.core.authentication import AzureCliAuthentication
-from azureml.core.compute import ComputeTarget
 from azureml.pipeline.core.graph import PipelineParameter
-from azureml.pipeline.core import PublishedPipeline
 from azureml.pipeline.steps import PythonScriptStep
-from azureml.pipeline.core import Pipeline, PipelineData, StepSequence
-from azureml.data.data_reference import DataReference
+from azureml.pipeline.core import Pipeline, PipelineData
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
-from azureml.core import Workspace, Experiment, Datastore
-import argparse
+from azureml.core import Datastore
 import datetime
-import requests
-import json
 import os
 import sys
 from dotenv import load_dotenv
@@ -18,7 +11,8 @@ sys.path.append(os.path.abspath("./aml_service"))  # NOQA: E402
 from workspace import get_workspace
 from attach_compute import get_compute
 
-def main():    
+
+def main():
     load_dotenv()
     workspace_name = os.environ.get("AML_WORKSPACE_NAME")
     resource_group = os.environ.get("RESOURCE_GROUP")
@@ -29,7 +23,7 @@ def main():
     sources_directory_train = os.environ.get("SOURCES_DIR_TRAIN")
     train_script_path = os.environ.get("TRAIN_SCRIPT_PATH")
     evaluate_script_path = os.environ.get("EVALUATE_SCRIPT_PATH")
-    register_script_path = os.environ.get("REGISTER_SCRIPT_PATH")    
+    register_script_path = os.environ.get("REGISTER_SCRIPT_PATH")
     vm_size_cpu = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
     compute_name_cpu = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
     experiment_name = os.environ.get("EXPERIMENT_NAME")
@@ -42,7 +36,7 @@ def main():
         tenant_id,
         app_id,
         app_secret)
-    print(aml_workspace)    
+    print(aml_workspace)
 
     # Get Azure machine learning cluster
     aml_compute_cpu = get_compute(
@@ -61,7 +55,8 @@ def main():
     )
     run_config.environment.docker.enabled = True
 
-    model_name = PipelineParameter(name="model_name", default_value="sklearn_regression_model.pkl")
+    model_name = PipelineParameter(
+        name="model_name", default_value="sklearn_regression_model.pkl")
     def_blob_store = Datastore(aml_workspace, "workspaceblobstore")
     jsonconfigs = PipelineData("jsonconfigs", datastore=def_blob_store)
     config_suffix = datetime.datetime.now().strftime("%Y%m%d%H")
@@ -89,15 +84,15 @@ def main():
         compute_target=aml_compute_cpu,
         source_directory=sources_directory_train,
         arguments=[
-                    "--config_suffix", config_suffix,
-                    "--json_config", jsonconfigs,
+            "--config_suffix", config_suffix,
+            "--json_config", jsonconfigs,
         ],
         runconfig=run_config,
         inputs=[jsonconfigs],
         # outputs=[jsonconfigs],
         allow_reuse=False,
     )
-    print("Step Evaluate created")    
+    print("Step Evaluate created")
 
     register_model_step = PythonScriptStep(
         name="Register New Trained Model",
@@ -122,7 +117,7 @@ def main():
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
-    pipeline_run = train_pipeline.submit(experiment_name=experiment_name)  
+    train_pipeline.submit(experiment_name=experiment_name)
 
 
 if __name__ == '__main__':

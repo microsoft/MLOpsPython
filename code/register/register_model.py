@@ -23,14 +23,13 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import os, json, sys
-from azureml.core import Workspace
+import os
+import json
+import sys
 from azureml.core import Run
-from azureml.core import Experiment
 from azureml.core.model import Model
 import argparse
 
-from azureml.core.runconfig import RunConfiguration
 from azureml.core.authentication import AzureCliAuthentication
 
 cli_auth = AzureCliAuthentication()
@@ -78,10 +77,10 @@ try:
     with open(evaluate_output_path) as f:
         config = json.load(f)
     if not config["run_id"]:
-        raise Exception("No new model to register as production model perform better")
-except:
+        raise Exception(
+            "No new model to register as production model perform better")
+except Exception:
     print("No new model to register as production model perform better")
-    # raise Exception('No new model to register as production model perform better')
     sys.exit(0)
 
 run_id = config["run_id"]

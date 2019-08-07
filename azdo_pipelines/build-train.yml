@@ -16,7 +16,24 @@ variables:
 - group: devopsforai-aml-vg
 
 
-steps:    
+steps:
+- script: |
+   flake8 --output-file=$(Build.BinariesDirectory)/flake8_testresults.xml --format junit-xml  
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Run code quality tests'
+  enabled: 'true'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(Build.BinariesDirectory)/*_testresults.xml'
+    testRunTitle: 'Linitnig'
+    failTaskOnFailedTests: true
+  displayName: 'Publish linting results'
+  enabled: 'true'
+  
+
+    
 - bash: |
    # Invoke the Python training pipeline
    python3 $(Build.SourcesDirectory)/aml_pipelines/model_train_pipeline.py
