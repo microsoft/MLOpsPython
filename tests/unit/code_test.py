@@ -22,5 +22,4 @@ def test_get_workspace():
         app_id,
         app_secret)
 
-    print(aml_workspace.name)
     assert aml_workspace.name == workspace_name
