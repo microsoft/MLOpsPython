@@ -4,7 +4,7 @@ parameters:
 
 steps:
 - script: |
-   flake8 --output-file=$(Build.BinariesDirectory)/flake8_testresults.xml --format junit-xml  
+   flake8 --output-file=$(Build.BinariesDirectory)/lint_testresults.xml --format junit-xml  
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Run code quality tests'
   enabled: 'true'
@@ -12,7 +12,7 @@ steps:
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
-    testResultsFiles: '$(Build.BinariesDirectory)/*_testresults.xml'
+    testResultsFiles: '$(Build.BinariesDirectory)/lint_testresults.xml'
     testRunTitle: 'Linitnig'
     failTaskOnFailedTests: true
   displayName: 'Publish linting results'
