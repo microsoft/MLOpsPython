@@ -4,22 +4,13 @@ parameters:
 
 steps:
 - script: |
-   flake8 --output-file=$(Build.BinariesDirectory)/lint_testresults.xml --format junit-xml  
+   flake8 --output-file=$(Build.BinariesDirectory)/lint-testresults.xml --format junit-xml  
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Run code quality tests'
   enabled: 'true'
-
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '$(Build.BinariesDirectory)/lint_testresults.xml'
-    testRunTitle: 'Linitnig'
-    failTaskOnFailedTests: true
-  displayName: 'Publish linting results'
-  enabled: 'true'
   
 - script: |
-   pytest --junitxml=$(Build.BinariesDirectory)/unittest-results.xml $(Build.SourcesDirectory)/tests/unit
+   pytest --junitxml=$(Build.BinariesDirectory)/unit-testresults.xml $(Build.SourcesDirectory)/tests/unit
   displayName: 'Run unit tests'
   enabled: 'true'
   env:
@@ -28,8 +19,8 @@ steps:
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
-    testResultsFiles: '$(Build.BinariesDirectory)/unittest-results.xml'
+    testResultsFiles: '$(Build.BinariesDirectory)/*-testresults.xml'
     testRunTitle: 'Unit tests'
     failTaskOnFailedTests: true
-  displayName: 'Publish unit test results'
+  displayName: 'Publish linting and unit test results'
   enabled: 'true'
