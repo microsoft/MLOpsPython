@@ -20,7 +20,7 @@ steps:
   condition: succeededOrFailed()
   inputs:
     testResultsFiles: '$(Build.BinariesDirectory)/*-testresults.xml'
-    testRunTitle: 'Unit tests'
+    testRunTitle: 'Linting & Unit tests'
     failTaskOnFailedTests: true
   displayName: 'Publish linting and unit test results'
   enabled: 'true'
