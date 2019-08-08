@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./aml_service"))  # NOQA: E402
 from workspace import get_workspace
 from attach_compute import get_compute
+import json
 
 
 def main():
@@ -26,7 +27,6 @@ def main():
     register_script_path = os.environ.get("REGISTER_SCRIPT_PATH")
     vm_size_cpu = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
     compute_name_cpu = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
-    experiment_name = os.environ.get("EXPERIMENT_NAME")
     model_name = os.environ.get("MODEL_NAME")
 
     # Get Azure machine learning workspace
@@ -119,7 +119,8 @@ def main():
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
     published_pipeline = train_pipeline.publish(
-        name="training-pipeline", description="Model training/retraining pipeline"
+        name="training-pipeline",
+        description="Model training/retraining pipeline"
     )
 
     train_pipeline_json = {}
