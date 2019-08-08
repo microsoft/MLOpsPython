@@ -122,7 +122,8 @@ def main():
 
     train_pipeline_json = {}
     train_pipeline_json["rest_endpoint"] = train_pipeline.endpoint
-    with open($(Build.ArtifactStagingDirectory)"/train_pipeline.json", "w") as outfile:
+    json_file_path = $(Build.ArtifactStagingDirectory) + "/train_pipeline.json"
+    with open(json_file_path, "w") as outfile:
         json.dump(train_pipeline_json, outfile)
 
 
