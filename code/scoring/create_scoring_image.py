@@ -39,7 +39,7 @@ run = Run.get_context()
 if "OfflineRun" in run.id:
     print("offline run")
     # Get workspace
-    ws = Workspace.from_config(auth=cli_auth)
+    ws = Workspace.from_config(auth=cli_auth, path='./')
 else:
     exp = run.experiment
     ws = run.experiment.workspace
