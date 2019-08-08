@@ -118,11 +118,13 @@ def main():
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
-    train_pipeline.submit(experiment_name=experiment_name)
+    published_pipeline = train_pipeline.publish(
+        name="training-pipeline", description="Model training/retraining pipeline"
+    )
 
     train_pipeline_json = {}
-    train_pipeline_json["rest_endpoint"] = train_pipeline.endpoint
-    json_file_path = $(Build.ArtifactStagingDirectory) + "/train_pipeline.json"
+    train_pipeline_json["rest_endpoint"] = published_pipeline.endpoint
+    json_file_path = "aml_service/train_pipeline.json"
     with open(json_file_path, "w") as outfile:
         json.dump(train_pipeline_json, outfile)
 
