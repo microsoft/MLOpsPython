@@ -27,6 +27,7 @@ def main():
     vm_size_cpu = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
     compute_name_cpu = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
     experiment_name = os.environ.get("EXPERIMENT_NAME")
+    model_name = os.environ.get("MODEL_NAME")
 
     # Get Azure machine learning workspace
     aml_workspace = get_workspace(
@@ -56,7 +57,7 @@ def main():
     run_config.environment.docker.enabled = True
 
     model_name = PipelineParameter(
-        name="model_name", default_value="sklearn_regression_model.pkl")
+        name="model_name", default_value=model_name)
     def_blob_store = Datastore(aml_workspace, "workspaceblobstore")
     jsonconfigs = PipelineData("jsonconfigs", datastore=def_blob_store)
     config_suffix = datetime.datetime.now().strftime("%Y%m%d%H")
@@ -118,6 +119,11 @@ def main():
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
     train_pipeline.submit(experiment_name=experiment_name)
+
+    train_pipeline_json = {}
+    train_pipeline_json["rest_endpoint"] = train_pipeline.endpoint
+    with open($(Build.ArtifactStagingDirectory)"/train_pipeline.json", "w") as outfile:
+        json.dump(train_pipeline_json, outfile)
 
 
 if __name__ == '__main__':
