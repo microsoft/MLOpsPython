@@ -125,7 +125,7 @@ def main():
 
     train_pipeline_json = {}
     train_pipeline_json["rest_endpoint"] = published_pipeline.endpoint
-    json_file_path = "aml_service/train_pipeline.json"
+    json_file_path = "aml_pipelines/train_pipeline.json"
     with open(json_file_path, "w") as outfile:
         json.dump(train_pipeline_json, outfile)
 

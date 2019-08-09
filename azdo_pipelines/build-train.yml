@@ -31,9 +31,11 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/aml_service'
+    SourceFolder: '$(Build.SourcesDirectory)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    Contents: '?(run_train_pipeline.py|*.json)'  
+    Contents: |
+      aml_pipelines/**/'?(run_train_pipeline.py|*.json)'  
+      code/scoring/**
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
