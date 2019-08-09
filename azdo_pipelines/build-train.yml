@@ -35,7 +35,7 @@ steps:
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     Contents: |
       aml_pipelines/'?(run_train_pipeline.py|*.json)'  
-      code/scoring/**
+
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
