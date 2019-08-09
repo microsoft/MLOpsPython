@@ -34,7 +34,8 @@ steps:
     SourceFolder: '$(Build.SourcesDirectory)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     Contents: |
-      aml_pipelines/'?(run_train_pipeline.py|*.json)'  
+      aml_pipelines/?(run_train_pipeline.py|*.json)  
+      code/scoring/**
 
 
 - task: PublishBuildArtifacts@1
