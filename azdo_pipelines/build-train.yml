@@ -33,7 +33,7 @@ steps:
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/aml_service'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    Contents: 'run_train_pipeline.py'  
+    Contents: '?(run_train_pipeline.py|*.json)'  
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
