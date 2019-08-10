@@ -48,3 +48,7 @@ dependencies:
   - pandas==0.23.1
   - numpy==1.14.5
   - joblib==0.13.2
+  - gunicorn==19.9.0
+  - flask==1.1.1
+  - azure-ml-api-sdk
+
