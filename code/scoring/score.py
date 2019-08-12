@@ -23,19 +23,18 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import pickle
 import json
 import numpy
-from sklearn.ensemble import RandomForestClassifier
 from azureml.core.model import Model
+import joblib
 
 
 def init():
     global model
-    from sklearn.externals import joblib
 
     # load the model from file into a global object
-    model_path = Model.get_model_path(model_name="sklearn_regression_model.pkl")
+    model_path = Model.get_model_path(
+        model_name="sklearn_regression_model.pkl")
     model = joblib.load(model_path)
 
 

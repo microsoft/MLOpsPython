@@ -34,7 +34,8 @@ def get_absPath(filename):
     """Returns the path of the notebooks folder"""
     path = os.path.abspath(
         os.path.join(
-            os.path.dirname(__file__), os.path.pardir, os.path.pardir, "data", filename
+            os.path.dirname(
+                __file__), os.path.pardir, os.path.pardir, "data", filename
         )
     )
     return path
@@ -119,6 +120,8 @@ def test_check_distribution():
     mean = np.mean(dataset.values, axis=0)
     std = np.mean(dataset.values, axis=0)
     assert (
-        np.sum(abs(mean - historical_mean) > shift_tolerance * abs(historical_mean))
-        or np.sum(abs(std - historical_std) > shift_tolerance * abs(historical_std)) > 0
+        np.sum(abs(mean - historical_mean) >
+               shift_tolerance * abs(historical_mean))
+        or np.sum(abs(std - historical_std) >
+                  shift_tolerance * abs(historical_std)) > 0
     )

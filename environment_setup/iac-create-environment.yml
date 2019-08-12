@@ -1,0 +1,31 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - environment_setup/arm-templates/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  baseName: $[coalesce(variables['baseNameOverride'], 'mlops')]
+  location: $[coalesce(variables['locationOverride'], 'centralus')]
+  azuresub: $[coalesce(variables['azuresubOverride'], 'AzureResourceConnection')]
+
+
+steps:
+- task: AzureResourceGroupDeployment@2
+  inputs:
+    azureSubscription: $(azuresub)
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: '$(baseName)-AML-RG'
+    location: $(location)
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/cloud-environment.json'
+    overrideParameters: '-baseName $(baseName)'
+    deploymentMode: 'Incremental'
+  displayName: 'Deploy MLOps resources to Azure'
+
+  

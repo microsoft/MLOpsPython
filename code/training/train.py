@@ -23,8 +23,6 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import pickle
-from azureml.core import Workspace
 from azureml.core.run import Run
 import os
 import argparse
@@ -35,8 +33,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
 import numpy as np
 import json
-import subprocess
-from typing import Tuple, List
 
 
 parser = argparse.ArgumentParser("train")
@@ -72,8 +68,10 @@ ws = run.experiment.workspace
 
 X, y = load_diabetes(return_X_y=True)
 columns = ["age", "gender", "bmi", "bp", "s1", "s2", "s3", "s4", "s5", "s6"]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-data = {"train": {"X": X_train, "y": y_train}, "test": {"X": X_test, "y": y_test}}
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=0)
+data = {"train": {"X": X_train, "y": y_train},
+        "test": {"X": X_test, "y": y_test}}
 
 print("Running train.py")
 
@@ -97,15 +95,12 @@ with open(model_name, "wb") as file:
 
 # upload the model file explicitly into artifacts
 run.upload_file(name="./outputs/" + model_name, path_or_stream=model_name)
-print("Uploaded the model {} to experiment {}".format(model_name, run.experiment.name))
+print("Uploaded the model {} to experiment {}".format(
+    model_name, run.experiment.name))
 dirpath = os.getcwd()
 print(dirpath)
 print("Following files are uploaded ")
 print(run.get_file_names())
-
-# register the model
-# run.log_model(file_name = model_name)
-# print('Registered the model {} to run history {}'.format(model_name, run.history.name))
 
 run_id = {}
 run_id["run_id"] = run.id

@@ -23,11 +23,9 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import os, json
-from azureml.core import Workspace
-from azureml.core import Experiment
+import os
+import json
 from azureml.core.model import Model
-import azureml.core
 from azureml.core import Run
 import argparse
 
@@ -68,10 +66,6 @@ train_output_path = os.path.join(args.json_config, train_run_id_json)
 with open(train_output_path) as f:
     config = json.load(f)
 
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--train_run_id',type=str,default='',help='Run id of the newly trained model')
-# #parser.add_argument('--model_assets_path',type=str,default='outputs',help='Location of trained model.')
-
 
 new_model_run_id = config["run_id"]  # args.train_run_id
 experiment_name = config["experiment_name"]
@@ -79,19 +73,23 @@ experiment_name = config["experiment_name"]
 
 
 try:
-    # Get most recently registered model, we assume that is the model in production. Download this model and compare it with the recently trained model by running test with same data set.
+    # Get most recently registered model, we assume that
+    # is the model in production.
+    # Download this model and compare it with the recently
+    # trained model by running test with same data set.
     model_list = Model.list(ws)
     production_model = next(
         filter(
-            lambda x: x.created_time == max(model.created_time for model in model_list),
+            lambda x: x.created_time == max(
+                model.created_time for model in model_list),
             model_list,
         )
     )
     production_model_run_id = production_model.tags.get("run_id")
     run_list = exp.get_runs()
-    # production_model_run = next(filter(lambda x: x.id == production_model_run_id, run_list))
 
-    # Get the run history for both production model and newly trained model and compare mse
+    # Get the run history for both production model and
+    # newly trained model and compare mse
     production_model_run = Run(exp, run_id=production_model_run_id)
     new_model_run = Run(exp, run_id=new_model_run_id)
 
@@ -107,9 +105,10 @@ try:
     if new_model_mse < production_model_mse:
         promote_new_model = True
         print("New trained model performs better, thus it will be registered")
-except:
+except Exception:
     promote_new_model = True
-    print("This is the first model to be trained, thus nothing to evaluate for now")
+    print("This is the first model to be trained, \
+          thus nothing to evaluate for now")
 
 run_id = {}
 run_id["run_id"] = ""
