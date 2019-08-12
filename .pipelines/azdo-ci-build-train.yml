@@ -21,7 +21,7 @@ steps:
     
 - bash: |
    # Invoke the Python building and publishing a training pipeline
-   python3 $(Build.SourcesDirectory)/.pipelines/azdo-ci-build-train.py
+   python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline.py
   failOnStderr: 'false'
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
