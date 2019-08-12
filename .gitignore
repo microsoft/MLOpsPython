@@ -104,4 +104,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-aml_config/config.json
+.DS_Store

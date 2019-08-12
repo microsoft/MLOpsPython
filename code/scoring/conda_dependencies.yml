@@ -44,6 +44,11 @@ dependencies:
     # Required packages for AzureML execution, history, and data preparation.
   - azureml-sdk[notebooks]    # add the version to lock it ==0.1.74
   - scipy==1.0.0
-  - scikit-learn==0.19.1
+  - scikit-learn==0.21.3
   - pandas==0.23.1
   - numpy==1.14.5
+  - joblib==0.13.2
+  - gunicorn==19.9.0
+  - flask==1.1.1
+  - azure-ml-api-sdk
+

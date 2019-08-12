@@ -1,0 +1,20 @@
+trigger: none
+pr:
+  branches:
+    include:
+    - master
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+container:
+  image: mlopscr.azurecr.io/public/mlops/mlopspython:latest
+  endpoint: acrconnection
+
+
+variables:
+- group: devopsforai-aml-vg
+
+
+steps:
+- template: azdo-base-pipeline.yml
