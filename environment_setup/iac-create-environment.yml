@@ -12,7 +12,7 @@ pool:
 variables:
   baseName: $[coalesce(variables['baseNameOverride'], 'mlops')]
   location: $[coalesce(variables['locationOverride'], 'centralus')]
-  azuresub: $[coalesce(variables['azuresubOverride'], 'davete02_sub')]
+  azuresub: $[coalesce(variables['azuresubOverride'], 'AzureResourceConnection')]
 
 
 steps:
