@@ -4,7 +4,7 @@ trigger:
     include:
     - master
 
-pool:
+pool: 
   vmImage: 'ubuntu-latest'
 
 container:

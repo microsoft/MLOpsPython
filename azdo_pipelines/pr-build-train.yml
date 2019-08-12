@@ -4,16 +4,17 @@ pr:
     include:
     - master
 
-pool:
+pool: 
   vmImage: 'ubuntu-latest'
 
-
 container:
-  image: $(FULL_AGENT_IMAGE_NAME)
+  image: mlopscr.azurecr.io/public/mlops/mlopspython:latest
   endpoint: acrconnection
+
+
+variables:
+- group: devopsforai-aml-vg
 
 
 steps:
 - template: base-pipeline.yml
-  parameters:
-    requirementsPath: 'requirements.txt'
