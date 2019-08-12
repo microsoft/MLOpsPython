@@ -7,7 +7,7 @@ import datetime
 import os
 import sys
 from dotenv import load_dotenv
-sys.path.append(os.path.abspath("./aml_service"))  # NOQA: E402
+sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from workspace import get_workspace
 from attach_compute import get_compute
 import json
