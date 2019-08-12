@@ -17,4 +17,4 @@ variables:
 
 
 steps:
-- template: base-pipeline.yml
+- template: azdo-base-pipeline.yml
