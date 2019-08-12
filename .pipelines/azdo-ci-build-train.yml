@@ -21,7 +21,7 @@ steps:
     
 - bash: |
    # Invoke the Python building and publishing a training pipeline
-   python3 $(Build.SourcesDirectory)/aml_pipelines/model_train_pipeline.py
+   python3 $(Build.SourcesDirectory)/.pipelines/azdo-ci-build-train.py
   failOnStderr: 'false'
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
@@ -34,7 +34,7 @@ steps:
     SourceFolder: '$(Build.SourcesDirectory)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     Contents: |
-      aml_pipelines/?(run_train_pipeline.py|*.json)  
+      ml_service/pipelines/?(run_train_pipeline.py|*.json)  
       code/scoring/**
 
 
