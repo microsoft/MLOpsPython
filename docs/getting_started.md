@@ -10,22 +10,23 @@ We use Azure DevOps for running our build(CI), retraining trigger and release (C
 
 If you already have Azure DevOps account, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
-#### Enable Azure DevOps Preview
-The steps below uses the latest DevOps features. Thus, please enable the feature **New YAML pipeline creation experience** by following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/project/navigation/preview-features?view=azure-devops). 
 
-**Note:** Make sure you have the right permissions in Azure DevOps to do so.
-
-### 3. Create Service Principal to Login to Azure and create resources
+### 3. Create Service Principal to Login to Azure
 
 To create service principal, register an application entity in Azure Active Directory (Azure AD) and grant it the Contributor or Owner role of the subscription or the resource group where the web service belongs to. See [how to create service principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) and assign permissions to manage Azure resource.
 Please make note the following values after creating a service principal, we will need them in subsequent steps
-- Azure subscription id (subscriptionid)
-- Service principal username (spidentity)([application id](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-application-id-and-authentication-key))
+- Application (client) ID
+- Directory (tenant) ID
+- Application Secret
+
+<!-- 
+Service principal username (spidentity)([application id](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-application-id-and-authentication-key))
 - Service principal password (spsecret) ([auth_key](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-application-id-and-authentication-key))
-- Service principal [tenant id](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-tenant-id) (sptenant)
+- Service principal [tenant id](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-tenant-id) (sptenant) -->
 
 **Note:** You must have sufficient permissions to register an application with your Azure AD tenant, and assign the application to a role in your Azure subscription. Contact your subscription adminstator if you don't have the permissions. Normally a subscription admin can create a Service principal and can provide you the details.
 
+<!-- 
 ### 3(b). Configure local development environment variables
 
 For local development, this project makes use of [python-dotenv](https://pypi.org/project/python-dotenv/). This pip package allows you to use a `.env` file to manage your environment variables at runtime. 
@@ -41,24 +42,38 @@ Our pipeline require the following variables to autheticate with Azure.
 
 We noted the value of these variables in previous steps.
 
-**NOTE:** These values should be treated as secret as they allow access to your subscription. 
+**NOTE:** These values should be treated as secret as they allow access to your subscription.  -->
+
+### 4. Create a Variable Group
 
 We make use of variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines. You can either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to learn more about how to create a variable group and [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline.
  
-Please name your variable group **``AzureKeyVaultSecrets``**, we are using this name within our build yaml file. 
+Please name your variable group **``devopsforai-aml-vg``** as we are using this name within our build yaml file. 
 
-Up until now you shouls have 
+The varibale group should contain the following variables:
+
+a table (name, description, value)
+
+Up until now you should have 
 - Forked (or cloned) the repo
 - Created a devops account or use an existing one
 - Got service principal details and subscription id
-- Set them as variable group within devops
+- A variable group with all configuration values
 
-We now have 3 pipelines that we would set up
+<!-- We now have 3 pipelines that we would set up
 - **Build Pipeline (azure-pipelines.yml)**: Runs tests and sets up infrastructure 
 - **Retraining trigger pipeline(/template/retraining-template.json)**: This pipeline triggers Azure ML Pipeline (training/retraining) which trains a new model and publishes model image, if new model performs better
-- **Release pipeline(/template/release-template.json)**: This pipeline deploys and tests model image as web service in QA and Prod environment
+- **Release pipeline(/template/release-template.json)**: This pipeline deploys and tests model image as web service in QA and Prod environment -->
 
+### 5. Create resources 
 
+The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json)
+
+In your DevOps project create a build pipeline from your forked **GitHub** repository 
+![build connnect step](./images/build-connect.png)
+
+Refer to an **Existing Azure Pipelines YAML file** 
+![configure step](./images/select-iac-pipeline.png)
 
 ### 5. Set up Build Pipeline
 1. Select your devops organization and project by clicking dev.azure.com
