@@ -54,6 +54,10 @@ The varibale group should contain the following variables:
 
 a table (name, description, value)
 
+Mark **SP_APP_SECRET** variable as a secret one.
+
+Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
+
 Up until now you should have 
 - Forked (or cloned) the repo
 - Created a devops account or use an existing one
@@ -67,15 +71,60 @@ Up until now you should have
 
 ### 5. Create resources 
 
-The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json)
+The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json). The pipeline requires an **Azure Resource Manager** service connection
+
+![create service connection](./images/create-rm-service-connection.png)
+
+Give the connection name **``AzureResourceConnection``** as it is referred by the pipeline definition.
 
 In your DevOps project create a build pipeline from your forked **GitHub** repository 
+
 ![build connnect step](./images/build-connect.png)
 
 Refer to an **Existing Azure Pipelines YAML file** 
+
 ![configure step](./images/select-iac-pipeline.png)
 
-### 5. Set up Build Pipeline
+Having done that, run the pipeline
+![iac run](./images/run-iac-pipeline.png)
+
+Check out created resources in the [Azure Portal](portal.azure.com)
+![created resources](./images/created-resources.png)
+
+Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-create-environment.yml) that removes resources ctreated for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
+
+
+### 6. Set up Build Pipeline
+
+In your [Azure DevOps](https://dev.azure.com) project create and run a new build pipeline refereing to  **azdo-ci-build-train.yml** pipeline in yuor forked **GitHub** repository
+
+![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
+
+Once the pipline is finished, explore the execution logs 
+
+![ci build logs](./images/ci-build-logs.png)
+
+and checkout a published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://ms.portal.azure.com/)
+
+![training pipeline](./images/training-pipeline.png)
+
+Rename the pipeline as **ci-build**.
+
+Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linitnig, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
+
+### 6. Train the Model
+
+The next step is to invoke the training pipeline created in the previous step. It can be done with a **Release Pipeline**:
+
+![invoke training pipeline](./images/invoke-training-pipeline.png)
+
+An artifact of this pipeline will be the result of the build pipeline **ci-buid**
+
+![artifact invoke pipeline](./images/artifact-invoke-pipeline.png)
+
+
+The pipeline is triggered whenever a new training pipeline is published by the builder pipeline. It can also be triggered manually or configured to run on a scheduled basis.
+
 1. Select your devops organization and project by clicking dev.azure.com
 2. Once you are in the right devops project, click Pipelines on the left hand menu and select Builds
 3. Click **New pipeline** to create new pipeline
@@ -95,7 +144,7 @@ Refer to an **Existing Azure Pipelines YAML file**
 8. Your build run would look similar to the following image
 ![select repo](./images/build-run.png)
 
-Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch.
+
 
 
 **Note:** The build pipeline will perform basic test on the code and provision infrastructure on azure. This can take around 10 mins to complete.
