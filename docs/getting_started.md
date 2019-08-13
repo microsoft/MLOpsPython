@@ -114,7 +114,13 @@ Great, you now have the build pipeline setup, you can either manually trigger it
 
 ### 6. Train the Model
 
-The next step is to invoke the training pipeline created in the previous step. 
+The next step is to invoke the training pipeline created in the previous step. It can be done with a **Release Pipeline**:
+
+![invoke training pipeline](./images/invoke-training-pipeline.png)
+
+An artifact of this pipeline will be the result of the build pipeline **ci-buid**
+
+![artifact invoke pipeline](./images/artifact-invoke-pipeline.png)
 
 
 The pipeline is triggered whenever a new training pipeline is published by the builder pipeline. It can also be triggered manually or configured to run on a scheduled basis.
