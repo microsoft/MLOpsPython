@@ -72,20 +72,24 @@ Up until now you should have
 ### 5. Create resources 
 
 The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json). The pipeline requires an **Azure Resource Manager** service connection
+
 ![create service connection](./images/create-rm-service-connection.png)
+
 Give the connection name **``AzureResourceConnection``** as it is referred by the pipeline definition.
 
 In your DevOps project create a build pipeline from your forked **GitHub** repository 
+
 ![build connnect step](./images/build-connect.png)
 
 Refer to an **Existing Azure Pipelines YAML file** 
+
 ![configure step](./images/select-iac-pipeline.png)
 
 Having done that, run the pipeline
 ![iac run](./images/run-iac-pipeline.png)
 
 Check out created resources in the [Azure Portal](portal.azure.com)
-![created resources](./images/created_resources.png)
+![created resources](./images/created-resources.png)
 
 
 
