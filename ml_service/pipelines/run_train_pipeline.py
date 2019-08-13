@@ -21,7 +21,6 @@ model_name = os.environ.get("MODEL_NAME")
 #     secret = KEY,
 #     tenant = TENANT_ID
 # )
-# az login --service-principal -u $(SP_APP_ID) -p $(SP_APP_SECRET) --tenant $(TENANT_ID)
 cli_auth = AzureCliAuthentication()
 token = cli_auth.get_authentication_header()
 
