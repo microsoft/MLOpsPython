@@ -72,7 +72,7 @@ The easiest way to create all required resources (Resource Group, ML Workspace, 
 In your DevOps project create a build pipeline from your forked **GitHub** repository 
 ![build connnect step](./images/build-connect.png)
 
-refering to an **Existing Azure Pipelines YAML file** 
+Refer to an **Existing Azure Pipelines YAML file** 
 ![configure step](./images/select-iac-pipeline.png)
 
 ### 5. Set up Build Pipeline
