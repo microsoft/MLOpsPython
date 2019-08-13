@@ -54,6 +54,10 @@ The varibale group should contain the following variables:
 
 a table (name, description, value)
 
+Mark **SP_APP_SECRET** variable as a secret one.
+
+Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
+
 Up until now you should have 
 - Forked (or cloned) the repo
 - Created a devops account or use an existing one
@@ -67,13 +71,25 @@ Up until now you should have
 
 ### 5. Create resources 
 
-The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json)
+The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json). The pipeline requires an **Azure Resource Manager** service connection
+![create service connection](./images/create-rm-service-connection.png)
+Give the connection **``AzureResourceCOnnection``** as it is referred by the pipeline definition.
 
 In your DevOps project create a build pipeline from your forked **GitHub** repository 
 ![build connnect step](./images/build-connect.png)
 
 Refer to an **Existing Azure Pipelines YAML file** 
 ![configure step](./images/select-iac-pipeline.png)
+
+Having done that, run the pipeline
+![iac run](./images/run-iac-pipeline.png)
+
+and check out created resources in the **Azure Portal**
+![created resources](./images/created resources.png)
+
+
+
+
 
 ### 5. Set up Build Pipeline
 1. Select your devops organization and project by clicking dev.azure.com
