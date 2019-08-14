@@ -84,7 +84,7 @@ Check out created resources in the [Azure Portal](portal.azure.com):
 
 ![created resources](./images/created-resources.png)
 
-Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-create-environment.yml) that removes resources ctreated for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
+Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-remove-environment.yml) that removes resources ctreated for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
 
 
 ### 6. Set up Build Pipeline
