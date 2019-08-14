@@ -14,7 +14,7 @@ If you already have Azure DevOps account, create a [new project](https://docs.mi
 ### 3. Create Service Principal to Login to Azure
 
 To create service principal, register an application entity in Azure Active Directory (Azure AD) and grant it the Contributor or Owner role of the subscription or the resource group where the web service belongs to. See [how to create service principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) and assign permissions to manage Azure resource.
-Please make note the following values after creating a service principal, we will need them in subsequent steps
+Please make note of the following values after creating a service principal, we will need them in subsequent steps
 - Application (client) ID
 - Directory (tenant) ID
 - Application Secret
