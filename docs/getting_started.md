@@ -93,7 +93,7 @@ In your [Azure DevOps](https://dev.azure.com) project create and run a new build
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
 
-Once the pipline is finished, explore the execution logs: 
+Name the pipeline **ci-build**. Once the pipline is finished, explore the execution logs: 
 
 ![ci build logs](./images/ci-build-logs.png)
 
@@ -101,7 +101,6 @@ and checkout a published training pipeline in the **mlops-AML-WS** workspace in 
 
 ![training pipeline](./images/training-pipeline.png)
 
-Rename the pipeline as **ci-build**.
 
 Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linitnig, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
 
