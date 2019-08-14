@@ -77,9 +77,11 @@ Refer to an **Existing Azure Pipelines YAML file**:
 ![configure step](./images/select-iac-pipeline.png)
 
 Having done that, run the pipeline:
+
 ![iac run](./images/run-iac-pipeline.png)
 
 Check out created resources in the [Azure Portal](portal.azure.com):
+
 ![created resources](./images/created-resources.png)
 
 Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-create-environment.yml) that removes resources ctreated for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
