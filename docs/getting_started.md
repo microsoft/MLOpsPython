@@ -89,15 +89,15 @@ Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-r
 
 ### 6. Set up Build Pipeline
 
-In your [Azure DevOps](https://dev.azure.com) project create and run a new build pipeline refereing to  **azdo-ci-build-train.yml** pipeline in your forked **GitHub** repository:
+In your [Azure DevOps](https://dev.azure.com) project create and run a new build pipeline refereing to [azdo-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml) pipeline in your forked **GitHub** repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
 
-Once the pipline is finished, explore the execution logs 
+Once the pipline is finished, explore the execution logs: 
 
 ![ci build logs](./images/ci-build-logs.png)
 
-and checkout a published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://ms.portal.azure.com/)
+and checkout a published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://ms.portal.azure.com/):
 
 ![training pipeline](./images/training-pipeline.png)
 
