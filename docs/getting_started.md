@@ -102,40 +102,41 @@ and checkout a published training pipeline in the **mlops-AML-WS** workspace in 
 ![training pipeline](./images/training-pipeline.png)
 
 
-Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linitnig, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
+Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linting, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
 
-### 6. Train the Model
+### 7. Train the Model
 
 The next step is to invoke the training pipeline created in the previous step. It can be done with a **Release Pipeline**:
 
 ![invoke training pipeline](./images/invoke-training-pipeline.png)
 
-An artifact of this pipeline will be the result of the build pipeline **ci-buid**
+An artifact of this pipeline will be the result of the build pipeline **ci-buid**:
 
 ![artifact invoke pipeline](./images/artifact-invoke-pipeline.png)
 
-Configure a pipeline to see values from the previously defined variable group **devopsforai-aml-vg**
+Configure a pipeline to see values from the previously defined variable group **devopsforai-aml-vg**:
 
 ![retrain pipeline vg](./images/retrain-pipeline-vg.png)
 
-Add an empty stage with name **``Invoke Training Pipeline``** and make sure that the **Agent Specification** is **``ubuntu-16.04``**
+Add an empty stage with name **``Invoke Training Pipeline``** and make sure that the **Agent Specification** is **``ubuntu-16.04``**:
+
 ![agent specification](./images/agent-specification.png)
 
-Add a command line step **``Invoke Training Pipeline``** with the following script
+Add a command line step **``Invoke Training Pipeline``** with the following script:
 
 ```bash
 docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME microsoft/mlopspython python run_train_pipeline.py
 ```
 
-The pipeline is triggered whenever a new training pipeline is published by the builder pipeline. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually
+This release pipeline is triggered whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
 
 ![create release](./images/create-release.png)
 
-Once the pipeline is completed, check out in the **ML Workspace** that the training pipeline is running 
+Once the release pipeline is completed, check out in the **ML Workspace** that the training pipeline is running: 
 
 ![running training pipeline](./images/running-training-pipeline.png)
 
-The training pipeline will train, evaluate and register a new model. Wait intil it is fininshed and make sure there is a new model in the **ML Workspace**
+The training pipeline will train, evaluate and register a new model. Wait until it is fininshed and make sure there is a new model in the **ML Workspace**:
 
 ![trained model](./images/trained-model.png)
 
