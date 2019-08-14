@@ -24,7 +24,7 @@ To deploy this solution in your subscription, follow the manual instructions in 
 
 This reference architecture shows how to implement continuous integration (CI), continuous delivery (CD), and retraining pipeline for an AI application using Azure DevOps and Azure Machine Learning. The solution is built on the scikit-learn diabetes dataset but can be easily adapted for any AI scenario and other popular build systems such as Jenkins and Travis. 
 
-![Architecture](/docs/images/main-diagram.png)
+![Architecture](/docs/images/main-flow.png)
 
 
 ## Architecture Flow
