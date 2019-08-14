@@ -118,17 +118,19 @@ Configure a pipeline to see values from the previously defined variable group **
 
 ![retrain pipeline vg](./images/retrain-pipeline-vg.png)
 
-Add an empty stage with name **``Invoke Training Pipeline``** and make sure that the **Agent Specification** is **``ubuntu-16.04``**:
+Add an empty stage with name **Invoke Training Pipeline** and make sure that the **Agent Specification** is **ubuntu-16.04**:
 
 ![agent specification](./images/agent-specification.png)
 
-Add a command line step **``Invoke Training Pipeline``** with the following script:
+Add a command line step **Run Training Pipeline** with the following script:
 
 ```bash
-docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME microsoft/mlopspython python run_train_pipeline.py
+docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines \
+       -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME \ 
+       microsoft/mlopspython python run_train_pipeline.py
 ```
 
-This release pipeline is triggered whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
+This release pipeline should be triggered whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
 
 ![create release](./images/create-release.png)
 
@@ -142,43 +144,43 @@ The training pipeline will train, evaluate and register a new model. Wait until 
 
 Good! Now we have a trained model.
 
-### 6. Train the Model
+### 8. Deploy the Model
 
 The final step is to deploy the model across environments with a release pipeline. There will be a **``QA``** environment running on [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) and a **``Prod``** environment running on [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service). 
 
 ![deploy model](./images/deploy-model.png)
 
 
-This pipeline leverages the **Azure Machine Learning** extension that should be installed in your organization from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml)
+This pipeline leverages the **Azure Machine Learning** extension that should be installed in your organization from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml).
 
 The pipeline consumes two artifacts: the result of the **Build Pipeline** as it contains configuration files and the **model** trained and registered by the ML training pipeline. 
 
-Configuration of a code **``_ci-build``** artifact is similar to what we did in the previous chapter. 
+Configuration of a code **_ci-build** artifact is similar to what we did in the previous chapter. 
 
-In order to configure a model artifact there should be a service connection to **``mlops-AML-WS``** workspace.
+In order to configure a model artifact there should be a service connection to **mlops-AML-WS** workspace:
 
 ![workspace connection](./images/workspace-connection.png)
 
-Add an artifact to the pipeline and select **AzureML Model Artifact** source type. Select the **Service Endpoint** and **Model Names** from the drop down lists
+Add an artifact to the pipeline and select **AzureML Model Artifact** source type. Select the **Service Endpoint** and **Model Names** from the drop down lists:
 
 ![model artifact](./images/model-artifact.png)
 
-Create a stage **``QA (ACI)``** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below
+Create a stage **QA (ACI)** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below:
 
 ![deploy aci](./images/deploy-aci.png)
 
-In a similar way create a stage **``Prod (AKS)``** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below
+In a similar way create a stage **Prod (AKS** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below:
 
 ![deploy aks](./images/deploy-aks.png)
 
 
-Note! Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
+**Note:** Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
 
-Save the pipeline and craete a release for it to trigger the pipeline manually. Once it's finished, check out deployments in the **``mlops-AML-WS``** workspace.
+Save the pipeline and craete a release to trigger it manually. Once the pipeline exection is finished, check out deployments in the **mlops-AML-WS** workspace.
 
 
 
-Congratulations, you now have three pipelines set up end to end.
+Congratulations! You have three pipelines set up end to end:
    - Build pipeline: triggered on code change to master branch on GitHub, performs linting, unit testing and publishing a trainig pipeline
    - Release Trigger pipeline: runs a published training pipeline to trian, evaluate and register a model
    - Release Deployment pipeline: deploys a model to QA (ACI) and Prod (AKS) environemts
