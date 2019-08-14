@@ -14,7 +14,7 @@ If you already have Azure DevOps account, create a [new project](https://docs.mi
 ### 3. Create Service Principal to Login to Azure
 
 To create service principal, register an application entity in Azure Active Directory (Azure AD) and grant it the Contributor or Owner role of the subscription or the resource group where the web service belongs to. See [how to create service principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) and assign permissions to manage Azure resource.
-Please make note the following values after creating a service principal, we will need them in subsequent steps
+Please make note of the following values after creating a service principal, we will need them in subsequent steps
 - Application (client) ID
 - Directory (tenant) ID
 - Application Secret
@@ -31,13 +31,30 @@ Please name your variable group **``devopsforai-aml-vg``** as we are using this 
 
 The varibale group should contain the following variables:
 
-a table (name, description, value)
+| Variable Name | Suggested Value |
+| --- | --- |
+| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2 |
+| AML_COMPUTE_CLUSTER_NAME | train-cluster |
+| AML_WORKSPACE_NAME | mlops-AML-WS |
+| BASE_NAME | mlops |
+| EVALUATE_SCRIPT_PATH | evaluate/evaluate_model.py |
+| EXPERIMENT_NAME | mlopspython |
+| LOCATION | centralus |
+| MODEL_NAME | sklearn_regression_model.pkl |
+| REGISTER_SCRIPT_PATH | register/register_model.py |
+| RESOURCE_GROUP | mlops-AML-RG |
+| SOURCES_DIR_TRAIN | code |
+| SP_APP_ID |  |
+| SP_APP_SECRET |  |
+| SUBSCRIPTION_ID |  |
+| TENANT_ID |  |
+| TRAIN_SCRIPT_PATH | training/train.py |
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
 Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
-Up until now you should have 
+Up until now you should have: 
 - Forked (or cloned) the repo
 - Created a devops account or use an existing one
 - Got service principal details and subscription id
@@ -45,121 +62,125 @@ Up until now you should have
 
 ### 5. Create resources 
 
-The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json). The pipeline requires an **Azure Resource Manager** service connection
+The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline coming in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of all required resources basing on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json). The pipeline requires an **Azure Resource Manager** service connection:
 
 ![create service connection](./images/create-rm-service-connection.png)
 
 Give the connection name **``AzureResourceConnection``** as it is referred by the pipeline definition.
 
-In your DevOps project create a build pipeline from your forked **GitHub** repository 
+In your DevOps project create a build pipeline from your forked **GitHub** repository: 
 
 ![build connnect step](./images/build-connect.png)
 
-Refer to an **Existing Azure Pipelines YAML file** 
+Refer to an **Existing Azure Pipelines YAML file**: 
 
 ![configure step](./images/select-iac-pipeline.png)
 
-Having done that, run the pipeline
+Having done that, run the pipeline:
+
 ![iac run](./images/run-iac-pipeline.png)
 
-Check out created resources in the [Azure Portal](portal.azure.com)
+Check out created resources in the [Azure Portal](portal.azure.com):
+
 ![created resources](./images/created-resources.png)
 
-Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-create-environment.yml) that removes resources ctreated for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
+Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-remove-environment.yml) that removes resources ctreated for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
 
 
 ### 6. Set up Build Pipeline
 
-In your [Azure DevOps](https://dev.azure.com) project create and run a new build pipeline refereing to  **azdo-ci-build-train.yml** pipeline in yuor forked **GitHub** repository
+In your [Azure DevOps](https://dev.azure.com) project create and run a new build pipeline refereing to [azdo-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml) pipeline in your forked **GitHub** repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
 
-Once the pipline is finished, explore the execution logs 
+Name the pipeline **ci-build**. Once the pipline is finished, explore the execution logs: 
 
 ![ci build logs](./images/ci-build-logs.png)
 
-and checkout a published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://ms.portal.azure.com/)
+and checkout a published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://ms.portal.azure.com/):
 
 ![training pipeline](./images/training-pipeline.png)
 
-Rename the pipeline as **ci-build**.
 
-Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linitnig, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
+Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linting, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
 
-### 6. Train the Model
+### 7. Train the Model
 
 The next step is to invoke the training pipeline created in the previous step. It can be done with a **Release Pipeline**:
 
 ![invoke training pipeline](./images/invoke-training-pipeline.png)
 
-An artifact of this pipeline will be the result of the build pipeline **ci-buid**
+An artifact of this pipeline will be the result of the build pipeline **ci-buid**:
 
 ![artifact invoke pipeline](./images/artifact-invoke-pipeline.png)
 
-Configure a pipeline to see values from the previously defined variable group **devopsforai-aml-vg**
+Configure a pipeline to see values from the previously defined variable group **devopsforai-aml-vg**:
 
 ![retrain pipeline vg](./images/retrain-pipeline-vg.png)
 
-Add an empty stage with name **``Invoke Training Pipeline``** and make sure that the **Agent Specification** is **``ubuntu-16.04``**
+Add an empty stage with name **Invoke Training Pipeline** and make sure that the **Agent Specification** is **ubuntu-16.04**:
+
 ![agent specification](./images/agent-specification.png)
 
-Add a command line step **``Invoke Training Pipeline``** with the following script
+Add a command line step **Run Training Pipeline** with the following script:
 
 ```bash
-docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME microsoft/mlopspython python run_train_pipeline.py
+docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines \
+       -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME \ 
+       microsoft/mlopspython python run_train_pipeline.py
 ```
 
-The pipeline is triggered whenever a new training pipeline is published by the builder pipeline. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually
+This release pipeline should be triggered whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
 
 ![create release](./images/create-release.png)
 
-Once the pipeline is completed, check out in the **ML Workspace** that the training pipeline is running 
+Once the release pipeline is completed, check out in the **ML Workspace** that the training pipeline is running: 
 
 ![running training pipeline](./images/running-training-pipeline.png)
 
-The training pipeline will train, evaluate and register a new model. Wait intil it is fininshed and make sure there is a new model in the **ML Workspace**
+The training pipeline will train, evaluate and register a new model. Wait until it is fininshed and make sure there is a new model in the **ML Workspace**:
 
 ![trained model](./images/trained-model.png)
 
 Good! Now we have a trained model.
 
-### 6. Train the Model
+### 8. Deploy the Model
 
 The final step is to deploy the model across environments with a release pipeline. There will be a **``QA``** environment running on [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) and a **``Prod``** environment running on [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service). 
 
 ![deploy model](./images/deploy-model.png)
 
 
-This pipeline leverages the **Azure Machine Learning** extension that should be installed in your organization from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml)
+This pipeline leverages the **Azure Machine Learning** extension that should be installed in your organization from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml).
 
 The pipeline consumes two artifacts: the result of the **Build Pipeline** as it contains configuration files and the **model** trained and registered by the ML training pipeline. 
 
-Configuration of a code **``_ci-build``** artifact is similar to what we did in the previous chapter. 
+Configuration of a code **_ci-build** artifact is similar to what we did in the previous chapter. 
 
-In order to configure a model artifact there should be a service connection to **``mlops-AML-WS``** workspace.
+In order to configure a model artifact there should be a service connection to **mlops-AML-WS** workspace:
 
 ![workspace connection](./images/workspace-connection.png)
 
-Add an artifact to the pipeline and select **AzureML Model Artifact** source type. Select the **Service Endpoint** and **Model Names** from the drop down lists
+Add an artifact to the pipeline and select **AzureML Model Artifact** source type. Select the **Service Endpoint** and **Model Names** from the drop down lists:
 
 ![model artifact](./images/model-artifact.png)
 
-Create a stage **``QA (ACI)``** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below
+Create a stage **QA (ACI)** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below:
 
 ![deploy aci](./images/deploy-aci.png)
 
-In a similar way create a stage **``Prod (AKS)``** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below
+In a similar way create a stage **Prod (AKS** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below:
 
 ![deploy aks](./images/deploy-aks.png)
 
 
-Note! Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
+**Note:** Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
 
-Save the pipeline and craete a release for it to trigger the pipeline manually. Once it's finished, check out deployments in the **``mlops-AML-WS``** workspace.
+Save the pipeline and craete a release to trigger it manually. Once the pipeline exection is finished, check out deployments in the **mlops-AML-WS** workspace.
 
 
 
-Congratulations, you now have three pipelines set up end to end.
+Congratulations! You have three pipelines set up end to end:
    - Build pipeline: triggered on code change to master branch on GitHub, performs linting, unit testing and publishing a trainig pipeline
    - Release Trigger pipeline: runs a published training pipeline to trian, evaluate and register a model
    - Release Deployment pipeline: deploys a model to QA (ACI) and Prod (AKS) environemts
