@@ -31,7 +31,24 @@ Please name your variable group **``devopsforai-aml-vg``** as we are using this 
 
 The varibale group should contain the following variables:
 
-a table (name, description, value)
+| Variable Name | Suggested Value |
+| --- | --- |
+| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2 |
+| AML_COMPUTE_CLUSTER_NAME | train-cluster |
+| AML_WORKSPACE_NAME | mlops-AML-WS |
+| BASE_NAME | mlops |
+| EVALUATE_SCRIPT_PATH | evaluate/evaluate_model.py |
+| EXPERIMENT_NAME | mlopspython |
+| LOCATION | centralus |
+| MODEL_NAME | sklearn_regression_model.pkl |
+| REGISTER_SCRIPT_PATH | register/register_model.py |
+| RESOURCE_GROUP | mlops-AML-RG |
+| SOURCES_DIR_TRAIN | code |
+| SP_APP_ID |  |
+| SP_APP_SECRET |  |
+| SUBSCRIPTION_ID |  |
+| TENANT_ID |  |
+| TRAIN_SCRIPT_PATH | training/train.py |
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
@@ -70,7 +87,7 @@ Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-c
 
 ### 6. Set up Build Pipeline
 
-In your [Azure DevOps](https://dev.azure.com) project create and run a new build pipeline refereing to  **azdo-ci-build-train.yml** pipeline in yuor forked **GitHub** repository
+In your [Azure DevOps](https://dev.azure.com) project create and run a new build pipeline refereing to  **azdo-ci-build-train.yml** pipeline in your forked **GitHub** repository
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
 
