@@ -54,7 +54,7 @@ Mark **SP_APP_SECRET** variable as a secret one.
 
 Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
-Up until now you should have 
+Up until now you should have: 
 - Forked (or cloned) the repo
 - Created a devops account or use an existing one
 - Got service principal details and subscription id
