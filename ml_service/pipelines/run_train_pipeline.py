@@ -6,15 +6,15 @@ from azureml.core.authentication import AzureCliAuthentication
 from azure.common.credentials import ServicePrincipalCredentials
 
 
- try:
-     with open("train_pipeline.json") as f:
-         train_pipeline_json = json.load(f)
- except Exception:
-     print("No pipeline json found")
-     sys.exit(0)
+try:
+    with open("train_pipeline.json") as f:
+        train_pipeline_json = json.load(f)
+except Exception:
+    print("No pipeline json found")
+    sys.exit(0)
 
- experiment_name = os.environ.get("EXPERIMENT_NAME")
- model_name = os.environ.get("MODEL_NAME")
+experiment_name = os.environ.get("EXPERIMENT_NAME")
+model_name = os.environ.get("MODEL_NAME")
 
 credentials = ServicePrincipalCredentials(
     client_id = '368aaecc-1df8-4132-914c-6c42f8aa0f8b',
