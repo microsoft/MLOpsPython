@@ -8,13 +8,13 @@ from azure.common.credentials import ServicePrincipalCredentials
 
  try:
      with open("train_pipeline.json") as f:
-#         train_pipeline_json = json.load(f)
-# except Exception:
-#     print("No pipeline json found")
-#     sys.exit(0)
+         train_pipeline_json = json.load(f)
+ except Exception:
+     print("No pipeline json found")
+     sys.exit(0)
 
-# experiment_name = os.environ.get("EXPERIMENT_NAME")
-# model_name = os.environ.get("MODEL_NAME")
+ experiment_name = os.environ.get("EXPERIMENT_NAME")
+ model_name = os.environ.get("MODEL_NAME")
 
 credentials = ServicePrincipalCredentials(
     client_id = '368aaecc-1df8-4132-914c-6c42f8aa0f8b',
@@ -27,7 +27,7 @@ credentials = ServicePrincipalCredentials(
 token = credentials.token['access_token']
 print("token", token)
 
-#rest_endpoint = train_pipeline_json["rest_endpoint"]
+rest_endpoint = train_pipeline_json["rest_endpoint"]
 
 response = requests.post(
     rest_endpoint, headers=token,
