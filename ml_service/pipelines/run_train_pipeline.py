@@ -25,11 +25,12 @@ credentials = ServicePrincipalCredentials(
 # token = cli_auth.get_authentication_header()
 token = credentials.token['access_token']
 print("token", token)
+auth_header = {"Authorization": "Bearer " + token}
 
 rest_endpoint = train_pipeline_json["rest_endpoint"]
 
 response = requests.post(
-    rest_endpoint, headers=token,
+    rest_endpoint, headers=auth_header,
     json={"ExperimentName": experiment_name,
           "ParameterAssignments": {"model_name": model_name}}
 )
