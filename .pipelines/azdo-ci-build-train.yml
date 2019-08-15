@@ -8,7 +8,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 container:
-  image: mlopscr.azurecr.io/public/mlops/mlopspython:latest
+  image: mcr.microsoft.com/mlops/python:latest
   endpoint: acrconnection
 
 

@@ -8,9 +8,9 @@
 
 - environment_setup/iac-*.yml, arm-templates: Infrastructure as Code piplines to create and delete required resources along with corresponding arm-templates.
 
-- environment_setup/Dockerfile : Dockerfile of a building agent (microsoft/mlopspython) containing Python 3.6 and all required packages.
+- environment_setup/Dockerfile : Dockerfile of a building agent containing Python 3.6 and all required packages.
 
-- environment_setup/docker-image-pipeline.yml : An AzDo pipeline building and pushing microsoft/mlopspython image. 
+- environment_setup/docker-image-pipeline.yml : An AzDo pipeline building and pushing [microsoft/mlopspython](https://hub.docker.com/_/microsoft-mlops-python) image. 
 
 ### Pipelines
 
