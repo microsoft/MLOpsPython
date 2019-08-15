@@ -3,7 +3,6 @@ import os
 import json
 import requests
 from azureml.core.authentication import AzureCliAuthentication
-# from azure.common.credentials import ServicePrincipalCredentials
 
 
 try:
@@ -16,16 +15,10 @@ except Exception:
 experiment_name = os.environ.get("EXPERIMENT_NAME")
 model_name = os.environ.get("MODEL_NAME")
 
-# credentials = ServicePrincipalCredentials(
-#     client_id = $(SP_APP_ID),
-#     secret = KEY,
-#     tenant = TENANT_ID
-# )
 cli_auth = AzureCliAuthentication()
 token = cli_auth.get_authentication_header()
 
 rest_endpoint = train_pipeline_json["rest_endpoint"]
-print("rest_endpoint ", rest_endpoint)
 
 response = requests.post(
     rest_endpoint, headers=token,
@@ -33,6 +26,5 @@ response = requests.post(
           "ParameterAssignments": {"model_name": model_name}}
 )
 
-print("response ", response)
 run_id = response.json()["Id"]
 print("Pipeline run initiated ", run_id)
