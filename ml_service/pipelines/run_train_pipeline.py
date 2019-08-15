@@ -5,6 +5,10 @@ import requests
 from azure.common.credentials import ServicePrincipalCredentials
 
 
+tenant_id = os.environ.get("TENANT_ID")
+app_id = os.environ.get("SP_APP_ID")
+app_secret = os.environ.get("SP_APP_SECRET")
+
 try:
     with open("train_pipeline.json") as f:
         train_pipeline_json = json.load(f)
@@ -16,13 +20,11 @@ experiment_name = os.environ.get("EXPERIMENT_NAME")
 model_name = os.environ.get("MODEL_NAME")
 
 credentials = ServicePrincipalCredentials(
-    client_id='368aaecc-1df8-4132-914c-6c42f8aa0f8b',
-    secret='e9ToDq-+0add3Oe6O=lwcqo=_Ppy*zim',
-    tenant='72f988bf-86f1-41af-91ab-2d7cd011db47'
+    client_id=app_id,
+    secret=app_secret,
+    tenant=tenant_id
 )
 
-# cli_auth = AzureCliAuthentication()
-# token = cli_auth.get_authentication_header()
 token = credentials.token['access_token']
 print("token", token)
 auth_header = {"Authorization": "Bearer " + token}
