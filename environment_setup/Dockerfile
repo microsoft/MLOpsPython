@@ -10,8 +10,4 @@ COPY environment_setup/requirements.txt  /setup/
 
 RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt   
 
-COPY environment_setup/python.sh /usr/local/sbin/python.sh
-RUN rm /usr/local/bin/python && ln -s /usr/local/sbin/python.sh /usr/local/bin/python
-
-
 CMD ["python"]
