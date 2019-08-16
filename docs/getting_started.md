@@ -126,8 +126,9 @@ Add a command line step **Run Training Pipeline** with the following script:
 
 ```bash
 docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines \
-       -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME \ 
-       mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
+-w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME \
+-e TENANT_ID=$TENANT_ID -e SP_APP_ID=$SP_APP_ID -e SP_APP_SECRET=$SP_APP_SECRET \
+mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
 ```
 
 This release pipeline should be triggered whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
