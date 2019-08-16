@@ -166,14 +166,37 @@ Add an artifact to the pipeline and select **AzureML Model Artifact** source typ
 
 ![model artifact](./images/model-artifact.png)
 
-Create a stage **QA (ACI)** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below:
+Create a stage **QA (ACI)** and add a single task to the job **Azure ML Model Deploy**: 
 
 ![deploy aci](./images/deploy-aci.png)
 
-In a similar way create a stage **Prod (AKS** and add a single task to the job **Azure ML Model Deploy**. Specify task parameters as it is shown below:
+Specify task parameters as it is shown in the table below:
+| Parameter | Value |
+| --- | --- |
+| Display Name | Azure ML Model Deploy |
+| Azure ML Workspace | mlops-AML-WS |
+| Inference config Path | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml` |
+| Model Deployment Target | Azure Container Instance |
+| Deployment Name | mlopspython-aci |
+| Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aci.yml` |
+| Overwrite existing deployment | X |
+
+
+In a similar way create a stage **Prod (AKS** and add a single task to the job **Azure ML Model Deploy**: 
 
 ![deploy aks](./images/deploy-aks.png)
 
+Specify task parameters as it is shown in the table below:
+| Parameter | Value |
+| --- | --- |
+| Display Name | Azure ML Model Deploy |
+| Azure ML Workspace | mlops-AML-WS |
+| Inference config Path | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml` |
+| Model Deployment Target | Azure Kubernetes Service |
+| Select AKS Cluster for Deployment | YOUR_DEPLOYMENT_K8S_CLUSTER |
+| Deployment Name | mlopspython-aks |
+| Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aks.yml` |
+| Overwrite existing deployment | X |
 
 **Note:** Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
 
