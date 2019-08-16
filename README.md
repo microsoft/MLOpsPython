@@ -1,3 +1,13 @@
+---
+page_type: sample
+languages:
+- python
+products:
+- azure
+- azure-machine-learning-service
+- azure-devops
+---
+
 # MLOps with Azure ML
 
 
