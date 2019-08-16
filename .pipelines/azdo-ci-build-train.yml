@@ -1,0 +1,45 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+container: mcr.microsoft.com/mlops/python:latest
+
+
+variables:
+- group: devopsforai-aml-vg
+
+
+steps:
+- template: azdo-base-pipeline.yml
+    
+- bash: |
+   # Invoke the Python building and publishing a training pipeline
+   python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline.py
+  failOnStderr: 'false'
+  env:
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
+  displayName: 'Train model using AML with Remote Compute'
+  enabled: 'true'
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    Contents: |
+      ml_service/pipelines/?(run_train_pipeline.py|*.json)  
+      code/scoring/**
+
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    ArtifactName: 'mlops-pipelines'
+    publishLocation: 'container'
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    TargetPath: '$(Build.ArtifactStagingDirectory)'  

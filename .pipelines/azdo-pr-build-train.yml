@@ -1,0 +1,18 @@
+trigger: none
+pr:
+  branches:
+    include:
+    - master
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+container: mcr.microsoft.com/mlops/python:latest  
+
+
+variables:
+- group: devopsforai-aml-vg
+
+
+steps:
+- template: azdo-base-pipeline.yml

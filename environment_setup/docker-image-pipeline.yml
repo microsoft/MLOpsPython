@@ -1,0 +1,29 @@
+resources:
+- repo: self
+
+queue:
+  name: Hosted Ubuntu 1604
+
+trigger:
+  branches:
+    include:
+    - master
+
+  paths:
+    include:
+    - environment_setup/*
+
+variables:
+  containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
+  imageName: $[coalesce(variables['agentImageName'], 'public/mlops/mlopspython')]  
+
+steps:
+  - task: Docker@2
+    displayName: Build and Push
+    inputs:
+      command: buildAndPush
+      containerRegistry: '$(containerRegistry)'
+      repository: '$(imageName)'
+      tags: 'latest'
+      buildContext: '$(Build.SourcesDirectory)' 
+      dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'
