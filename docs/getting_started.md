@@ -171,6 +171,8 @@ Create a stage **QA (ACI)** and add a single task to the job **Azure ML Model De
 ![deploy aci](./images/deploy-aci.png)
 
 Specify task parameters as it is shown in the table below:
+
+
 | Parameter | Value |
 | --- | --- |
 | Display Name | Azure ML Model Deploy |
@@ -187,6 +189,7 @@ In a similar way create a stage **Prod (AKS** and add a single task to the job *
 ![deploy aks](./images/deploy-aks.png)
 
 Specify task parameters as it is shown in the table below:
+
 | Parameter | Value |
 | --- | --- |
 | Display Name | Azure ML Model Deploy |
