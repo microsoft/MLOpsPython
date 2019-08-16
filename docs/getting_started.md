@@ -84,7 +84,7 @@ Check out created resources in the [Azure Portal](portal.azure.com):
 
 ![created resources](./images/created-resources.png)
 
-Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-remove-environment.yml) that removes resources ctreated for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
+Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-remove-environment.yml) that removes resources created for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
 
 
 ### 6. Set up Build Pipeline
@@ -131,7 +131,7 @@ docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_se
 mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
 ```
 
-This release pipeline should be triggered whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
+This release pipeline should be automatically triggered (continuous deployment) whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
 
 ![create release](./images/create-release.png)
 
