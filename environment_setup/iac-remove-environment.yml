@@ -10,18 +10,16 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  baseName: $[coalesce(variables['baseNameOverride'], 'mlops')]
-  location: $[coalesce(variables['locationOverride'], 'centralus')]
-  azuresub: $[coalesce(variables['azuresubOverride'], 'AzureResourceConnection')]
+- group: devopsforai-aml-vg
 
 
 steps:
 - task: AzureResourceGroupDeployment@2
   inputs:
-    azureSubscription: $(azuresub)
+    azureSubscription: 'AzureResourceConnection'
     action: 'DeleteRG'
-    resourceGroupName: '$(baseName)-AML-RG'
-    location: $(location)
+    resourceGroupName: '$(RESOURCE_GROUP)'
+    location: $(LOCATION)
   displayName: 'Delete resources in Azure'
 
   
