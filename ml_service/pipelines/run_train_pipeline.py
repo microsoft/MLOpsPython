@@ -39,4 +39,3 @@ response = requests.post(
 
 run_id = response.json()["Id"]
 print("Pipeline run initiated ", run_id)
-
