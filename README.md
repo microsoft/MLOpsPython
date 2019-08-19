@@ -6,6 +6,7 @@ products:
 - azure
 - azure-machine-learning-service
 - azure-devops
+description: "Code which demonstrates how to deploy and use an Inception model in Azure Machine Learning Service."
 ---
 
 # MLOps with Azure ML
