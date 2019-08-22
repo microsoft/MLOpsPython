@@ -215,6 +215,7 @@ Using bash script task to invoke [Create Image Script](./ml_service/util/create_
 ![release_createimage](./images/release-task-createimage.PNG)
 
 Specify task parameters as it is shown in the table below:
+
 | Parameter          | Value                               |
 | ------------------ | ----------------------------------- |
 | Azure Subscription | Subscription used to deploy Web App |
