@@ -51,12 +51,11 @@ image.wait_for_creation(show_output=True)
 if image.creation_state != "Succeeded":
     raise Exception("Image creation status: {image.creation_state}")
 
-print(
-    "{}(v.{} [{}]) stored at {} with build log {}".format(
-        image.name,
-        image.version,
-        image.creation_state,
-        image.image_location,
-        image.image_build_log_uri,
-    )
+print("{}(v.{} [{}]) stored at {} with build log {}".format(
+    image.name,
+    image.version,
+    image.creation_state,
+    image.image_location,
+    image.image_build_log_uri,
+)
 )
