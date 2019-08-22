@@ -20,7 +20,7 @@ Please make note of the following values after creating a service principal, we 
 - Application Secret
 
 
-**Note:** You must have sufficient permissions to register an application with your Azure AD tenant, and assign the application to a role in your Azure subscription. Contact your subscription adminstator if you don't have the permissions. Normally a subscription admin can create a Service principal and can provide you the details.
+**Note:** You must have sufficient permissions to register an application with your Azure AD tenant, and assign the application to a role in your Azure subscription. Contact your subscription administrator if you don't have the permissions. Normally a subscription admin can create a Service principal and can provide you the details.
 
 
 ### 4. Create a Variable Group
@@ -29,26 +29,26 @@ We make use of variable group inside Azure DevOps to store variables and their v
  
 Please name your variable group **``devopsforai-aml-vg``** as we are using this name within our build yaml file. 
 
-The varibale group should contain the following variables:
+The variable group should contain the following variables:
 
-| Variable Name | Suggested Value |
-| --- | --- |
-| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2 |
-| AML_COMPUTE_CLUSTER_NAME | train-cluster |
-| AML_WORKSPACE_NAME | mlops-AML-WS |
-| BASE_NAME | mlops |
-| EVALUATE_SCRIPT_PATH | evaluate/evaluate_model.py |
-| EXPERIMENT_NAME | mlopspython |
-| LOCATION | centralus |
-| MODEL_NAME | sklearn_regression_model.pkl |
-| REGISTER_SCRIPT_PATH | register/register_model.py |
-| RESOURCE_GROUP | mlops-AML-RG |
-| SOURCES_DIR_TRAIN | code |
-| SP_APP_ID |  |
-| SP_APP_SECRET |  |
-| SUBSCRIPTION_ID |  |
-| TENANT_ID |  |
-| TRAIN_SCRIPT_PATH | training/train.py |
+| Variable Name               | Suggested Value              |
+| --------------------------- | ---------------------------- |
+| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2              |
+| AML_COMPUTE_CLUSTER_NAME    | train-cluster                |
+| AML_WORKSPACE_NAME          | mlops-AML-WS                 |
+| BASE_NAME                   | mlops                        |
+| EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py   |
+| EXPERIMENT_NAME             | mlopspython                  |
+| LOCATION                    | centralus                    |
+| MODEL_NAME                  | sklearn_regression_model.pkl |
+| REGISTER_SCRIPT_PATH        | register/register_model.py   |
+| RESOURCE_GROUP              | mlops-AML-RG                 |
+| SOURCES_DIR_TRAIN           | code                         |
+| SP_APP_ID                   |                              |
+| SP_APP_SECRET               |                              |
+| SUBSCRIPTION_ID             |                              |
+| TENANT_ID                   |                              |
+| TRAIN_SCRIPT_PATH           | training/train.py            |
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
@@ -173,15 +173,15 @@ Create a stage **QA (ACI)** and add a single task to the job **Azure ML Model De
 Specify task parameters as it is shown in the table below:
 
 
-| Parameter | Value |
-| --- | --- |
-| Display Name | Azure ML Model Deploy |
-| Azure ML Workspace | mlops-AML-WS |
-| Inference config Path | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml` |
-| Model Deployment Target | Azure Container Instance |
-| Deployment Name | mlopspython-aci |
+| Parameter                     | Value                                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Display Name                  | Azure ML Model Deploy                                                                                |
+| Azure ML Workspace            | mlops-AML-WS                                                                                         |
+| Inference config Path         | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`      |
+| Model Deployment Target       | Azure Container Instance                                                                             |
+| Deployment Name               | mlopspython-aci                                                                                      |
 | Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aci.yml` |
-| Overwrite existing deployment | X |
+| Overwrite existing deployment | X                                                                                                    |
 
 
 In a similar way create a stage **Prod (AKS** and add a single task to the job **Azure ML Model Deploy**: 
@@ -190,25 +190,50 @@ In a similar way create a stage **Prod (AKS** and add a single task to the job *
 
 Specify task parameters as it is shown in the table below:
 
-| Parameter | Value |
-| --- | --- |
-| Display Name | Azure ML Model Deploy |
-| Azure ML Workspace | mlops-AML-WS |
-| Inference config Path | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml` |
-| Model Deployment Target | Azure Kubernetes Service |
-| Select AKS Cluster for Deployment | YOUR_DEPLOYMENT_K8S_CLUSTER |
-| Deployment Name | mlopspython-aks |
-| Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aks.yml` |
-| Overwrite existing deployment | X |
+| Parameter                         | Value                                                                                                |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Display Name                      | Azure ML Model Deploy                                                                                |
+| Azure ML Workspace                | mlops-AML-WS                                                                                         |
+| Inference config Path             | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`      |
+| Model Deployment Target           | Azure Kubernetes Service                                                                             |
+| Select AKS Cluster for Deployment | YOUR_DEPLOYMENT_K8S_CLUSTER                                                                          |
+| Deployment Name                   | mlopspython-aks                                                                                      |
+| Deployment Configuration file     | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aks.yml` |
+| Overwrite existing deployment     | X                                                                                                    |
 
 **Note:** Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
 
-Save the pipeline and craete a release to trigger it manually. Once the pipeline exection is finished, check out deployments in the **mlops-AML-WS** workspace.
+**Deploy trained model to Azure Web App for containers**
+
+Note: This is an optional step and can be used only if you are deploying your scoring service on Azure Web Apps.
+
+[Create Image Script](../ml_service/util/create_scoring_image.py)
+can be used to create a scoring image from the release pipeline. Image created by this script will be registered under Azure Container Registry(ACR) instance that belongs to Azure Machine Learning Service. Any dependencies that scoring file depends on can also be packaged with the container with Image config. To learn more on how to create a container with AML SDK click [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).    
+
+Below is release pipeline with two tasks one to create an image using the above script and second is the deploy the image to Web App for containers  
+![release_webapp](./images/release-webapp-pipeline.PNG)
+
+Using bash script task to invoke [Create Image Script](../ml_service/util/create_scoring_image.py)
+![release_createimage](./images/release-task-createimage.PNG)
+
+Specify task parameters as it is shown in the table below:
+
+
+| Parameter          | Value                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------- |
+| Azure subscription | Subscription used to deploy Web App                                                                 |
+| App name           | Web App for Containers name                                                                         |
+| Image name         | Specify the fully qualified container image name. For example, 'myregistry.azurecr.io/nginx:latest' |
+
+![release_webapp](./images/release-task-webappdeploy.PNG)
+
+
+Save the pipeline and create a release to trigger it manually. Once the pipeline execution is finished, check out deployments in the **mlops-AML-WS** workspace.
 
 
 
 Congratulations! You have three pipelines set up end to end:
-   - Build pipeline: triggered on code change to master branch on GitHub, performs linting, unit testing and publishing a trainig pipeline
-   - Release Trigger pipeline: runs a published training pipeline to trian, evaluate and register a model
-   - Release Deployment pipeline: deploys a model to QA (ACI) and Prod (AKS) environemts
+   - Build pipeline: triggered on code change to master branch on GitHub, performs linting, unit testing and publishing a training pipeline
+   - Release Trigger pipeline: runs a published training pipeline to train, evaluate and register a model
+   - Release Deployment pipeline: deploys a model to QA (ACI) and Prod (AKS) environments
     
