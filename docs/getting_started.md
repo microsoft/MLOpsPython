@@ -217,11 +217,11 @@ Using bash script task to invoke [Create Image Script](./ml_service/util/create_
 Specify task parameters as it is shown in the table below:
 
 
-| Parameter             | Value                                                                                           |
-| --------------------- | ----------------------------------------------------------------------------------------------- |
-| Azure Subscription    | Subscription used to deploy Web App                                                             |
-| App name              | Web App for Containers name                                                                     |
-| Inference config Path | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml` |
+| Parameter          | Value                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------- |
+| Azure Subscription | Subscription used to deploy Web App                                                                 |
+| App name           | Web App for Containers name                                                                         |
+| Image Name         | Specify the fully qualified container image name. For example, 'myregistry.azurecr.io/nginx:latest' |
 
 ![release_webapp](./images/release-task-webappdeploy.PNG)
 
