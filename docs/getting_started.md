@@ -205,7 +205,7 @@ Specify task parameters as it is shown in the table below:
 
 **Deploy trained model to Azure Web App for containers**
 
-Note: This is an optional step and can be used only if you are deploying your scoring services on web apps.
+Note: This is an optional step and can be used only if you are deploying your scoring service on Azure Web Apps.
 
 [Create Image Script](/../ml_service/util/create_scoring_image.py)
 can be used to create a scoring image from the release pipeline. Image created by this script will be registered under Azure Container Registry(ACR) instance that belongs to Azure Machine Learning Service. Any dependencies that scoring file depends on can also be packaged with the container with Image config. To learn more on how to create a container with AML SDK click [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).    
@@ -213,7 +213,7 @@ can be used to create a scoring image from the release pipeline. Image created b
 Below is release pipeline with two tasks one to create an image using the above script and second is the deploy the image to Web App for containers  
 ![release_webapp](./images/release-webapp-pipeline.PNG)
 
-Using bash script task to invoke [Create Image Script](./ml_service/util/create_scoring_image.py)
+Using bash script task to invoke [Create Image Script](/../ml_service/util/create_scoring_image.py)
 ![release_createimage](./images/release-task-createimage.PNG)
 
 Specify task parameters as it is shown in the table below:
