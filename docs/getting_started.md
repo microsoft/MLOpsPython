@@ -36,7 +36,7 @@ The variable group should contain the following variables:
 | AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2              |
 | AML_COMPUTE_CLUSTER_NAME    | train-cluster                |
 | AML_WORKSPACE_NAME          | mlops-AML-WS                 |
-| BASE_NAME                   | mlops                        |
+| BASE_NAME                   | mlops[unique part of the name]                        |
 | EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py   |
 | EXPERIMENT_NAME             | mlopspython                  |
 | LOCATION                    | centralus                    |
@@ -51,6 +51,8 @@ The variable group should contain the following variables:
 | TRAIN_SCRIPT_PATH           | training/train.py            |
 
 Mark **SP_APP_SECRET** variable as a secret one.
+
+**Note:** The BASE_NAME parameter is used throughout the solution for naming Azure resources. When the solution is used in a shared subscription, there can be naming collisions with resources that require unique names like azure blob storage and registry DNS naming. Make sure to give a unique value to the BASE_NAME variable (e.g. mlops_My_Project_Name), so that the created resources will have unique names (e.g. mlops_My_Project_Name-AML-RG, mlops_My_Project_Name-AML-WS, etc.).  
 
 Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
