@@ -4,7 +4,7 @@
   "parameters": {
     "baseName": {
       "type": "string",
-      "maxLength": 10,
+      "maxLength": 20,
       "minLength": 3,
       "metadata": {
         "description": "The base name to use as prefix to create all the resources."

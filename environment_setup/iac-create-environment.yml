@@ -18,7 +18,7 @@ steps:
   inputs:
     azureSubscription: 'AzureResourceConnection'
     action: 'Create Or Update Resource Group'
-    resourceGroupName: '$(RESOURCE_GROUP)'
+    resourceGroupName: $[concat(parameters('RESOURCE_GROUP'),'-AML-RG')]
     location: $(LOCATION)
     templateLocation: 'Linked artifact'
     csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/cloud-environment.json'
