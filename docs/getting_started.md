@@ -35,14 +35,12 @@ The variable group should contain the following variables:
 | --------------------------- | ---------------------------- |
 | AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2              |
 | AML_COMPUTE_CLUSTER_NAME    | train-cluster                |
-| AML_WORKSPACE_NAME          | mlops-AML-WS                 |
-| BASE_NAME                   | mlops[unique part of the name]                        |
+| BASE_NAME                   | [unique base name]                        |
 | EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py   |
 | EXPERIMENT_NAME             | mlopspython                  |
 | LOCATION                    | centralus                    |
 | MODEL_NAME                  | sklearn_regression_model.pkl |
 | REGISTER_SCRIPT_PATH        | register/register_model.py   |
-| RESOURCE_GROUP              | mlops-AML-RG                 |
 | SOURCES_DIR_TRAIN           | code                         |
 | SP_APP_ID                   |                              |
 | SP_APP_SECRET               |                              |
@@ -52,7 +50,7 @@ The variable group should contain the following variables:
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
-**Note:** The BASE_NAME parameter is used throughout the solution for naming Azure resources. When the solution is used in a shared subscription, there can be naming collisions with resources that require unique names like azure blob storage and registry DNS naming. Make sure to give a unique value to the BASE_NAME variable (e.g. mlops_My_Project_Name), so that the created resources will have unique names (e.g. mlops_My_Project_Name-AML-RG, mlops_My_Project_Name-AML-WS, etc.).  
+**Note:** The BASE_NAME parameter is used throughout the solution for naming Azure resources. When the solution is used in a shared subscription, there can be naming collisions with resources that require unique names like azure blob storage and registry DNS naming. Make sure to give a unique value to the BASE_NAME variable (e.g. MyUniqueML), so that the created resources will have unique names (e.g. MyUniqueML-AML-RG, MyUniqueML-AML-WS, etc.). The length of the BASE_NAME value should not exceed 10 charecters. 
 
 Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
