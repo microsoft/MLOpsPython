@@ -66,7 +66,7 @@ The easiest way to create all required resources (Resource Group, ML Workspace, 
 
 ![create service connection](./images/create-rm-service-connection.png)
 
-Give the connection name **``AzureResourceConnection``** as it is referred by the pipeline definition.
+Give the connection name **``AzureResourceConnection``** as it is referred by the pipeline definition. Leave the field **``Resource Group``** empty.
 
 In your DevOps project create a build pipeline from your forked **GitHub** repository: 
 
