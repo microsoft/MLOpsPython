@@ -160,6 +160,8 @@ Configuration of a code **_ci-build** artifact is similar to what we did in the 
 
 In order to configure a model artifact there should be a service connection to **mlops-AML-WS** workspace:
 
+**Note:** Creating service connection using Azure Machine Learning extension requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
+
 ![workspace connection](./images/workspace-connection.png)
 
 Add an artifact to the pipeline and select **AzureML Model Artifact** source type. Select the **Service Endpoint** and **Model Names** from the drop down lists:
