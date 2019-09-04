@@ -122,7 +122,7 @@ Rename the default "Stage 1" to **Invoke Training Pipeline** and make sure that 
 
 ![agent specification](./images/agent-specification.png)
 
-Add a command line step **Run Training Pipeline** with the following script:
+Add a **Command Line Script** step, rename it to **Run Training Pipeline** with the following script:
 
 ```bash
 docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines \
