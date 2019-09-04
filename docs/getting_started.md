@@ -159,6 +159,7 @@ The pipeline consumes two artifacts: the result of the **Build Pipeline** as it 
 Configuration of a code **_ci-build** artifact is similar to what we did in the previous chapter. 
 
 In order to configure a model artifact there should be a service connection to **mlops-AML-WS** workspace:
+**Note:** Creating service connection using Azure Machine Learning extension requires owner access to the subscription.
 
 ![workspace connection](./images/workspace-connection.png)
 
