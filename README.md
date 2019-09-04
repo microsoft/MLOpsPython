@@ -47,7 +47,7 @@ This reference architecture shows how to implement continuous integration (CI), 
 
     - **Train Model** task executes model training script on Azure ML Compute. It outputs a [model](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#model) file which is stored in the [run history](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#run).
 
-    - **Evaluate Model** task evaluates the performance of newly trained model with the model in production. If the new model performs better than the production model, the following steps are executed. If not, they will be skipped.
+    - **Evaluate Model** task evaluates the performance of the newly trained model with the model in production. If the new model performs better than the production model, the following steps are executed. If not, they will be skipped.
 
     - **Register Model** task takes the improved model and registers it with the [Azure ML Model registry](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#model-registry). This allows us to version control it.
 
@@ -55,7 +55,7 @@ This reference architecture shows how to implement continuous integration (CI), 
 
 Once you have registered your ML model, you can use Azure ML + Azure DevOps to deploy it.
 
-[Azure DevOps release pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/?view=azure-devops) packages the new model along with the scoring file and its python dependencies into a [docker image](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#image) and pushes it to [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-intro). This image is used to deploy the model as [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service) across QA and Prod environments. The QA environment is running on top of [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/) and the Prod environemt is built with [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes).
+[Azure DevOps release pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/?view=azure-devops) packages the new model along with the scoring file and its python dependencies into a [docker image](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#image) and pushes it to [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-intro). This image is used to deploy the model as [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service) across QA and Prod environments. The QA environment is running on top of [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/) and the Prod environment is built with [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes).
     
 
 ### Repo Details
