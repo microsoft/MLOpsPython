@@ -118,7 +118,7 @@ Configure a pipeline to see values from the previously defined variable group **
 
 ![retrain pipeline vg](./images/retrain-pipeline-vg.png)
 
-Add an empty stage with name **Invoke Training Pipeline** and make sure that the **Agent Specification** is **ubuntu-16.04**:
+Rename the default "Stage 1" to **Invoke Training Pipeline** and make sure that the **Agent Specification** is **ubuntu-16.04** under the Agent Job:
 
 ![agent specification](./images/agent-specification.png)
 
