@@ -131,7 +131,7 @@ docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_se
 mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
 ```
 
-This release pipeline should be automatically triggered (continuous deployment) whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually:
+This release pipeline should be automatically triggered (continuous deployment) whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually by clicking on the **Create release** button on the top right of your screen, when selecting this new build pipeline:
 
 ![create release](./images/create-release.png)
 
