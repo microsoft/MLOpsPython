@@ -106,7 +106,7 @@ Great, you now have the build pipeline setup, you can either manually trigger it
 
 ### 7. Train the Model
 
-The next step is to invoke the training pipeline created in the previous step. It can be done with a **Release Pipeline**:
+The next step is to invoke the training pipeline created in the previous step. It can be done with a **Release Pipeline**. Click on the Pipelines/Releases menu, and then **New pipeline**:
 
 ![invoke training pipeline](./images/invoke-training-pipeline.png)
 
