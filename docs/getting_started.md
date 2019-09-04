@@ -114,7 +114,7 @@ An artifact of this pipeline will be the result of the build pipeline **ci-buid*
 
 ![artifact invoke pipeline](./images/artifact-invoke-pipeline.png)
 
-Configure a pipeline to see values from the previously defined variable group **devopsforai-aml-vg**. Click on the "Variable groups", and to the right, click on "Link variable group". From there, pick the **devopsforai-aml-vg** variable group we created in an earlier step:
+Configure a pipeline to see values from the previously defined variable group **devopsforai-aml-vg**. Click on the "Variable groups", and to the right, click on "Link variable group". From there, pick the **devopsforai-aml-vg** variable group we created in an earlier step, choose "Release" as a variable group scope, and click on "Link":
 
 ![retrain pipeline vg](./images/retrain-pipeline-vg.png)
 
