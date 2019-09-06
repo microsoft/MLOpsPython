@@ -147,7 +147,7 @@ Good! Now we have a trained model.
 
 ### 8. Deploy the Model
 
-The final step is to deploy the model across environments with a release pipeline. There will be a **``QA``** environment running on [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) and a **``Prod``** environment running on [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service). 
+The final step is to deploy the model across environments with a release pipeline. There will be a **``QA``** environment running on [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) and a **``Prod``** environment running on [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service). This is the final picture of what your release pipeline will look like:
 
 ![deploy model](./images/deploy-model.png)
 
@@ -156,13 +156,13 @@ This pipeline leverages the **Azure Machine Learning** extension that should be 
 
 The pipeline consumes two artifacts: the result of the **Build Pipeline** as it contains configuration files and the **model** trained and registered by the ML training pipeline. 
 
-Configuration of a code **_ci-build** artifact is similar to what we did in the previous chapter. 
+Add the **_ci-build** artifact using the same process as what we did in the previous chapter. 
 
-In order to configure a model artifact there should be a service connection to **mlops-AML-WS** workspace:
+In order to configure a model artifact there should be a service connection to **mlops-AML-WS** workspace. To get there, go to the project settings (by clicking on the cog wheel to the bottom left of the screen), and then click on **Service connections** under the **Pipelines** section:
 
 ![workspace connection](./images/workspace-connection.png)
 
-Add an artifact to the pipeline and select **AzureML Model Artifact** source type. Select the **Service Endpoint** and **Model Names** from the drop down lists:
+Add an artifact to the pipeline and select **AzureML Model Artifact** source type. Select the **Service Endpoint** and **Model Names** from the drop down lists. **Service Endpoint** refers to the **Service connection** created in the previous step:
 
 ![model artifact](./images/model-artifact.png)
 
