@@ -235,7 +235,7 @@ Finally for the Azure WebApp on Container Task, specify the following task param
 ![release_webapp](./images/release-task-webappdeploy.PNG)
 
 
-Save the pipeline and create a release to trigger it manually. Once the pipeline execution is finished, check out deployments in the **mlops-AML-WS** workspace.
+Save the pipeline and create a release to trigger it manually. To create the trigger, click on the "Create release" button on the top right of your screen, and follow the on-screen instructions. Once the pipeline execution is finished, check out deployments in the **mlops-AML-WS** workspace.
 
 
 
