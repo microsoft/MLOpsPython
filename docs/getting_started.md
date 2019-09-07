@@ -166,7 +166,7 @@ Add an artifact to the pipeline and select **AzureML Model Artifact** source typ
 
 ![model artifact](./images/model-artifact.png)
 
-Create a stage **QA (ACI)** and add a single task to the job **Azure ML Model Deploy**: 
+Go to the new **Releases Pipelines** section, and click new to create a new release pipeline. A first stage is automatically created and choose **start with an Empty job**. Name the stage **QA (ACI)** and add a single task to the job **Azure ML Model Deploy**. Make sure that the Agent Specification is ubuntu-16.04 under the Agent Job: 
 
 ![deploy aci](./images/deploy-aci.png)
 
@@ -184,7 +184,7 @@ Specify task parameters as it is shown in the table below:
 | Overwrite existing deployment | X                                                                                                    |
 
 
-In a similar way create a stage **Prod (AKS** and add a single task to the job **Azure ML Model Deploy**: 
+In a similar way create a stage **Prod (AKS)** and add a single task to the job **Azure ML Model Deploy**. Make sure that the Agent Specification is ubuntu-16.04 under the Agent Job: 
 
 ![deploy aks](./images/deploy-aks.png)
 
@@ -208,7 +208,7 @@ Specify task parameters as it is shown in the table below:
 Note: This is an optional step and can be used only if you are deploying your scoring service on Azure Web Apps.
 
 [Create Image Script](../ml_service/util/create_scoring_image.py)
-can be used to create a scoring image from the release pipeline. Image created by this script will be registered under Azure Container Registry(ACR) instance that belongs to Azure Machine Learning Service. Any dependencies that scoring file depends on can also be packaged with the container with Image config. To learn more on how to create a container with AML SDK click [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).    
+can be used to create a scoring image from the release pipeline. Image created by this script will be registered under Azure Container Registry(ACR) instance that belongs to Azure Machine Learning Service. Any dependencies that scoring file depends on can also be packaged with the container with Image config. To learn more on how to create a container with AML SDK click [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).
 
 Below is release pipeline with two tasks one to create an image using the above script and second is the deploy the image to Web App for containers  
 ![release_webapp](./images/release-webapp-pipeline.PNG)
@@ -216,6 +216,8 @@ Below is release pipeline with two tasks one to create an image using the above 
 Using bash script task to invoke [Create Image Script](../ml_service/util/create_scoring_image.py)
 ![release_createimage](./images/release-task-createimage.PNG)
 
+For the Bash script above, use the following parameters :
+python3 $(System.DefaultWorkingDirectory)/_MLOpsPythonRepo/mlservice/util/create_scoring_image.py
 Specify task parameters as it is shown in the table below:
 
 
