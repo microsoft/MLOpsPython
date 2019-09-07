@@ -208,17 +208,22 @@ Specify task parameters as it is shown in the table below:
 Note: This is an optional step and can be used only if you are deploying your scoring service on Azure Web Apps.
 
 [Create Image Script](../ml_service/util/create_scoring_image.py)
-can be used to create a scoring image from the release pipeline. Image created by this script will be registered under Azure Container Registry(ACR) instance that belongs to Azure Machine Learning Service. Any dependencies that scoring file depends on can also be packaged with the container with Image config. To learn more on how to create a container with AML SDK click [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).
+can be used to create a scoring image from the release pipeline. Image created by this script will be registered under Azure Container Registry (ACR) instance that belongs to Azure Machine Learning Service. Any dependencies that scoring file depends on can also be packaged with the container with Image config. To learn more on how to create a container with AML SDK click [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).
 
 Below is release pipeline with two tasks one to create an image using the above script and second is the deploy the image to Web App for containers  
 ![release_webapp](./images/release-webapp-pipeline.PNG)
 
-Using bash script task to invoke [Create Image Script](../ml_service/util/create_scoring_image.py)
+For the bash script task to invoke the [Create Image Script](../ml_service/util/create_scoring_image.py), specify the following task parameters:
+
+| Parameter          | Value                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------- |
+| Display Name       | Create Scoring Image                                                                                |
+| Script             | python3 $(System.DefaultWorkingDirectory)/\_MLOpsPythonRepo/mlservice/util/create_scoring_image.py  |
+
+Finally 
 ![release_createimage](./images/release-task-createimage.PNG)
 
-For the Bash script above, use the following parameters :
-python3 $(System.DefaultWorkingDirectory)/_MLOpsPythonRepo/mlservice/util/create_scoring_image.py
-Specify task parameters as it is shown in the table below:
+Finally for the Azure WebApp on Container Task, specify the following task parameters as it is shown in the table below:
 
 
 | Parameter          | Value                                                                                               |
