@@ -131,7 +131,11 @@ docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_se
 mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
 ```
 
-This release pipeline should be automatically triggered (continuous deployment) whenever a new **ML training pipeline** is published by the **AzDo builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually by clicking on the "Create release" button on the top right of your screen, when selecting this new build pipeline:
+Now, add the automation to trigger a run of this pipeline whenever the **ci_build** build is completed, click on the lightning bolt icon on the top right of the **\_ci-build** artifact is selected, and enable the automatic release :
+
+![automate_infoke_training_pipeline](./images/automate_infoke_training_pipeline.png)
+
+This release pipeline should now be automatically triggered (continuous deployment) whenever a new **ML training pipeline** is published by the **ci-build builder pipeline**. It can also be triggered manually or configured to run on a scheduled basis. Create a new release to trigger the pipeline manually by clicking on the "Create release" button on the top right of your screen, when selecting this new build pipeline:
 
 ![create release](./images/create-release.png)
 
@@ -147,7 +151,7 @@ Good! Now we have a trained model.
 
 ### 8. Deploy the Model
 
-The final step is to deploy the model across environments with a release pipeline. There will be a **``QA``** environment running on [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) and a **``Prod``** environment running on [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service). This is the final picture of what your release pipeline will look like:
+The final step is to deploy the model across environments with a release pipeline. There will be a **``QA``** environment running on [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) and a **``Prod``** environment running on [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service). This is the final picture of what your release pipeline should look like:
 
 ![deploy model](./images/deploy-model.png)
 
@@ -200,6 +204,10 @@ Specify task parameters as it is shown in the table below:
 | Deployment Name                   | mlopspython-aks                                                                                      |
 | Deployment Configuration file     | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aks.yml` |
 | Overwrite existing deployment     | X                                                                                                    |
+
+Similarly to the **Invoke Training Pipeline** release pipeline, previously created, in order to trigger a coutinuous integration, click on the lightning bolt icon, make sure the **Continuous deployment trigger** is checked and save the trigger:
+
+[Automate Deploy Model Pipeline](./images/automate_deploy_model_pipeline.png)
 
 **Note:** Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
 
