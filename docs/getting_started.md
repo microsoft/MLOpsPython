@@ -207,7 +207,7 @@ Specify task parameters as it is shown in the table below:
 
 Similarly to the **Invoke Training Pipeline** release pipeline, previously created, in order to trigger a coutinuous integration, click on the lightning bolt icon, make sure the **Continuous deployment trigger** is checked and save the trigger:
 
-[Automate Deploy Model Pipeline](./images/automate_deploy_model_pipeline.png)
+![Automate Deploy Model Pipeline](./images/automate_deploy_model_pipeline.png)
 
 **Note:** Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
 
