@@ -25,7 +25,9 @@ Please make note of the following values after creating a service principal, we 
 
 ### 4. Create a Variable Group
 
-We make use of variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines. You can either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to learn more about how to create a variable group and [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline.
+We make use of variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines. You can either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to learn more about how to create a variable group and [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline. Click on **Library** in the **Pipelines** section as indicated below:
+
+![library_variable groups](./images/library_variable_groups.png)
  
 Please name your variable group **``devopsforai-aml-vg``** as we are using this name within our build yaml file. 
 
@@ -66,7 +68,7 @@ The easiest way to create all required resources (Resource Group, ML Workspace, 
 
 ![create service connection](./images/create-rm-service-connection.png)
 
-Give the connection name **``AzureResourceConnection``** as it is referred by the pipeline definition. Leave the field **``Resource Group``** empty.
+Give the connection name **``AzureResourceConnection``** as it is referred by the pipeline definition. Leave the **``Resource Group``** field empty.
 
 In your DevOps project create a build pipeline from your forked **GitHub** repository: 
 
@@ -131,6 +133,10 @@ docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_se
 mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
 ```
 
+as in the screen shot below, leaving all other fields to their default value:
+
+![Run Training Pipeline Task](./images/run_training_pipeline_task.png)
+
 Now, add the automation to trigger a run of this pipeline whenever the **ci_build** build is completed, click on the lightning bolt icon on the top right of the **\_ci-build** artifact is selected, and enable the automatic release :
 
 ![automate_infoke_training_pipeline](./images/automate_infoke_training_pipeline.png)
@@ -160,7 +166,7 @@ This pipeline leverages the **Azure Machine Learning** extension that should be 
 
 The pipeline consumes two artifacts: the result of the **Build Pipeline** as it contains configuration files and the **model** trained and registered by the ML training pipeline. 
 
-Add the **_ci-build** artifact using the same process as what we did in the previous chapter. 
+Add the **\_ci-build** artifact using the same process as what we did in the previous step. 
 
 In order to configure a model artifact there should be a service connection to **mlops-AML-WS** workspace. To get there, go to the project settings (by clicking on the cog wheel to the bottom left of the screen), and then click on **Service connections** under the **Pipelines** section:
 
