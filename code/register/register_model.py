@@ -93,7 +93,7 @@ print("Run ID for last run: {}".format(run_id))
 model_local_dir = "model"
 os.makedirs(model_local_dir, exist_ok=True)
 
-run.register_model(model_name, asset_path= "./outputs/" + model_name,
+model = run.register_model(model_name, asset_path= "./outputs/" + model_name,
                    tags={"area": "diabetes", "type": "regression"})
 
 os.chdir("..")
