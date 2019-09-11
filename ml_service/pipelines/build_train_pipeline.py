@@ -92,6 +92,11 @@ def main():
     )
     print("Step Evaluate created")
 
+    # Currently, the Evaluate step will automatically register
+    # the model if it performs better. This step is based on a
+    # previous version of the repo which utilized JSON files to
+    # track evaluation results.
+
     # register_model_step = PythonScriptStep(
     #     name="Register New Trained Model",
     #     script_name=register_script_path,
