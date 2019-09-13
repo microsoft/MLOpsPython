@@ -23,7 +23,7 @@ steps:
   failOnStderr: 'false'
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
-  displayName: 'Train model using AML with Remote Compute'
+  displayName: 'Publish Azure Machine Learning Pipeline'
   enabled: 'true'
 
 - task: CopyFiles@2
@@ -32,7 +32,7 @@ steps:
     SourceFolder: '$(Build.SourcesDirectory)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     Contents: |
-      ml_service/pipelines/?(run_train_pipeline.py|*.json)  
+      ml_service/pipelines/?(run_train_pipeline.py|*.json)
       code/scoring/**
 
 

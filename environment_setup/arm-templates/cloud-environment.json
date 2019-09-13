@@ -20,7 +20,8 @@
         "southeastasia",
         "westcentralus",
         "westeurope",
-        "westus2"
+        "westus2",
+        "centralus"
       ],
       "metadata": {
         "description": "Specifies the location for all resources."
