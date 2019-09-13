@@ -49,6 +49,7 @@ The variable group should contain the following variables:
 | SUBSCRIPTION_ID             |                              |
 | TENANT_ID                   |                              |
 | TRAIN_SCRIPT_PATH           | training/train.py            |
+| TRAINING_PIPELINE_NAME      | training-pipeline            |
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
@@ -88,6 +89,7 @@ Check out created resources in the [Azure Portal](portal.azure.com):
 
 Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-remove-environment.yml) that removes resources created for this project or you can just delete a resource group in the [Azure Portal](portal.azure.com).
 
+Once this resource group is created, be sure that the Service Principal you have created has access to this resource group.
 
 ### 6. Set up Build Pipeline
 
@@ -127,9 +129,11 @@ Rename the default "Stage 1" to **Invoke Training Pipeline** and make sure that 
 Add a **Command Line Script** step, rename it to **Run Training Pipeline** with the following script:
 
 ```bash
-docker run  -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines \
--w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME \
--e TENANT_ID=$TENANT_ID -e SP_APP_ID=$SP_APP_ID -e SP_APP_SECRET=$(SP_APP_SECRET) \
+docker run -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines \
+ -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME \
+ -e TENANT_ID=$TENANT_ID -e SP_APP_ID=$SP_APP_ID -e SP_APP_SECRET=$(SP_APP_SECRET) \
+ -e SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e RELEASE_RELEASEID=$RELEASE_RELEASEID \
+ -e BUILD_BUILDID=$BUILD_BUILDID -e BASE_NAME=$BASE_NAME \
 mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
 ```
 

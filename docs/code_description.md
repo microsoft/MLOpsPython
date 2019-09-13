@@ -27,8 +27,8 @@
 ### Code
 
 - `code/training/train.py` : a training step of an ML training pipeline.
-- `code/evaluate/evaluate_model.py` : an evaluating step of an ML training pipeline.
-- `code/evaluate/register_model.py` : registers a new trained model if evaluation shows the new model is more performant than the previous one.
+- `code/evaluate/evaluate_model.py` : an evaluating step of an ML training pipeline which registers a new trained model if evaluation shows the new model is more performant than the previous one.
+- `code/evaluate/register_model.py` : (LEGACY) registers a new trained model if evaluation shows the new model is more performant than the previous one.
 
 ### Scoring
 - code/scoring/score.py : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.

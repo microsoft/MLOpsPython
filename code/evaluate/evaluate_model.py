@@ -24,14 +24,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
-import json
-from azureml.core.model import Model
-from azureml.core import Run
+from azureml.core import Model, Run
 import argparse
 
 
 # Get workspace
-# ws = Workspace.from_config()
 run = Run.get_context()
 exp = run.experiment
 ws = run.experiment.workspace
@@ -39,38 +36,33 @@ ws = run.experiment.workspace
 
 parser = argparse.ArgumentParser("evaluate")
 parser.add_argument(
-    "--config_suffix", type=str, help="Datetime suffix for json config files"
+    "--release_id",
+    type=str,
+    help="The ID of the release triggering this pipeline run",
 )
 parser.add_argument(
-    "--json_config",
+    "--model_name",
     type=str,
-    help="Directory to write all the intermediate json configs",
+    help="Name of the Model",
+    default="sklearn_regression_model.pkl",
 )
 args = parser.parse_args()
 
-print("Argument 1: %s" % args.config_suffix)
-print("Argument 2: %s" % args.json_config)
+print("Argument 1: %s" % args.release_id)
+print("Argument 2: %s" % args.model_name)
+model_name = args.model_name
+release_id = args.release_id
 
-if not (args.json_config is None):
-    os.makedirs(args.json_config, exist_ok=True)
-    print("%s created" % args.json_config)
 # Paramaterize the matrics on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
 
-# Get the latest run_id
-# with open("aml_config/run_id.json") as f:
-#     config = json.load(f)
-
-train_run_id_json = "run_id_{}.json".format(args.config_suffix)
-train_output_path = os.path.join(args.json_config, train_run_id_json)
-with open(train_output_path) as f:
-    config = json.load(f)
-
-
-new_model_run_id = config["run_id"]  # args.train_run_id
-experiment_name = config["experiment_name"]
-# exp = Experiment(workspace=ws, name=experiment_name)
-
+all_runs = exp.get_runs(
+    properties={"release_id": release_id, "run_type": "train"},
+    include_children=True
+    )
+new_model_run = next(all_runs)
+new_model_run_id = new_model_run.id
+print(f'New Run found with Run ID of: {new_model_run_id}')
 
 try:
     # Get most recently registered model, we assume that
@@ -110,16 +102,12 @@ except Exception:
     print("This is the first model to be trained, \
           thus nothing to evaluate for now")
 
-run_id = {}
-run_id["run_id"] = ""
+
 # Writing the run id to /aml_config/run_id.json
 if promote_new_model:
-    run_id["run_id"] = new_model_run_id
-    # register new model
-    # new_model_run.register_model(model_name='',model_path='outputs/sklearn_regression_model.pkl')
-
-run_id["experiment_name"] = experiment_name
-filename = "run_id_{}.json".format(args.config_suffix)
-output_path = os.path.join(args.json_config, filename)
-with open(output_path, "w") as outfile:
-    json.dump(run_id, outfile)
+    model_path = os.path.join('outputs', model_name)
+    new_model_run.register_model(
+        model_name=model_name,
+        model_path=model_path,
+        properties={"release_id": release_id})
+    print("Registered new model!")

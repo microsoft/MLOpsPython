@@ -41,6 +41,7 @@ def get_compute(
                 min_node_count=None,
                 timeout_in_minutes=10)
         return compute_target
-    except ComputeTargetException:
+    except ComputeTargetException as e:
+        print(e)
         print('An error occurred trying to provision compute.')
         exit()
