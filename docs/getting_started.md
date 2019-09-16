@@ -238,7 +238,7 @@ For the bash script task to invoke the [Create Image Script](../ml_service/util/
 | Parameter          | Value                                                                                               |
 | ------------------ | --------------------------------------------------------------------------------------------------- |
 | Display Name       | Create Scoring Image                                                                                |
-| Script             | python3 $(System.DefaultWorkingDirectory)/\_MLOpsPythonRepo/mlservice/util/create_scoring_image.py  |
+| Script             | python3 $(System.DefaultWorkingDirectory)/\_MLOpsPythonRepo/ml_service/util/create_scoring_image.py  |
 
 Finally 
 ![release_createimage](./images/release-task-createimage.PNG)
