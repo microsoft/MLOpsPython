@@ -29,8 +29,6 @@ def main():
     build_id = os.environ.get("BUILD_BUILDID")
     pipeline_name = os.environ.get("TRAINING_PIPELINE_NAME")
 
-    print(app_secret)
-
     # Get Azure machine learning workspace
     aml_workspace = get_workspace(
         workspace_name,
