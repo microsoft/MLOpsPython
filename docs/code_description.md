@@ -32,7 +32,7 @@
 
 ### Scoring
 - code/scoring/score.py : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.
-- code/scoring/conda_dependencies.yml : contains a list of dependencies required by sore.py to be installed in a deployable Docker Image 
+- code/scoring/conda_dependencies.yml : contains a list of dependencies required by score.py to be installed in a deployable Docker Image 
 - code/scoring/inference_config.yml, deployment_config_aci.yml, deployment_config_aks.yml : configuration files for the [AML Model Deploy](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.private-vss-services-azureml&ssr=false#overview) pipeline task for ACI and AKS deployment targets.
 
 
