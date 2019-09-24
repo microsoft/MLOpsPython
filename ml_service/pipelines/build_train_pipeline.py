@@ -42,7 +42,7 @@ def main():
     # Get Azure machine learning cluster
     aml_compute = get_compute(
         aml_workspace,
-        compute_name,
+        "rmlcompute",
         vm_size)
     if aml_compute is not None:
         print(aml_compute)
