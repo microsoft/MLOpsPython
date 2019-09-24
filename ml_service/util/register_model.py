@@ -11,13 +11,13 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 load_dotenv()
 
 TENANT_ID = os.environ.get('TENANT_ID')
-APP_ID = os.environ.get('APP_ID')
-APP_SECRET = os.environ.get('APP_SECRET')
+APP_ID = os.environ.get('SP_APP_ID')
+APP_SECRET = os.environ.get('SP_APP_SECRET')
 MODEL_PATH = os.environ.get('MODEL_PATH')
 MODEL_NAME = os.environ.get('MODEL_NAME')
-WORKSPACE_NAME = os.environ.get('WORKSPACE_NAME')
+WORKSPACE_NAME = os.environ.get("BASE_NAME")+"-AML-WS"
 SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
-RESOURCE_GROUP = os.environ.get('RESOURCE_GROUP')
+RESOURCE_GROUP = os.environ.get("BASE_NAME")+"-AML-RG"
 
 
 if os.path.isfile(MODEL_PATH) is False:

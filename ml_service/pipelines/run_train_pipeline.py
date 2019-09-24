@@ -1,41 +1,62 @@
-import sys
 import os
-import json
-import requests
-from azure.common.credentials import ServicePrincipalCredentials
+from azureml.pipeline.core import PublishedPipeline
+from azureml.core import Workspace
+from azureml.core.authentication import ServicePrincipalAuthentication
+from dotenv import load_dotenv
 
 
-tenant_id = os.environ.get("TENANT_ID")
-app_id = os.environ.get("SP_APP_ID")
-app_secret = os.environ.get("SP_APP_SECRET")
+def main():
+    load_dotenv()
+    workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
+    resource_group = os.environ.get("BASE_NAME")+"-AML-RG"
+    subscription_id = os.environ.get("SUBSCRIPTION_ID")
+    tenant_id = os.environ.get("TENANT_ID")
+    experiment_name = os.environ.get("EXPERIMENT_NAME")
+    model_name = os.environ.get("MODEL_NAME")
+    app_id = os.environ.get('SP_APP_ID')
+    app_secret = os.environ.get('SP_APP_SECRET')
+    release_id = os.environ.get('RELEASE_RELEASEID')
+    build_id = os.environ.get('BUILD_BUILDID')
 
-try:
-    with open("train_pipeline.json") as f:
-        train_pipeline_json = json.load(f)
-except Exception:
-    print("No pipeline json found")
-    sys.exit(0)
+    service_principal = ServicePrincipalAuthentication(
+            tenant_id=tenant_id,
+            service_principal_id=app_id,
+            service_principal_password=app_secret)
 
-experiment_name = os.environ.get("EXPERIMENT_NAME")
-model_name = os.environ.get("MODEL_NAME")
+    aml_workspace = Workspace.get(
+        name=workspace_name,
+        subscription_id=subscription_id,
+        resource_group=resource_group,
+        auth=service_principal
+        )
 
-credentials = ServicePrincipalCredentials(
-    client_id=app_id,
-    secret=app_secret,
-    tenant=tenant_id
-)
+    # Find the pipeline that was published by the specified build ID
+    pipelines = PublishedPipeline.list(aml_workspace)
+    matched_pipes = []
 
-token = credentials.token['access_token']
-print("token", token)
-auth_header = {"Authorization": "Bearer " + token}
+    for p in pipelines:
+        if p.version == build_id:
+            matched_pipes.append(p)
 
-rest_endpoint = train_pipeline_json["rest_endpoint"]
+    if(len(matched_pipes) > 1):
+        published_pipeline = None
+        raise Exception(f"Multiple active pipelines are published for build {build_id}.")  # NOQA: E501
+    elif(len(matched_pipes) == 0):
+        published_pipeline = None
+        raise KeyError(f"Unable to find a published pipeline for this build {build_id}")  # NOQA: E501
+    else:
+        published_pipeline = matched_pipes[0]
 
-response = requests.post(
-    rest_endpoint, headers=auth_header,
-    json={"ExperimentName": experiment_name,
-          "ParameterAssignments": {"model_name": model_name}}
-)
+    pipeline_parameters = {"model_name": model_name, "release_id": release_id}
 
-run_id = response.json()["Id"]
-print("Pipeline run initiated ", run_id)
+    response = published_pipeline.submit(
+        aml_workspace,
+        experiment_name,
+        pipeline_parameters)
+
+    run_id = response.id
+    print("Pipeline run initiated ", run_id)
+
+
+if __name__ == "__main__":
+    main()

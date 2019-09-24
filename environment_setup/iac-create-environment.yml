@@ -18,11 +18,11 @@ steps:
   inputs:
     azureSubscription: 'AzureResourceConnection'
     action: 'Create Or Update Resource Group'
-    resourceGroupName: '$(RESOURCE_GROUP)'
+    resourceGroupName: '$(BASE_NAME)-AML-RG'
     location: $(LOCATION)
     templateLocation: 'Linked artifact'
     csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/cloud-environment.json'
-    overrideParameters: '-baseName $(BASE_NAME)'
+    overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION)'
     deploymentMode: 'Incremental'
   displayName: 'Deploy MLOps resources to Azure'
 

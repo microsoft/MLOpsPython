@@ -33,17 +33,13 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
 import numpy as np
-import json
 
 
 parser = argparse.ArgumentParser("train")
 parser.add_argument(
-    "--config_suffix", type=str, help="Datetime suffix for json config files"
-)
-parser.add_argument(
-    "--json_config",
+    "--release_id",
     type=str,
-    help="Directory to write all the intermediate json configs",
+    help="The ID of the release triggering this pipeline run",
 )
 parser.add_argument(
     "--model_name",
@@ -54,14 +50,11 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-print("Argument 1: %s" % args.config_suffix)
-print("Argument 2: %s" % args.json_config)
+print("Argument 1: %s" % args.release_id)
+print("Argument 2: %s" % args.model_name)
 
 model_name = args.model_name
-
-if not (args.json_config is None):
-    os.makedirs(args.json_config, exist_ok=True)
-    print("%s created" % args.json_config)
+release_id = args.release_id
 
 run = Run.get_context()
 exp = run.experiment
@@ -103,12 +96,8 @@ print(dirpath)
 print("Following files are uploaded ")
 print(run.get_file_names())
 
-run_id = {}
-run_id["run_id"] = run.id
-run_id["experiment_name"] = run.experiment.name
-filename = "run_id_{}.json".format(args.config_suffix)
-output_path = os.path.join(args.json_config, filename)
-with open(output_path, "w") as outfile:
-    json.dump(run_id, outfile)
+# Add properties to identify this specific training run
+run.add_properties({"release_id": release_id, "run_type": "train"})
+print(f"added properties: {run.properties}")
 
 run.complete()
