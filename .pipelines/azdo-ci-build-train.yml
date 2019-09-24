@@ -15,8 +15,6 @@ variables:
 
 
 steps:
-- template: azdo-base-pipeline.yml
-  enabled: 'false'
     
 - bash: |
    # Invoke the Python building and publishing a training pipeline
