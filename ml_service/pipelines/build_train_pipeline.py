@@ -61,7 +61,8 @@ def main():
     release_id = PipelineParameter(
         name="release_id", default_value="0"
     )
-  train_step = PythonScriptStep(
+    
+    train_step = PythonScriptStep(
         name="Train Model",
         script_name="train_with_r.py",
         compute_target=aml_compute,
