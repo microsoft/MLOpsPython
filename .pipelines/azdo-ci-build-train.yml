@@ -15,8 +15,7 @@ variables:
 
 
 steps:
-- template: azdo-base-pipeline.yml
-    
+
 - bash: |
    # Invoke the Python building and publishing a training pipeline
    python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline.py
