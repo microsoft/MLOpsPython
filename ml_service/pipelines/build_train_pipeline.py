@@ -64,9 +64,9 @@ def main():
 
     train_step = PythonScriptStep(
         name="Train Model",
-        script_name=train_script_path,
+        script_name="train_with_r.py",
         compute_target=aml_compute_cpu,
-        source_directory=sources_directory_train,
+        source_directory="code/training",
         arguments=[
             "--config_suffix", config_suffix,
             "--json_config", jsonconfigs,
@@ -79,42 +79,43 @@ def main():
     )
     print("Step Train created")
 
-    evaluate_step = PythonScriptStep(
-        name="Evaluate Model ",
-        script_name=evaluate_script_path,
-        compute_target=aml_compute_cpu,
-        source_directory=sources_directory_train,
-        arguments=[
-            "--config_suffix", config_suffix,
-            "--json_config", jsonconfigs,
-        ],
-        runconfig=run_config,
-        inputs=[jsonconfigs],
-        # outputs=[jsonconfigs],
-        allow_reuse=False,
-    )
-    print("Step Evaluate created")
+    # evaluate_step = PythonScriptStep(
+    #     name="Evaluate Model ",
+    #     script_name=evaluate_script_path,
+    #     compute_target=aml_compute_cpu,
+    #     source_directory=sources_directory_train,
+    #     arguments=[
+    #         "--config_suffix", config_suffix,
+    #         "--json_config", jsonconfigs,
+    #     ],
+    #     runconfig=run_config,
+    #     inputs=[jsonconfigs],
+    #     # outputs=[jsonconfigs],
+    #     allow_reuse=False,
+    # )
+    # print("Step Evaluate created")
 
-    register_model_step = PythonScriptStep(
-        name="Register New Trained Model",
-        script_name=register_script_path,
-        compute_target=aml_compute_cpu,
-        source_directory=sources_directory_train,
-        arguments=[
-            "--config_suffix", config_suffix,
-            "--json_config", jsonconfigs,
-            "--model_name", model_name,
-        ],
-        runconfig=run_config,
-        inputs=[jsonconfigs],
-        # outputs=[jsonconfigs],
-        allow_reuse=False,
-    )
-    print("Step register model created")
+    # register_model_step = PythonScriptStep(
+    #     name="Register New Trained Model",
+    #     script_name=register_script_path,
+    #     compute_target=aml_compute_cpu,
+    #     source_directory=sources_directory_train,
+    #     arguments=[
+    #         "--config_suffix", config_suffix,
+    #         "--json_config", jsonconfigs,
+    #         "--model_name", model_name,
+    #     ],
+    #     runconfig=run_config,
+    #     inputs=[jsonconfigs],
+    #     # outputs=[jsonconfigs],
+    #     allow_reuse=False,
+    # )
+    # print("Step register model created")
 
-    evaluate_step.run_after(train_step)
-    register_model_step.run_after(evaluate_step)
-    steps = [register_model_step]
+    # evaluate_step.run_after(train_step)
+    # register_model_step.run_after(evaluate_step)
+    # steps = [register_model_step]
+    steps = [train_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
