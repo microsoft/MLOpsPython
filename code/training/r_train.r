@@ -9,7 +9,7 @@ mount_name = "kcmunninstoragev2-databricks" # Change this to the mount name in y
 
 # Load Training Data
 #path = paste("/dbfs/mnt/",mount_name,"/weight_data.csv",sep="")
-path="../../../data/train/weight_data.csv"
+path="weight_data.csv"
 print(paste("Reading file from",path))
 
 routes<-read.csv(path, header=TRUE)
