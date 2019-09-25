@@ -55,7 +55,7 @@ def main():
                       'azure-storage-blob'])
     )
     run_config.environment.docker.enabled = True
-    run_config.environment.docker.base_image = "rimage:latest"
+    run_config.environment.docker.base_image = "eugenefedorenko/rimage:latest"
 
     model_name = PipelineParameter(
         name="model_name", default_value=model_name)
