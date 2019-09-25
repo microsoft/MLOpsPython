@@ -12,7 +12,11 @@ args, unknown = parser.parse_known_args()
 folder = args.AZUREML_SCRIPT_DIRECTORY_NAME
 
 #os.system("Rscript "+"dbfs:/"+folder+"/r_train.r")
+os.system("dbfs ls")
+os.system("dbfs ls dbfs:/FileStore")
 os.system("ls -ltr "+"dbfs:/"+folder)
+os.system("ls -ltr "+"dbfs:/FileStore")
+
 # os.system("pwd")
 # os.system("env")
 # os.system("ls -ltr /local_disk0")
