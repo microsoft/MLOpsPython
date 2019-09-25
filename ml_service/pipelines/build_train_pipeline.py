@@ -70,10 +70,10 @@ def main():
         python_script_name="train_with_r.py",
         source_directory="code/training",
         run_name='DB_Python_Local_demo',
-        existing_cluster_id=cluster_id,
+        existing_cluster_id="0925-210443-edge340",
         compute_target=aml_compute,
         allow_reuse=False,
-        python_script_params=['--MODEL_PATH', model_path]
+        python_script_params=['--model_name', model_name]
     )
 
     # train_step = PythonScriptStep(
