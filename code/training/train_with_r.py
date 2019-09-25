@@ -8,7 +8,7 @@ parser.add_argument(
     help="folder",
 )
 
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 folder = args.AZUREML_SCRIPT_DIRECTORY_NAME
 
 os.system("Rscript "+folder+"/r_train.r")
@@ -21,6 +21,5 @@ os.system("ls -ltr /databricks")
 os.system("ls -ltr /databricks/spark")
 os.system("ls -ltr /databricks/spark/scripts")
 os.system("ls -ltr /databricks/spark/python")
-os.system("whereis train_with_r.py")
-os.system("ls -ltr dbfs/143eb546-b32d-4e42-8194-f43c9d9f9e5f")
---AZUREML_SCRIPT_DIRECTORY_NAME
+
+
