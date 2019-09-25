@@ -63,18 +63,30 @@ def main():
         name="release_id", default_value="0"
     )
     
-    train_step = PythonScriptStep(
-        name="Train Model",
-        script_name="train_with_r.py",
-        compute_target=aml_compute,
+    train_step = DatabricksStep(
+        name="DBPythonInLocalMachine",
+        num_workers=1,
+        python_script_name="train_with_r.py",
         source_directory="code/training",
-        arguments=[
-            "--release_id", release_id,
-            "--model_name", model_name,
-        ],
-        runconfig=run_config,
+        run_name='DB_Python_Local_demo',
+        existing_cluster_id=cluster_id,
+        compute_target=aml_compute,
         allow_reuse=False,
+        python_script_params=['--MODEL_PATH', model_path]
     )
+
+    # train_step = PythonScriptStep(
+    #     name="Train Model",
+    #     script_name="train_with_r.py",
+    #     compute_target=aml_compute,
+    #     source_directory="code/training",
+    #     arguments=[
+    #         "--release_id", release_id,
+    #         "--model_name", model_name,
+    #     ],
+    #     runconfig=run_config,
+    #     allow_reuse=False,
+    # )
     print("Step Train created")
 
     # evaluate_step = PythonScriptStep(
