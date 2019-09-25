@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from workspace import get_workspace
 from attach_compute import get_compute
+from azureml.pipeline.steps import DatabricksStep
 
 
 def main():
@@ -42,7 +43,7 @@ def main():
     # Get Azure machine learning cluster
     aml_compute = get_compute(
         aml_workspace,
-        "rmlcompute",
+        "databricks",
         vm_size)
     if aml_compute is not None:
         print(aml_compute)
