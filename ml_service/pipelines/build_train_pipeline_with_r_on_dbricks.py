@@ -1,5 +1,4 @@
 from azureml.pipeline.core.graph import PipelineParameter
-from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline  # , PipelineData
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
 # from azureml.core import Datastore
@@ -44,7 +43,6 @@ def main():
     if aml_compute is not None:
         print(aml_compute)
 
-    
     train_step = DatabricksStep(
         name="DBPythonInLocalMachine",
         num_workers=1,
@@ -55,7 +53,6 @@ def main():
         compute_target=aml_compute,
         allow_reuse=False
     )
-
 
     print("Step Train created")
 
