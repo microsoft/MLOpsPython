@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from workspace import get_workspace
 from attach_compute import get_compute
-from azureml.pipeline.steps import DatabricksStep
 
 
 def main():
@@ -43,7 +42,7 @@ def main():
     # Get Azure machine learning cluster
     aml_compute = get_compute(
         aml_workspace,
-        "databricks",
+        compute_name,
         vm_size)
     if aml_compute is not None:
         print(aml_compute)
@@ -56,31 +55,51 @@ def main():
                       'azure-storage-blob'])
     )
     run_config.environment.docker.enabled = True
-    run_config.environment.docker.base_image = "eugenefedorenko/rimage:latest"
 
     model_name = PipelineParameter(
         name="model_name", default_value=model_name)
     release_id = PipelineParameter(
         name="release_id", default_value="0"
     )
-    
-    train_step = DatabricksStep(
-        name="DBPythonInLocalMachine",
-        num_workers=1,
-        python_script_name="train_with_r.py",
-        source_directory="code/training",
-        run_name='DB_Python_Local_demo',
-        existing_cluster_id="0925-210443-edge340",
-        compute_target=aml_compute,
-        allow_reuse=False,
-        python_script_params=['--model_name', model_name]
-    )
 
-    # train_step = PythonScriptStep(
-    #     name="Train Model",
-    #     script_name="train_with_r.py",
+    train_step = PythonScriptStep(
+        name="Train Model",
+        script_name=train_script_path,
+        compute_target=aml_compute,
+        source_directory=sources_directory_train,
+        arguments=[
+            "--release_id", release_id,
+            "--model_name", model_name,
+        ],
+        runconfig=run_config,
+        allow_reuse=False,
+    )
+    print("Step Train created")
+
+    evaluate_step = PythonScriptStep(
+        name="Evaluate Model ",
+        script_name=evaluate_script_path,
+        compute_target=aml_compute,
+        source_directory=sources_directory_train,
+        arguments=[
+            "--release_id", release_id,
+            "--model_name", model_name,
+        ],
+        runconfig=run_config,
+        allow_reuse=False,
+    )
+    print("Step Evaluate created")
+
+    # Currently, the Evaluate step will automatically register
+    # the model if it performs better. This step is based on a
+    # previous version of the repo which utilized JSON files to
+    # track evaluation results.
+
+    # register_model_step = PythonScriptStep(
+    #     name="Register New Trained Model",
+    #     script_name=register_script_path,
     #     compute_target=aml_compute,
-    #     source_directory="code/training",
+    #     source_directory=sources_directory_train,
     #     arguments=[
     #         "--release_id", release_id,
     #         "--model_name", model_name,
@@ -88,45 +107,11 @@ def main():
     #     runconfig=run_config,
     #     allow_reuse=False,
     # )
-    print("Step Train created")
-
-    # evaluate_step = PythonScriptStep(
-    #     name="Evaluate Model ",
-    #     script_name=evaluate_script_path,
-    #     compute_target=aml_compute_cpu,
-    #     source_directory=sources_directory_train,
-    #     arguments=[
-    #         "--config_suffix", config_suffix,
-    #         "--json_config", jsonconfigs,
-    #     ],
-    #     runconfig=run_config,
-    #     inputs=[jsonconfigs],
-    #     # outputs=[jsonconfigs],
-    #     allow_reuse=False,
-    # )
-    # print("Step Evaluate created")
-
-    # register_model_step = PythonScriptStep(
-    #     name="Register New Trained Model",
-    #     script_name=register_script_path,
-    #     compute_target=aml_compute_cpu,
-    #     source_directory=sources_directory_train,
-    #     arguments=[
-    #         "--config_suffix", config_suffix,
-    #         "--json_config", jsonconfigs,
-    #         "--model_name", model_name,
-    #     ],
-    #     runconfig=run_config,
-    #     inputs=[jsonconfigs],
-    #     # outputs=[jsonconfigs],
-    #     allow_reuse=False,
-    # )
     # print("Step register model created")
 
-    # evaluate_step.run_after(train_step)
+    evaluate_step.run_after(train_step)
     # register_model_step.run_after(evaluate_step)
-    # steps = [register_model_step]
-    steps = [train_step]
+    steps = [evaluate_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()

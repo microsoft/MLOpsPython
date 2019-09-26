@@ -24,7 +24,7 @@ steps:
   failOnStderr: 'false'
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
-  displayName: 'Publish Azure Machine Learning Pipeline'
+  displayName: 'Publish Azure Machine Learning Pipeline. Python on ML'
   enabled: 'false'
 
 - bash: |
@@ -33,7 +33,7 @@ steps:
   failOnStderr: 'false'
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
-  displayName: 'Publish Azure Machine Learning Pipeline'
+  displayName: 'Publish Azure Machine Learning Pipeline. R on DataBricks'
   enabled: 'true'
 
 - task: CopyFiles@2
