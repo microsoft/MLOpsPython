@@ -11,9 +11,10 @@ parser.add_argument(
 args, unknown = parser.parse_known_args()
 folder = args.AZUREML_SCRIPT_DIRECTORY_NAME
 
+os.system("cd "+"/dbfs/"+folder)
 os.system("Rscript "+"/dbfs/"+folder+"/r_train.r")
 os.system("ls -ltr "+"/dbfs/"+folder)
-os.system("ls -ltr "+"/dbfs/FileStore")
+
 
 # os.system("pwd")
 # os.system("env")
