@@ -28,7 +28,7 @@ def main():
         subscription_id=subscription_id,
         resource_group=resource_group,
         auth=service_principal
-        )
+        )name
 
     # Find the pipeline that was published by the specified build ID
     pipelines = PublishedPipeline.list(aml_workspace)
