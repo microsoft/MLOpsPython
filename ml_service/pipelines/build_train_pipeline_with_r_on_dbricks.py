@@ -1,7 +1,4 @@
-from azureml.pipeline.core.graph import PipelineParameter
-from azureml.pipeline.core import Pipeline  # , PipelineData
-from azureml.core.runconfig import RunConfiguration, CondaDependencies
-# from azureml.core import Datastore
+from azureml.pipeline.core import Pipeline
 import os
 import sys
 from dotenv import load_dotenv
