@@ -27,7 +27,7 @@ steps:
   displayName: 'Publish Azure Machine Learning Pipeline. Python on ML'
   enabled: 'false'
 
-  - bash: |
+- bash: |
    # Invoke the Python building and publishing a training pipeline with R on ML Compute
    python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline_with_r.py
   failOnStderr: 'false'
