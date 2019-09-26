@@ -17,7 +17,7 @@ def main():
     app_id = os.environ.get("SP_APP_ID")
     app_secret = os.environ.get("SP_APP_SECRET")
     vm_size = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
-    compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
+    compute_name = os.environ.get("DATABRICKS_COMPUTE_NAME")
     db_cluster_id = os.environ.get("DB_CLUSTER_ID")
     build_id = os.environ.get("BUILD_BUILDID")
     pipeline_name = os.environ.get("TRAINING_PIPELINE_NAME")
