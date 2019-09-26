@@ -43,7 +43,7 @@ def main():
     train_step = DatabricksStep(
         name="DBPythonInLocalMachine",
         num_workers=1,
-        python_script_name="train_with_r.py",
+        python_script_name="train_with_r_on_databricks.py",
         source_directory="code/training/R",
         run_name='DB_Python_R_demo',
         existing_cluster_id=db_cluster_id,
