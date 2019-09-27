@@ -66,7 +66,7 @@ def main():
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
     published_pipeline = train_pipeline.publish(
-        name=pipeline_name,
+        name=pipeline_name + "_with_R",
         description="Model training/retraining pipeline",
         version=build_id
     )
