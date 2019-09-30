@@ -49,7 +49,7 @@ def main():
                       'azure-storage-blob'])
     )
     run_config.environment.docker.enabled = True
-    run_config.environment.docker.base_image = "eugenefedorenko/rimage:r"
+    run_config.environment.docker.base_image = "mcr.microsoft.com/mlops/python"
 
     train_step = PythonScriptStep(
         name="Train Model",
