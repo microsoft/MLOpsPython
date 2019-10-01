@@ -20,8 +20,10 @@
 
 ### ML Services
 
-- `ml_service/pipelines/build_train_pipeline.py` : builds and publishes an ML training pipeline.
-- `ml_service/pipelines/run_train_pipeline.py` : invokes a published ML training pipeline via REST API.
+- `ml_service/pipelines/build_train_pipeline.py` : builds and publishes an ML training pipeline. It uses Pyhton on ML Compute.
+- `ml_service/pipelines/build_train_pipeline_with_r.py` : builds and publishes an ML training pipeline. It uses R on ML Compute.
+- `ml_service/pipelines/build_train_pipeline_with_r_on_dbricks.py` : builds and publishes an ML training pipeline. It uses R on Databricks Compute.
+- `ml_service/pipelines/run_train_pipeline.py` : invokes a published ML training pipeline (Pyhton on ML Compute) via REST API.
 - `ml_service/util` : contains common utility functions used to build and publish an ML training pipeline.
 
 ### Code

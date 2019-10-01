@@ -25,7 +25,7 @@ steps:
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
   displayName: 'Publish Azure Machine Learning Pipeline. Python on ML'
-  enabled: 'false'
+  enabled: 'true'
 
 - bash: |
    # Invoke the Python building and publishing a training pipeline with R on ML Compute
@@ -34,7 +34,7 @@ steps:
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
   displayName: 'Publish Azure Machine Learning Pipeline. R on ML Compute'
-  enabled: 'true'
+  enabled: 'false'
 
 - bash: |
    # Invoke the Python building and publishing a training pipeline with R on DataBricks

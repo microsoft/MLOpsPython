@@ -33,23 +33,25 @@ Please name your variable group **``devopsforai-aml-vg``** as we are using this 
 
 The variable group should contain the following variables:
 
-| Variable Name               | Suggested Value              |
-| --------------------------- | ---------------------------- |
-| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2              |
-| AML_COMPUTE_CLUSTER_NAME    | train-cluster                |
-| BASE_NAME                   | [unique base name]                        |
-| EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py   |
-| EXPERIMENT_NAME             | mlopspython                  |
-| LOCATION                    | centralus                    |
-| MODEL_NAME                  | sklearn_regression_model.pkl |
-| REGISTER_SCRIPT_PATH        | register/register_model.py   |
-| SOURCES_DIR_TRAIN           | code                         |
-| SP_APP_ID                   |                              |
-| SP_APP_SECRET               |                              |
-| SUBSCRIPTION_ID             |                              |
-| TENANT_ID                   |                              |
-| TRAIN_SCRIPT_PATH           | training/train.py            |
-| TRAINING_PIPELINE_NAME      | training-pipeline            |
+| Variable Name               | Suggested Value                    |
+| --------------------------- | -----------------------------------|
+| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2                    |
+| AML_COMPUTE_CLUSTER_NAME    | train-cluster                      |
+| BASE_NAME                   | [unique base name]                 |
+| DB_CLUSTER_ID               | [Optional Databricks cluster Id]   |
+| DATABRICKS_COMPUTE_NAME     | [Optional Databricks compute name] |
+| EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py         |
+| EXPERIMENT_NAME             | mlopspython                        |
+| LOCATION                    | centralus                          |
+| MODEL_NAME                  | sklearn_regression_model.pkl       |
+| REGISTER_SCRIPT_PATH        | register/register_model.py         |
+| SOURCES_DIR_TRAIN           | code                               |
+| SP_APP_ID                   |                                    |
+| SP_APP_SECRET               |                                    |
+| SUBSCRIPTION_ID             |                                    |
+| TENANT_ID                   |                                    |
+| TRAIN_SCRIPT_PATH           | training/train.py                  |
+| TRAINING_PIPELINE_NAME      | training-pipeline                  |
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
@@ -107,6 +109,8 @@ and checkout a published training pipeline in the **mlops-AML-WS** workspace in 
 
 
 Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linting, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
+
+**Note:** The building pipeline contains disabled steps to build and publish ML pipelines using R to train a model. Enable these steps if you want to play with this approcah. For the pipeline training a model with R on Databricks you have to manually create a Databricks cluster and attach it to the ML Workspace as a compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables shoud be specified).
 
 ### 7. Train the Model
 
