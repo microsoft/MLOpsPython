@@ -31,6 +31,9 @@
 - `code/training/train.py` : a training step of an ML training pipeline.
 - `code/evaluate/evaluate_model.py` : an evaluating step of an ML training pipeline which registers a new trained model if evaluation shows the new model is more performant than the previous one.
 - `code/evaluate/register_model.py` : (LEGACY) registers a new trained model if evaluation shows the new model is more performant than the previous one.
+- `code/training/R/r_train.r` : training a model with R basing on a sample dataset (weight_data.csv).
+- `code/training/R/train_with_r.py` : a python wrapper (ML Pipeline Step) invoking R training script on ML Compute 
+- `code/training/R/train_with_r_on_databricks.py` : a python wrapper (ML Pipeline Step) invoking R training script on Databricks Compute
 
 ### Scoring
 - code/scoring/score.py : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.

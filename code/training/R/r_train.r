@@ -1,14 +1,7 @@
-# Databricks notebook source
 print(R.version.string)
 
 # COMMAND ----------
 
-mount_name = "kcmunninstoragev2-databricks" # Change this to the mount name in your Databricks workspace
-
-# COMMAND ----------
-
-# Load Training Data
-#path = paste("/dbfs/mnt/",mount_name,"/weight_data.csv",sep="")
 path="weight_data.csv"
 print(paste("Reading file from",path))
 
@@ -35,7 +28,6 @@ print(result)
 # COMMAND ----------
 
 # Save the model to blob storage
-#model_path = paste("/dbfs/mnt/",mount_name,"/models/model.rds",sep="")
 model_path="model.rds"
 saveRDS(model, model_path)
 
