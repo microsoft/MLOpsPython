@@ -34,6 +34,7 @@
 - `code/training/R/r_train.r` : training a model with R basing on a sample dataset (weight_data.csv).
 - `code/training/R/train_with_r.py` : a python wrapper (ML Pipeline Step) invoking R training script on ML Compute 
 - `code/training/R/train_with_r_on_databricks.py` : a python wrapper (ML Pipeline Step) invoking R training script on Databricks Compute
+- `code/training/R/weight_data.csv` : a sample dataset used by R script (r_train.r) to train a model
 
 ### Scoring
 - code/scoring/score.py : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.
