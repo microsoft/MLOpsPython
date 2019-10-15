@@ -110,7 +110,7 @@ and checkout a published training pipeline in the **mlops-AML-WS** workspace in 
 
 Great, you now have the build pipeline setup, you can either manually trigger it or it gets automatically triggered everytime there is a change in the master branch. The pipeline performs linting, unit testing, builds and publishes an **ML Training Pipeline** in an **ML Workspace**
 
-**Note:** The building pipeline contains disabled steps to build and publish ML pipelines using R to train a model. Enable these steps if you want to play with this approcah. For the pipeline training a model with R on Databricks you have to manually create a Databricks cluster and attach it to the ML Workspace as a compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables shoud be specified).
+**Note:** The building pipeline contains disabled steps to build and publish ML pipelines using R to train a model. Enable these steps if you want to play with this approach. For the pipeline training a model with R on Databricks you have to manually create a Databricks cluster and attach it to the ML Workspace as a compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables shoud be specified).
 
 ### 7. Train the Model
 
