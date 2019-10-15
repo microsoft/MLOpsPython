@@ -12,7 +12,7 @@ description: "Code which demonstrates how to set up and operationalize an MLOps 
 # MLOps with Azure ML
 
 
-[![Build Status](https://dev.azure.com/customai/DevopsForAI-AML/_apis/build/status/Microsoft.MLOpsPython?branchName=master)](https://dev.azure.com/customai/DevopsForAI-AML/_build/latest?definitionId=25&branchName=master)
+[![Build Status](https://dev.azure.com/customai/DevopsForAI-AML/_apis/build/status/Build%20%26%20Train?branchName=master)](https://dev.azure.com/customai/DevopsForAI-AML/_build/latest?definitionId=34&branchName=master)
 
 
 MLOps will help you to understand how to build the Continuous Integration and Continuous Delivery pipeline for a ML/AI project. We will be using the Azure DevOps Project for build and release/deployment pipelines along with Azure ML services for model retraining pipeline, model management and operationalization. 
