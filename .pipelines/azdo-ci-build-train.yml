@@ -15,16 +15,35 @@ variables:
 
 
 steps:
+
 - template: azdo-base-pipeline.yml
-    
+
 - bash: |
-   # Invoke the Python building and publishing a training pipeline
+   # Invoke the Python building and publishing a training pipeline with Python on ML Compute
    python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline.py
   failOnStderr: 'false'
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
-  displayName: 'Publish Azure Machine Learning Pipeline'
+  displayName: 'Publish Azure Machine Learning Pipeline. Python on ML'
   enabled: 'true'
+
+- bash: |
+   # Invoke the Python building and publishing a training pipeline with R on ML Compute
+   python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline_with_r.py
+  failOnStderr: 'false'
+  env:
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
+  displayName: 'Publish Azure Machine Learning Pipeline. R on ML Compute'
+  enabled: 'false'
+
+- bash: |
+   # Invoke the Python building and publishing a training pipeline with R on DataBricks
+   python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline_with_r_on_dbricks.py
+  failOnStderr: 'false'
+  env:
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
+  displayName: 'Publish Azure Machine Learning Pipeline. R on DataBricks'
+  enabled: 'false'
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'

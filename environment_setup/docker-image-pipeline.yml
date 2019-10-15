@@ -11,7 +11,7 @@ trigger:
 
   paths:
     include:
-    - environment_setup/*
+    - environment_setup/Dockerfile
 
 variables:
   containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]

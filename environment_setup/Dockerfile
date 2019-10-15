@@ -8,6 +8,7 @@ LABEL org.label-schema.vendor = "Microsoft" \
 
 COPY environment_setup/requirements.txt  /setup/
 	
-RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt   
+RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt && \ 
+    conda install -c r r-essentials
 
 CMD ["python"]

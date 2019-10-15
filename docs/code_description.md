@@ -20,8 +20,10 @@
 
 ### ML Services
 
-- `ml_service/pipelines/build_train_pipeline.py` : builds and publishes an ML training pipeline.
-- `ml_service/pipelines/run_train_pipeline.py` : invokes a published ML training pipeline via REST API.
+- `ml_service/pipelines/build_train_pipeline.py` : builds and publishes an ML training pipeline. It uses Python on ML Compute.
+- `ml_service/pipelines/build_train_pipeline_with_r.py` : builds and publishes an ML training pipeline. It uses R on ML Compute.
+- `ml_service/pipelines/build_train_pipeline_with_r_on_dbricks.py` : builds and publishes an ML training pipeline. It uses R on Databricks Compute.
+- `ml_service/pipelines/run_train_pipeline.py` : invokes a published ML training pipeline (Python on ML Compute) via REST API.
 - `ml_service/util` : contains common utility functions used to build and publish an ML training pipeline.
 
 ### Code
@@ -29,6 +31,10 @@
 - `code/training/train.py` : a training step of an ML training pipeline.
 - `code/evaluate/evaluate_model.py` : an evaluating step of an ML training pipeline which registers a new trained model if evaluation shows the new model is more performant than the previous one.
 - `code/evaluate/register_model.py` : (LEGACY) registers a new trained model if evaluation shows the new model is more performant than the previous one.
+- `code/training/R/r_train.r` : training a model with R basing on a sample dataset (weight_data.csv).
+- `code/training/R/train_with_r.py` : a python wrapper (ML Pipeline Step) invoking R training script on ML Compute 
+- `code/training/R/train_with_r_on_databricks.py` : a python wrapper (ML Pipeline Step) invoking R training script on Databricks Compute
+- `code/training/R/weight_data.csv` : a sample dataset used by R script (r_train.r) to train a model
 
 ### Scoring
 - code/scoring/score.py : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.
