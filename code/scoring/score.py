@@ -25,7 +25,6 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 import json
 import numpy
-from azureml.core.model import Model
 import joblib
 
 
