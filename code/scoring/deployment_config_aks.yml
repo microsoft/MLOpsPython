@@ -9,7 +9,7 @@ authEnabled: True
 containerResourceRequirements:
     cpu: 1
     memoryInGB: 4
-appInsightsEnabled: False
+appInsightsEnabled: True
 scoringTimeoutMs: 5000
 maxConcurrentRequestsPerContainer: 2
 maxQueueWaitMs: 5000
