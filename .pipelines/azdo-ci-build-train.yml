@@ -3,62 +3,41 @@ trigger:
   branches:
     include:
     - master
+  paths:
+    exclude:
+    - code/scoring/
+    - docs/
+    - environment_setup/
+    - charts/
+    - ml_service/util/create_scoring_image.py
 
-pool: 
-  vmImage: 'ubuntu-latest'
-
-container: mcr.microsoft.com/mlops/python:latest
-
-
-variables:
-- group: devopsforai-aml-vg
-
-
-steps:
-
-- template: azdo-base-pipeline.yml
-
-- bash: |
-   # Invoke the Python building and publishing a training pipeline with Python on ML Compute
-   python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline.py
-  failOnStderr: 'false'
-  env:
-    SP_APP_SECRET: '$(SP_APP_SECRET)'
-  displayName: 'Publish Azure Machine Learning Pipeline. Python on ML'
-  enabled: 'true'
-
-- bash: |
-   # Invoke the Python building and publishing a training pipeline with R on ML Compute
-   python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline_with_r.py
-  failOnStderr: 'false'
-  env:
-    SP_APP_SECRET: '$(SP_APP_SECRET)'
-  displayName: 'Publish Azure Machine Learning Pipeline. R on ML Compute'
-  enabled: 'false'
-
-- bash: |
-   # Invoke the Python building and publishing a training pipeline with R on DataBricks
-   python3 $(Build.SourcesDirectory)/ml_service/pipelines/build_train_pipeline_with_r_on_dbricks.py
-  failOnStderr: 'false'
-  env:
-    SP_APP_SECRET: '$(SP_APP_SECRET)'
-  displayName: 'Publish Azure Machine Learning Pipeline. R on DataBricks'
-  enabled: 'false'
-
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    Contents: |
-      ml_service/pipelines/?(run_train_pipeline.py|*.json)
-      code/scoring/**
-
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    ArtifactName: 'mlops-pipelines'
-    publishLocation: 'container'
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    TargetPath: '$(Build.ArtifactStagingDirectory)'  
+stages:
+- stage: 'Model_CI'
+  displayName: 'Model CI'
+  variables:
+  - group: devopsforai-aml-vg
+  # Choose from default, build_train_pipeline_with_r.py, or build_train_pipeline_with_r_on_dbricks.py
+  - name: build-train-script
+    value: 'build_train_pipeline.py'
+  jobs:
+  - job: "Model_CI_Pipeline"
+    displayName: "Model CI Pipeline"
+    pool: 
+      vmImage: 'ubuntu-latest'
+    container: mcr.microsoft.com/mlops/python:latest
+    timeoutInMinutes: 0
+    steps:
+    - template: azdo-base-pipeline.yml
+    - script: |
+        # Invoke the Python building and publishing a training pipeline
+        python3 $(Build.SourcesDirectory)/ml_service/pipelines/$(build-train-script)
+      failOnStderr: 'false'
+      env:
+        SP_APP_SECRET: '$(SP_APP_SECRET)'
+      displayName: 'Publish Azure Machine Learning Pipeline. Python on ML'
+      enabled: 'true'
+    - script: |
+        python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py
+      displayName: 'Trigger Training Pipeline'
+      env:
+        SP_APP_SECRET: '$(SP_APP_SECRET)'
