@@ -7,15 +7,14 @@ from dotenv import load_dotenv
 
 def main():
     load_dotenv()
-    workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
-    resource_group = os.environ.get("BASE_NAME")+"-AML-RG"
+    workspace_name = "aml-abtest"
+    resource_group = os.environ.get("BASE_NAME")
     subscription_id = os.environ.get("SUBSCRIPTION_ID")
     tenant_id = os.environ.get("TENANT_ID")
     experiment_name = os.environ.get("EXPERIMENT_NAME")
     model_name = os.environ.get("MODEL_NAME")
     app_id = os.environ.get('SP_APP_ID')
     app_secret = os.environ.get('SP_APP_SECRET')
-    release_id = os.environ.get('RELEASE_RELEASEID')
     build_id = os.environ.get('BUILD_BUILDID')
 
     service_principal = ServicePrincipalAuthentication(
@@ -47,7 +46,7 @@ def main():
     else:
         published_pipeline = matched_pipes[0]
 
-    pipeline_parameters = {"model_name": model_name, "release_id": release_id}
+    pipeline_parameters = {"model_name": model_name}
 
     response = published_pipeline.submit(
         aml_workspace,
