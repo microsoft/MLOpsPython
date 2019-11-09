@@ -10,13 +10,14 @@ load_dotenv()
 TENANT_ID = os.environ.get('TENANT_ID')
 APP_ID = os.environ.get('SP_APP_ID')
 APP_SECRET = os.environ.get('SP_APP_SECRET')
-WORKSPACE_NAME = os.environ.get("BASE_NAME")+"-AML-WS"
+WORKSPACE_NAME = "aml-abtest"
 SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
-RESOURCE_GROUP = os.environ.get("BASE_NAME")+"-AML-RG"
+RESOURCE_GROUP = os.environ.get("BASE_NAME")
 MODEL_NAME = os.environ.get('MODEL_NAME')
 MODEL_VERSION = os.environ.get('MODEL_VERSION')
 IMAGE_NAME = os.environ.get('IMAGE_NAME')
-
+SCORE_SCRIPT = os.environ.get('SCORE_SCRIPT')
+BUILD_NUMBER = os.environ.get('BUILD_BUILDNUMBER')
 
 SP_AUTH = ServicePrincipalAuthentication(
     tenant_id=TENANT_ID,
@@ -35,7 +36,7 @@ model = Model(ws, name=MODEL_NAME, version=MODEL_VERSION)
 os.chdir("./code/scoring")
 
 image_config = ContainerImage.image_configuration(
-    execution_script="score.py",
+    execution_script=SCORE_SCRIPT,
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
@@ -43,7 +44,7 @@ image_config = ContainerImage.image_configuration(
 )
 
 image = Image.create(
-    name=IMAGE_NAME, models=[model], image_config=image_config, workspace=ws
+    name=IMAGE_NAME + "-" + BUILD_NUMBER, models=[model], image_config=image_config, workspace=ws
 )
 
 image.wait_for_creation(show_output=True)
