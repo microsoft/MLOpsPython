@@ -11,14 +11,15 @@ trigger:
     - charts/
     - ml_service/util/create_scoring_image.py
 
+variables:
+- group: devopsforai-aml-vg
+# Choose from default, build_train_pipeline_with_r.py, or build_train_pipeline_with_r_on_dbricks.py
+- name: build-train-script
+  value: 'build_train_pipeline.py'
+
 stages:
 - stage: 'Model_CI'
   displayName: 'Model CI'
-  variables:
-  - group: devopsforai-aml-vg
-  # Choose from default, build_train_pipeline_with_r.py, or build_train_pipeline_with_r_on_dbricks.py
-  - name: build-train-script
-    value: 'build_train_pipeline.py'
   jobs:
   - job: "Model_CI_Pipeline"
     displayName: "Model CI Pipeline"
@@ -34,8 +35,17 @@ stages:
       failOnStderr: 'false'
       env:
         SP_APP_SECRET: '$(SP_APP_SECRET)'
-      displayName: 'Publish Azure Machine Learning Pipeline. Python on ML'
-      enabled: 'true'
+      displayName: 'Publish Azure Machine Learning Pipeline'
+- stage: 'Trigger_AML_Pipeline'
+  displayName: 'Train, evaluate, register model'
+  jobs:
+  - job: "Invoke_Model_Pipeline"
+    displayName: "Invoke Model Pipeline and evaluate results to register"
+    pool: 
+      vmImage: 'ubuntu-latest'
+    container: mcr.microsoft.com/mlops/python:latest
+    timeoutInMinutes: 0
+    steps:
     - script: |
         python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py
       displayName: 'Trigger Training Pipeline'
