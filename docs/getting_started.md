@@ -171,6 +171,13 @@ Great, you now have the build pipeline set up which automatically triggers every
 branch. The pipeline performs linting, unit testing, builds and publishes and executes a 
 **ML Training Pipeline** in a **ML Workspace**.
 
+![running training pipeline](./images/running-training-pipeline.png)
+
+The training pipeline will train, evaluate, and register a new model. Wait until
+it is finished and make sure there is a new model in the **ML Workspace**:
+
+![trained model](./images/trained-model.png)
+
 To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\azdo-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
 
 ### Set up a Release Deployment Pipeline to Deploy the Model
