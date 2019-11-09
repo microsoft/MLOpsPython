@@ -10,7 +10,7 @@ load_dotenv()
 TENANT_ID = os.environ.get('TENANT_ID')
 APP_ID = os.environ.get('SP_APP_ID')
 APP_SECRET = os.environ.get('SP_APP_SECRET')
-WORKSPACE_NAME = "aml-abtest"
+WORKSPACE_NAME = os.environ.get('AML_WORKSPACE_NAME')
 SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
 RESOURCE_GROUP = os.environ.get("BASE_NAME")
 MODEL_NAME = os.environ.get('MODEL_NAME')
