@@ -18,7 +18,7 @@ variables:
   value: 'build_train_pipeline.py'
 # Automatically triggers the train, evaluate, register pipeline after the CI steps. Set to false to disable.
 - name: auto-trigger-training
-  value: true
+  value: false
 
 stages:
 - stage: 'Model_CI'
