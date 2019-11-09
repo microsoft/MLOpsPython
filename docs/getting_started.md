@@ -171,29 +171,7 @@ Great, you now have the build pipeline set up which automatically triggers every
 branch. The pipeline performs linting, unit testing, builds and publishes and executes a 
 **ML Training Pipeline** in a **ML Workspace**.
 
-### Set up a Release Trigger Pipeline to Train the Model
-
-This release pipeline should now be automatically triggered
-(continuous deployment) whenever a new **ML training pipeline** is published by
-the **ci-build builder pipeline**. It can also be triggered manually or
-configured to run on a scheduled basis. Create a new release to trigger the
-pipeline manually by clicking on the "Create release" button on the top right
-of your screen, when selecting this new build pipeline:
-
-![create release](./images/create-release.png)
-
-Leave the fields empty and click on "create". Once the release pipeline is
-completed, check out in the **ML Workspace** that the training pipeline is
-running:
-
-![running training pipeline](./images/running-training-pipeline.png)
-
-The training pipeline will train, evaluate, and register a new model. Wait until
-it is finished and make sure there is a new model in the **ML Workspace**:
-
-![trained model](./images/trained-model.png)
-
-Good! Now we have a trained model.
+To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\azdo-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
 
 ### Set up a Release Deployment Pipeline to Deploy the Model
 
@@ -206,13 +184,10 @@ This is the final picture of what your release pipeline should look like:
 
 ![deploy model](./images/deploy-model.png)
 
-The pipeline consumes two artifacts:
+The pipeline consumes one artifact:
 
 1. the result of the **Build Pipeline** as it contains configuration files
 1. the **model** trained and registered by the ML training pipeline
-
-Create a new release pipeline and add the **\_ci-build** artifact using the
-same process as what we did in the previous step.
 
 Install the **Azure Machine Learning** extension to your organization from the
 [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
