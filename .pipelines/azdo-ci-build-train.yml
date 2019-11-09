@@ -16,6 +16,9 @@ variables:
 # Choose from default, build_train_pipeline_with_r.py, or build_train_pipeline_with_r_on_dbricks.py
 - name: build-train-script
   value: 'build_train_pipeline.py'
+# Automatically triggers the train, evaluate, register pipeline after the CI steps. Set to false to disable.
+- name: auto-trigger-training
+  value: true
 
 stages:
 - stage: 'Model_CI'
@@ -37,9 +40,10 @@ stages:
         SP_APP_SECRET: '$(SP_APP_SECRET)'
       displayName: 'Publish Azure Machine Learning Pipeline'
 - stage: 'Trigger_AML_Pipeline'
-  displayName: 'Train, evaluate, register model'
+  displayName: 'Train, evaluate, register model via previously published AML pipeline'
   jobs:
   - job: "Invoke_Model_Pipeline"
+    condition: and(succeeded(), eq(variables['auto-trigger-training'], true))
     displayName: "Invoke Model Pipeline and evaluate results to register"
     pool: 
       vmImage: 'ubuntu-latest'
