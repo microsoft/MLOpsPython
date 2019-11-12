@@ -56,3 +56,17 @@ stages:
       displayName: 'Trigger Training Pipeline'
       env:
         SP_APP_SECRET: '$(SP_APP_SECRET)'
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        Contents: |
+          code/scoring/**
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        ArtifactName: 'mlops-pipelines'
+        publishLocation: 'container'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+        TargetPath: '$(Build.ArtifactStagingDirectory)'
