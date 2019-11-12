@@ -5,7 +5,6 @@ trigger:
     - master
   paths:
     exclude:
-    - code/scoring/
     - docs/
     - environment_setup/
     - charts/
