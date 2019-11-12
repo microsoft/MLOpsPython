@@ -171,6 +171,13 @@ Great, you now have the build pipeline set up which automatically triggers every
 branch. The pipeline performs linting, unit testing, builds and publishes and executes a 
 **ML Training Pipeline** in a **ML Workspace**.
 
+**Note:** The build pipeline contains disabled steps to build and publish ML
+pipelines using R to train a model. Enable these steps if you want to play with
+this approach by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For the pipeline training a model with R on Databricks you have
+to manually create a Databricks cluster and attach it to the ML Workspace as a
+compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables shoud be
+specified).
+
 ![running training pipeline](./images/running-training-pipeline.png)
 
 The training pipeline will train, evaluate, and register a new model. Wait until
@@ -191,7 +198,7 @@ This is the final picture of what your release pipeline should look like:
 
 ![deploy model](./images/deploy-model.png)
 
-The pipeline consumes one artifact:
+The pipeline consumes two artifacts:
 
 1. the result of the **Build Pipeline** as it contains configuration files
 1. the **model** trained and registered by the ML training pipeline
