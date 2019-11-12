@@ -145,9 +145,7 @@ you can set up the rest of the pipelines necessary for deploying your ML model
 to production. These are the pipelines that you will be setting up:
 
 1. **Build pipeline:** triggered on code change to master branch on GitHub,
-performs linting, unit testing and publishing a training pipeline.
-1. **Release Trigger pipeline:** runs a published training pipeline to train,
-evaluate and register a model.
+performs linting, unit testing, publishing a training pipeline, and runs the published training pipeline to train, evaluate, and register a model.
 1. **Release Deployment pipeline:** deploys a model to QA (ACI) and Prod (AKS)
 environments.
 
@@ -169,79 +167,16 @@ and checkout a published training pipeline in the **mlops-AML-WS** workspace in
 
 ![training pipeline](./images/training-pipeline.png)
 
-Great, you now have the build pipeline set up which can either be manually
-triggered or automatically triggered every time there's a change in the master
-branch. The pipeline performs linting, unit testing, and builds and publishes an
+Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master
+branch. The pipeline performs linting, unit testing, builds and publishes and executes a 
 **ML Training Pipeline** in a **ML Workspace**.
 
 **Note:** The build pipeline contains disabled steps to build and publish ML
 pipelines using R to train a model. Enable these steps if you want to play with
-this approach. For the pipeline training a model with R on Databricks you have
+this approach by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For the pipeline training a model with R on Databricks you have
 to manually create a Databricks cluster and attach it to the ML Workspace as a
 compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables shoud be
 specified).
-
-### Set up a Release Trigger Pipeline to Train the Model
-
-The next step is to invoke the training pipeline created in the previous step.
-It can be done with a **Release Pipeline**. Click on the Pipelines/Releases
-menu, and then **New pipeline**, and then click on "Empty Job" on the
-"Select a template" window that pops to the right:
-
-![invoke training pipeline](./images/invoke-training-pipeline.png)
-
-Next, click on "Add an artifact". We will select the artifact of this pipeline
-to be the result of the build pipeline **ci-build**:
-
-![artifact invoke pipeline](./images/artifact-invoke-pipeline.png)
-
-After that, configure a pipeline to see values from the previously defined
-variable group **devopsforai-aml-vg**. Click on the "Variable groups",
-and to the right, click on "Link variable group". From there, pick the
-**devopsforai-aml-vg** variable group we created in an earlier step, choose
-"Release" as a variable group scope, and click on "Link":
-
-![retrain pipeline vg](./images/retrain-pipeline-vg.png)
-
-Rename the default "Stage 1" to **Invoke Training Pipeline** and make sure that
-the **Agent Specification** is **ubuntu-16.04** under the Agent Job:
-
-![agent specification](./images/agent-specification.png)
-
-Add a **Command Line Script** step, rename it to **Run Training Pipeline** with the following script:
-
-```bash
-docker run -v $(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/ml_service/pipelines:/pipelines \
- -w=/pipelines -e MODEL_NAME=$MODEL_NAME -e EXPERIMENT_NAME=$EXPERIMENT_NAME \
- -e TENANT_ID=$TENANT_ID -e SP_APP_ID=$SP_APP_ID -e SP_APP_SECRET=$(SP_APP_SECRET) \
- -e SUBSCRIPTION_ID=$SUBSCRIPTION_ID -e RELEASE_RELEASEID=$RELEASE_RELEASEID \
- -e BUILD_BUILDID=$BUILD_BUILDID -e BASE_NAME=$BASE_NAME \
-mcr.microsoft.com/mlops/python:latest python run_train_pipeline.py
-```
-
-as in the screen shot below, leaving all other fields to their default value:
-
-![Run Training Pipeline Task](./images/run_training_pipeline_task.png)
-
-Now, add the automation to trigger a run of this pipeline whenever the
-**ci_build** build is completed, click on the lightning bolt icon on the top
-right of the **\_ci-build** artifact is selected, and enable the automatic
-release:
-
-![automate_invoke_training_pipeline](./images/automate_invoke_training_pipeline.png)
-
-This release pipeline should now be automatically triggered
-(continuous deployment) whenever a new **ML training pipeline** is published by
-the **ci-build builder pipeline**. It can also be triggered manually or
-configured to run on a scheduled basis. Create a new release to trigger the
-pipeline manually by clicking on the "Create release" button on the top right
-of your screen, when selecting this new build pipeline:
-
-![create release](./images/create-release.png)
-
-Leave the fields empty and click on "create". Once the release pipeline is
-completed, check out in the **ML Workspace** that the training pipeline is
-running:
 
 ![running training pipeline](./images/running-training-pipeline.png)
 
@@ -250,7 +185,7 @@ it is finished and make sure there is a new model in the **ML Workspace**:
 
 ![trained model](./images/trained-model.png)
 
-Good! Now we have a trained model.
+To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\azdo-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
 
 ### Set up a Release Deployment Pipeline to Deploy the Model
 
@@ -267,9 +202,6 @@ The pipeline consumes two artifacts:
 
 1. the result of the **Build Pipeline** as it contains configuration files
 1. the **model** trained and registered by the ML training pipeline
-
-Create a new release pipeline and add the **\_ci-build** artifact using the
-same process as what we did in the previous step.
 
 Install the **Azure Machine Learning** extension to your organization from the
 [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),

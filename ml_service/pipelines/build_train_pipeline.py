@@ -22,7 +22,6 @@ def main():
     sources_directory_train = os.environ.get("SOURCES_DIR_TRAIN")
     train_script_path = os.environ.get("TRAIN_SCRIPT_PATH")
     evaluate_script_path = os.environ.get("EVALUATE_SCRIPT_PATH")
-    # register_script_path = os.environ.get("REGISTER_SCRIPT_PATH")
     vm_size = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
     compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
     model_name = os.environ.get("MODEL_NAME")
@@ -90,27 +89,7 @@ def main():
     )
     print("Step Evaluate created")
 
-    # Currently, the Evaluate step will automatically register
-    # the model if it performs better. This step is based on a
-    # previous version of the repo which utilized JSON files to
-    # track evaluation results.
-
-    # register_model_step = PythonScriptStep(
-    #     name="Register New Trained Model",
-    #     script_name=register_script_path,
-    #     compute_target=aml_compute,
-    #     source_directory=sources_directory_train,
-    #     arguments=[
-    #         "--release_id", release_id,
-    #         "--model_name", model_name,
-    #     ],
-    #     runconfig=run_config,
-    #     allow_reuse=False,
-    # )
-    # print("Step register model created")
-
     evaluate_step.run_after(train_step)
-    # register_model_step.run_after(evaluate_step)
     steps = [evaluate_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
