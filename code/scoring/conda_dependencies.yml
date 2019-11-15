@@ -25,7 +25,7 @@ dependencies:
 
 - pip:
     # Required packages for AzureML execution, history, and data preparation.
-  - azure-ml-api-sdk==0.1.0a11
+  - azureml-model-management-sdk==1.0.1b6.post1
   - azureml-sdk==1.0.74
   - scipy==1.3.1
   - scikit-learn==0.21.3
