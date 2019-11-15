@@ -27,11 +27,5 @@ spec:
           containerPort: 5001
         - name: probe
           containerPort: 8086
-        env:
-          - name: APPLICATIONINSIGHTS_CONNECTION_STRING
-            valueFrom:
-              secretKeyRef:
-                name: app-insight-secret
-                key: InstrumentationKey
       imagePullSecrets:
         - name: aks-secret     
