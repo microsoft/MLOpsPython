@@ -5,7 +5,7 @@ variables:
 - name: 'imgTag'
   value: 1
 - name: 'imgName'
-  value: amlabtest74c95585.azurecr.io/$(IMAGE_NAME)-$(Build.TriggeredBy.BuildNumber)
+  value: myuniquemlamlcr.azurecr.io/$(IMAGE_NAME)-$(Build.TriggeredBy.BuildNumber)
 - name: 'kubernetesServiceConnection'
   value: 'abtesting-cluster'
 - name: 'blueReleaseName'
