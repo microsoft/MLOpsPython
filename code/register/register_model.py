@@ -54,7 +54,7 @@ parser.add_argument(
     "--model_name",
     type=str,
     help="Name of the Model",
-    default="sklearn_regression_model.pkl",
+    default="SKLearnRegressionModel",
 )
 
 args = parser.parse_args()
@@ -91,7 +91,7 @@ names()
 print("Run ID for last run: {}".format(run_id))
 
 model = run.register_model(model_name=model_name,
-                           model_path="./outputs/" + model_name,
+                           model_path="./outputs/model.pkl",
                            tags={"area": "diabetes", "type": "regression"})
 os.chdir("..")
 print(
