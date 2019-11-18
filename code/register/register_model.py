@@ -26,86 +26,114 @@ POSSIBILITY OF SUCH DAMAGE.
 import os
 import json
 import sys
-from azureml.core import Run
 import argparse
+from azureml.core import Run, Experiment, Workspace
+from azureml.core.model import Model as AMLModel
+from azureml.core.authentication import ServicePrincipalAuthentication
+from dotenv import load_dotenv
+sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
+from model_helper import get_model_by_build_id
 
-from azureml.core.authentication import AzureCliAuthentication
+def main():
+    load_dotenv()
+    workspace_name = os.environ.get("WORKSPACE_NAME")
+    resource_group = os.environ.get("RESOURCE_GROUP")
+    subscription_id = os.environ.get("SUBSCRIPTION_ID")
+    tenant_id = os.environ.get("TENANT_ID")
+    model_name = os.environ.get("MODEL_NAME")
+    app_id = os.environ.get('SP_APP_ID')
+    app_secret = os.environ.get('SP_APP_SECRET')
+    build_id = os.environ.get('BUILD_BUILDID')
 
-cli_auth = AzureCliAuthentication()
+    run = Run.get_context()
+    if (run.id.startswith('OfflineRun')):
+        # For local development, set values in this section
+        service_principal = ServicePrincipalAuthentication(
+            tenant_id=tenant_id,
+            service_principal_id=app_id,
+            service_principal_password=app_secret)
 
-# Get workspace
-# ws = Workspace.from_config(auth=cli_auth, path='./')
-
-
-run = Run.get_context()
-exp = run.experiment
-ws = run.experiment.workspace
-
-parser = argparse.ArgumentParser("register")
-parser.add_argument(
-    "--config_suffix", type=str, help="Datetime suffix for json config files"
-)
-parser.add_argument(
-    "--json_config",
-    type=str,
-    help="Directory to write all the intermediate json configs",
-)
-parser.add_argument(
-    "--model_name",
-    type=str,
-    help="Name of the Model",
-    default="sklearn_regression_model.pkl",
-)
-
-args = parser.parse_args()
-
-print("Argument 1: %s" % args.config_suffix)
-print("Argument 2: %s" % args.json_config)
-
-if not (args.json_config is None):
-    os.makedirs(args.json_config, exist_ok=True)
-    print("%s created" % args.json_config)
-
-evaluate_run_id_json = "run_id_{}.json".format(args.config_suffix)
-evaluate_output_path = os.path.join(args.json_config, evaluate_run_id_json)
-model_name = args.model_name
-
-# Get the latest evaluation result
-try:
-    with open(evaluate_output_path) as f:
-        config = json.load(f)
-    if not config["run_id"]:
-        raise Exception(
-            "No new model to register as production model perform better")
-except Exception:
-    print("No new model to register as production model perform better")
-    sys.exit(0)
-
-run_id = config["run_id"]
-experiment_name = config["experiment_name"]
-# exp = Experiment(workspace=ws, name=experiment_name)
-
-run = Run(experiment=exp, run_id=run_id)
-names = run.get_file_names
-names()
-print("Run ID for last run: {}".format(run_id))
-
-model = run.register_model(model_name=model_name,
-                           model_path="./outputs/" + model_name,
-                           tags={"area": "diabetes", "type": "regression"})
-os.chdir("..")
-print(
-    "Model registered: {} \nModel Description: {} \nModel Version: {}".format(
-        model.name, model.description, model.version
+        aml_workspace = Workspace.get(
+            name=workspace_name,
+            subscription_id=subscription_id,
+            resource_group=resource_group,
+            auth=service_principal
+        )
+        ws = aml_workspace
+        exp = Experiment(ws, "abtest")
+        run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
+    else:
+        exp = run.experiment
+        ws = run.experiment.workspace
+        
+    parser = argparse.ArgumentParser("register")
+    parser.add_argument(
+        "--build_id",
+        type=str,
+        help="The Build ID of the build triggering this pipeline run",
     )
-)
+    parser.add_argument(
+        "--run_id",
+        type=str,
+        help="Training run ID",
+    )
+    parser.add_argument(
+        "--model_name",
+        type=str,
+        help="Name of the Model",
+        default="sklearn_regression_model.pkl",
+    )
 
-# Writing the registered model details to /aml_config/model.json
-model_json = {}
-model_json["model_name"] = model.name
-model_json["model_version"] = model.version
-model_json["run_id"] = run_id
-filename = "model_{}.json".format(args.config_suffix)
-output_path = os.path.join(args.json_config, filename)
-with open(output_path, "w") as outfile:
-    json.dump(model_json, outfile)
+    args = parser.parse_args()
+    if (args.build_id is not None):
+        build_id = args.build_id
+    if (args.run_id is not None):
+        run_id = args.run_id
+    if (run_id is None):
+        run_id = run.parent.id()
+    model_name = args.model_name
+
+    if (build_id is None):
+        register_aml_model(model_name, exp, run_id)
+    else:
+        register_aml_model(model_name, exp, run_id, build_id)
+
+def model_already_registered(model_name, exp, run_id):
+    model_list = AMLModel.list(exp.workspace,name=model_name,run_id=run_id)
+    if len(model_list) >= 1:
+        print("Model name:", model_name, "in workspace", \
+            exp.workspace, "with run_id ", run_id, "is already registered.")
+        sys.exit(0)
+        
+def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
+    try:
+        if (build_id != 'none'):
+            get_model_by_build_id(model_name, build_id, exp.workspace)
+            model_already_registered(model_name, exp, run_id)
+            run = Run(experiment=exp, run_id=run_id)
+            tagsValue={"area": "diabetes", "type": "regression", "build_id": build_id, "run_id": run_id}
+        else:
+            run = Run(experiment=exp, run_id=run_id)
+            if (run is not None):
+                tagsValue={"area": "diabetes", "type": "regression", "run_id": run_id}
+            else:
+                print("A model run for experiment", exp.name,
+                    "matching properties run_id =", run_id,
+                    "was not found. Skipping model registration.")
+                sys.exit(0)
+
+        model = run.register_model(model_name=model_name,
+                                model_path="./outputs/" + model_name,
+                                tags=tagsValue)
+        os.chdir("..")
+        print(
+            "Model registered: {} \nModel Description: {} \nModel Version: {}".format(
+                model.name, model.description, model.version
+            )
+        )
+    except Exception as e:
+        print(e)
+        print("Model registration failed")
+
+if __name__ == '__main__':
+    main()
