@@ -40,19 +40,13 @@ parser.add_argument(
     type=str,
     help="The ID of the release triggering this pipeline run",
 )
-parser.add_argument(
-    "--model_name",
-    type=str,
-    help="Name of the Model",
-    default="model.pkl",
-)
 
 args = parser.parse_args()
 
 print("Argument 1: %s" % args.release_id)
 print("Argument 2: %s" % args.model_name)
 
-model_name = args.model_name
+model_name = "model.pkl"
 release_id = args.release_id
 
 run = Run.get_context()
