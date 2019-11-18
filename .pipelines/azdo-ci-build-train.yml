@@ -12,7 +12,9 @@ trigger:
 
 variables:
 - group: devopsforai-aml-vg
-# Choose from default, build_train_pipeline_with_r.py, or build_train_pipeline_with_r_on_dbricks.py
+# Choose from default, build_train_pipelinewith_r.py, or build_train_pipeline_with_r_on_dbricks.py
+- name: BUILD_BUILDNUMBER2
+  value: '20191112.2'
 - name: build-train-script
   value: 'build_train_pipeline.py'
 # Automatically triggers the train, evaluate, register pipeline after the CI steps. 
@@ -21,30 +23,30 @@ variables:
 #   value: false
 
 stages:
-- stage: 'Model_CI'
-  displayName: 'Model CI'
-  jobs:
-  - job: "Model_CI_Pipeline"
-    displayName: "Model CI Pipeline"
-    pool: 
-      vmImage: 'ubuntu-latest'
-    container: mcr.microsoft.com/mlops/python:latest
-    timeoutInMinutes: 0
-    steps:
-    - template: azdo-base-pipeline.yml
-    - script: |
-        # Invoke the Python building and publishing a training pipeline
-        python3 $(Build.SourcesDirectory)/ml_service/pipelines/$(build-train-script)
-      failOnStderr: 'false'
-      env:
-        SP_APP_SECRET: '$(SP_APP_SECRET)'
-      displayName: 'Publish Azure Machine Learning Pipeline'
+# - stage: 'Model_CI'
+#   displayName: 'Model CI'
+#   jobs:
+#   - job: "Model_CI_Pipeline"
+#     displayName: "Model CI Pipeline"
+#     pool: 
+#       vmImage: 'ubuntu-latest'
+#     container: mcr.microsoft.com/mlops/python:latest
+#     timeoutInMinutes: 0
+#     steps:
+#     - template: azdo-base-pipeline.yml
+#     - script: |
+#         # Invoke the Python building and publishing a training pipeline
+#         python3 $(Build.SourcesDirectory)/ml_service/pipelines/$(build-train-script)
+#       failOnStderr: 'false'
+#       env:
+#         SP_APP_SECRET: '$(SP_APP_SECRET)'
+#       displayName: 'Publish Azure Machine Learning Pipeline'
 - stage: 'Trigger_AML_Pipeline'
   displayName: 'Train, evaluate, register model via previously published AML pipeline'
   jobs:
-  - job: "Invoke_Model_Pipeline"
+  - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
-    displayName: "Invoke Model Pipeline and evaluate results to register"
+    displayName: "Get Pipeline ID for execution"
     pool: 
       vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
@@ -52,20 +54,50 @@ stages:
     steps:
     - script: |
         python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py
+        source $(Build.SourcesDirectory)/tmp.sh
+        echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINE_ID"
+      name: 'getpipelineid'
       displayName: 'Trigger Training Pipeline'
       env:
         SP_APP_SECRET: '$(SP_APP_SECRET)'
-    - task: CopyFiles@2
-      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+  - job: "Run_ML_Pipeline"
+    dependsOn: "Get_Pipeline_ID"
+    displayName: "Trigger ML Training Pipeline"
+    pool: server
+    variables:
+      AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
+    steps:
+    - task: ms-air-aiagility.private-vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke ML pipeline'
       inputs:
-        SourceFolder: '$(Build.SourcesDirectory)'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
-        Contents: |
-          code/scoring/**
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact'
-      inputs:
-        ArtifactName: 'mlops-pipelines'
-        publishLocation: 'container'
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-        TargetPath: '$(Build.ArtifactStagingDirectory)'
+        azureSubscription: 'aml-abtest-workspace'
+        PipelineId: '$(AMLPIPELINE_ID)'
+        ExperimentName: '$(EXPERIMENT_NAME)'
+        PipelineParameters: '"model_name": "sklearn_regression_model.pkl"'
+  # - job: "Training_Run_Report"
+  #   dependsOn: "Run_ML_Pipeline"
+  #   displayName: "Determine if evaluation succeeded and new model is registered"
+  #   pool: 
+  #     vmImage: 'ubuntu-latest'
+  #   container: mcr.microsoft.com/mlops/python:latest
+  #   timeoutInMinutes: 0
+  #   steps:
+  #   - script: |
+  #       python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py
+  #     displayName: 'Trigger Training Pipeline'
+  #     env:
+  #       SP_APP_SECRET: '$(SP_APP_SECRET)'
+  #   - task: CopyFiles@2
+  #     displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+  #     inputs:
+  #       SourceFolder: '$(Build.SourcesDirectory)'
+  #       TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  #       Contents: |
+  #         code/scoring/**
+  #   - task: PublishBuildArtifacts@1
+  #     displayName: 'Publish Artifact'
+  #     inputs:
+  #       ArtifactName: 'mlops-pipelines'
+  #       publishLocation: 'container'
+  #       pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+  #       TargetPath: '$(Build.ArtifactStagingDirectory)'

@@ -4,7 +4,6 @@ from azureml.core import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from dotenv import load_dotenv
 
-
 def main():
     load_dotenv()
     workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
@@ -16,6 +15,7 @@ def main():
     app_id = os.environ.get('SP_APP_ID')
     app_secret = os.environ.get('SP_APP_SECRET')
     build_id = os.environ.get('BUILD_BUILDID')
+    skip_train_execution = True
 
     service_principal = ServicePrincipalAuthentication(
             tenant_id=tenant_id,
@@ -45,16 +45,21 @@ def main():
         raise KeyError(f"Unable to find a published pipeline for this build {build_id}")  # NOQA: E501
     else:
         published_pipeline = matched_pipes[0]
+        print("published pipeline id is", published_pipeline.id)
 
-    pipeline_parameters = {"model_name": model_name}
+        # Save the Pipeline ID to be used for other AzDO jobs after script is complete
+        os.environ['amlpipeline_id'] = published_pipeline.id
+        savePIDcmd = 'echo "export AMLPIPELINE_ID=$amlpipeline_id" >tmp.sh'
+        os.system(savePIDcmd)
+        if(skip_train_execution == False):
+            pipeline_parameters = {"model_name": model_name}
+            response = published_pipeline.submit(
+                aml_workspace,
+                experiment_name,
+                pipeline_parameters)
 
-    response = published_pipeline.submit(
-        aml_workspace,
-        experiment_name,
-        pipeline_parameters)
-
-    run_id = response.id
-    print("Pipeline run initiated ", run_id)
+            run_id = response.id
+            print("Pipeline run initiated ", run_id)
 
 
 if __name__ == "__main__":
