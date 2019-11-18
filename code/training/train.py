@@ -44,7 +44,7 @@ parser.add_argument(
     "--model_name",
     type=str,
     help="Name of the Model",
-    default="sklearn_regression_model.pkl",
+    default="model.pkl",
 )
 
 args = parser.parse_args()
