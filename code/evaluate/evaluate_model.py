@@ -24,21 +24,55 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
-from azureml.core import Model, Run
+import sys
+from azureml.core import Model, Run, Workspace, Experiment
 import argparse
+from azureml.core.authentication import ServicePrincipalAuthentication
+from dotenv import load_dotenv
+sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
+from model_helper import get_model_by_build_id
 
 
-# Get workspace
 run = Run.get_context()
-exp = run.experiment
-ws = run.experiment.workspace
+if (run.id.startswith('OfflineRun')):
+    # For local development, set values in this section
+    load_dotenv()
+    workspace_name = os.environ.get("WORKSPACE_NAME")
+    resource_group = os.environ.get("RESOURCE_GROUP")
+    subscription_id = os.environ.get("SUBSCRIPTION_ID")
+    tenant_id = os.environ.get("TENANT_ID")
+    model_name = os.environ.get("MODEL_NAME")
+    app_id = os.environ.get('SP_APP_ID')
+    app_secret = os.environ.get('SP_APP_SECRET')
+    build_id = os.environ.get('BUILD_BUILDID')
+    service_principal = ServicePrincipalAuthentication(
+        tenant_id=tenant_id,
+        service_principal_id=app_id,
+        service_principal_password=app_secret)
 
-
-parser = argparse.ArgumentParser("evaluate")
+    aml_workspace = Workspace.get(
+        name=workspace_name,
+        subscription_id=subscription_id,
+        resource_group=resource_group,
+        auth=service_principal
+    )
+    ws = aml_workspace
+    exp = Experiment(ws, "abtest")
+    run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
+else:
+    exp = run.experiment
+    ws = run.experiment.workspace
+    
+parser = argparse.ArgumentParser("register")
 parser.add_argument(
-    "--release_id",
+    "--build_id",
     type=str,
-    help="The ID of the release triggering this pipeline run",
+    help="The Build ID of the build triggering this pipeline run",
+)
+parser.add_argument(
+    "--run_id",
+    type=str,
+    help="Training run ID",
 )
 parser.add_argument(
     "--model_name",
@@ -46,29 +80,20 @@ parser.add_argument(
     help="Name of the Model",
     default="sklearn_regression_model.pkl",
 )
+
 args = parser.parse_args()
-
-print("Argument 1: %s" % args.release_id)
-print("Argument 2: %s" % args.model_name)
+if (args.build_id is not None):
+    build_id = args.build_id
+if (args.run_id is not None):
+    run_id = args.run_id
+if (run_id is None):
+    run_id = run.parent.id()
 model_name = args.model_name
-release_id = args.release_id
+metric_eval = "mse"
 
-# Paramaterize the matrics on which the models should be compared
+# Paramaterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
-
-all_runs = exp.get_runs(
-    properties={"release_id": release_id, "run_type": "train"},
-    include_children=True
-    )
-new_model_run = next(all_runs)
-new_model_run_id = new_model_run.id
-print(f'New Run found with Run ID of: {new_model_run_id}')
-
 try:
-    # Get most recently registered model, we assume that
-    # is the model in production.
-    # Download this model and compare it with the recently
-    # trained model by running test with same data set.
     model_list = Model.list(ws)
     production_model = next(
         filter(
@@ -77,37 +102,39 @@ try:
             model_list,
         )
     )
-    production_model_run_id = production_model.tags.get("run_id")
-    run_list = exp.get_runs()
+    # TODO add logic for 1st time registering model evaluation
+    production_model_run_id = production_model.run_id
 
     # Get the run history for both production model and
     # newly trained model and compare mse
     production_model_run = Run(exp, run_id=production_model_run_id)
-    new_model_run = Run(exp, run_id=new_model_run_id)
+    new_model_run = run.parent
+    if (production_model_run.id == new_model_run.id):
+        print("Production and new model are same run.")
+        sys.exit(0)
+    else:
+        print("Production model run is", production_model_run)
 
-    production_model_mse = production_model_run.get_metrics().get("mse")
-    new_model_mse = new_model_run.get_metrics().get("mse")
-    print(
-        "Current Production model mse: {}, New trained model mse: {}".format(
-            production_model_mse, new_model_mse
+    production_model_mse = production_model_run.get_metrics().get(metric_eval)
+    new_model_mse = new_model_run.get_metrics().get(metric_eval)
+    if (production_model_mse is None or new_model_mse is None):
+        print("Unable to find", metric_eval, "metrics, "
+        "exiting evaluation")
+        sys.exit(0)
+    else:
+        print(
+            "Current Production model mse: {}, New trained model mse: {}".format(
+                production_model_mse, new_model_mse
+            )
         )
-    )
-
-    promote_new_model = False
+    
     if new_model_mse < production_model_mse:
-        promote_new_model = True
-        print("New trained model performs better, thus it will be registered")
-except Exception:
-    promote_new_model = True
-    print("This is the first model to be trained, \
-          thus nothing to evaluate for now")
-
-
-# Writing the run id to /aml_config/run_id.json
-if promote_new_model:
-    model_path = os.path.join('outputs', model_name)
-    new_model_run.register_model(
-        model_name=model_name,
-        model_path=model_path,
-        properties={"release_id": release_id})
-    print("Registered new model!")
+        print("New trained model performs better, thus it should be registered")
+    else:
+        print("New trained model metric is less than or equal to "
+              "production model so skipping model registration.")
+        run.parent.cancel()
+        # sys.exit(1)
+except Exception as e:
+    print(e)
+    print("Something went wrong trying to evaluate. Exiting.")
