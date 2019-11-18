@@ -26,14 +26,14 @@ POSSIBILITY OF SUCH DAMAGE.
 import json
 import numpy
 import joblib
-
+import os
 
 def init():
     global model
 
     # load the model from file into a global object
     model_path = os.path.join(os.getenv('AZUREML_MODEL_DIR'),
-                              'sklearn_regression_model.pkl')
+                              'model.pkl')
     model = joblib.load(model_path)
 
 
