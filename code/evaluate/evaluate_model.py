@@ -63,7 +63,7 @@ else:
     exp = run.experiment
     ws = run.experiment.workspace
 
-parser = argparse.ArgumentParser("register")
+parser = argparse.ArgumentParser("evaluate")
 parser.add_argument(
     "--build_id",
     type=str,

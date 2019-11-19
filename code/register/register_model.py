@@ -60,7 +60,7 @@ def main():
             auth=service_principal
         )
         ws = aml_workspace
-        exp = Experiment(ws, "abtest")
+        exp = Experiment(ws, workspace_name)
         run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
     else:
         exp = run.experiment
@@ -83,6 +83,12 @@ def main():
         help="Name of the Model",
         default="sklearn_regression_model.pkl",
     )
+    parser.add_argument(
+        "--validate",
+        type=str,
+        help="Set to true to only validate if model is registered for run",
+        default=False,
+    )
 
     args = parser.parse_args()
     if (args.build_id is not None):
@@ -91,12 +97,23 @@ def main():
         run_id = args.run_id
     if (run_id is None):
         run_id = run.parent.id()
+    if (args.validate is not None):
+        validate = args.validate
     model_name = args.model_name
 
-    if (build_id is None):
-        register_aml_model(model_name, exp, run_id)
+    if (validate):
+        try:
+            get_model_by_build_id(model_name, build_id, exp.workspace)
+            print("Model was registered for this build.")
+        except Exception as e:
+            print(e)
+            print("Model was not registered for this run.")
+            sys.exit(1)
     else:
-        register_aml_model(model_name, exp, run_id, build_id)
+        if (build_id is None):
+            register_aml_model(model_name, exp, run_id)
+        else:
+            register_aml_model(model_name, exp, run_id, build_id)
 
 
 def model_already_registered(model_name, exp, run_id):
@@ -104,7 +121,8 @@ def model_already_registered(model_name, exp, run_id):
     if len(model_list) >= 1:
         print("Model name:", model_name, "in workspace",
               exp.workspace, "with run_id ", run_id, "is already registered.")
-        sys.exit(0)
+    else:
+        raise Exception("Model is not registered")
 
 
 def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):

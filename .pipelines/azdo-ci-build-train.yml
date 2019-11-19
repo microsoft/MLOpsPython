@@ -72,30 +72,30 @@ stages:
         PipelineId: '$(AMLPIPELINE_ID)'
         ExperimentName: '$(EXPERIMENT_NAME)'
         PipelineParameters: '"model_name": "sklearn_regression_model.pkl"'
-  # - job: "Training_Run_Report"
-  #   dependsOn: "Run_ML_Pipeline"
-  #   displayName: "Determine if evaluation succeeded and new model is registered"
-  #   pool: 
-  #     vmImage: 'ubuntu-latest'
-  #   container: mcr.microsoft.com/mlops/python:latest
-  #   timeoutInMinutes: 0
-  #   steps:
-  #   - script: |
-  #       python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py
-  #     displayName: 'Trigger Training Pipeline'
-  #     env:
-  #       SP_APP_SECRET: '$(SP_APP_SECRET)'
-  #   - task: CopyFiles@2
-  #     displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
-  #     inputs:
-  #       SourceFolder: '$(Build.SourcesDirectory)'
-  #       TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  #       Contents: |
-  #         code/scoring/**
-  #   - task: PublishBuildArtifacts@1
-  #     displayName: 'Publish Artifact'
-  #     inputs:
-  #       ArtifactName: 'mlops-pipelines'
-  #       publishLocation: 'container'
-  #       pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-  #       TargetPath: '$(Build.ArtifactStagingDirectory)'
+  - job: "Training_Run_Report"
+    dependsOn: "Run_ML_Pipeline"
+    displayName: "Determine if evaluation succeeded and new model is registered"
+    pool: 
+      vmImage: 'ubuntu-latest'
+    container: mcr.microsoft.com/mlops/python:latest
+    timeoutInMinutes: 0
+    steps:
+    - script: |
+        python $(Build.SourcesDirectory)/code/register/register_model.py --build_id $(Build.BuildId) --validate True
+      displayName: 'Trigger Training Pipeline'
+      env:
+        SP_APP_SECRET: '$(SP_APP_SECRET)'
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        Contents: |
+          code/scoring/**
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        ArtifactName: 'mlops-pipelines'
+        publishLocation: 'container'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+        TargetPath: '$(Build.ArtifactStagingDirectory)'

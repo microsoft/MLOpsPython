@@ -12,8 +12,8 @@ from attach_compute import get_compute
 
 def main():
     load_dotenv()
-    workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
-    resource_group = os.environ.get("BASE_NAME")+"-AML-RG"
+    workspace_name = os.environ.get("WORKSPACE_NAME")
+    resource_group = os.environ.get("RESOURCE_GROUP")
     subscription_id = os.environ.get("SUBSCRIPTION_ID")
     tenant_id = os.environ.get("TENANT_ID")
     app_id = os.environ.get("SP_APP_ID")
