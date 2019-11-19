@@ -29,7 +29,7 @@ import argparse
 from azureml.core import Run, Experiment, Workspace
 from azureml.core.model import Model as AMLModel
 from azureml.core.authentication import ServicePrincipalAuthentication
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
+sys.path.append(os.path.abspath("./util"))  # NOQA: E402
 from model_helper import get_model_by_build_id
 
 
