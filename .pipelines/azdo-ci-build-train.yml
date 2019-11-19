@@ -68,7 +68,7 @@ stages:
     - task: ms-air-aiagility.private-vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
       displayName: 'Invoke ML pipeline'
       inputs:
-        azureSubscription: 'aml-abtest-workspace'
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         PipelineId: '$(AMLPIPELINE_ID)'
         ExperimentName: '$(EXPERIMENT_NAME)'
         PipelineParameters: '"model_name": "sklearn_regression_model.pkl"'
