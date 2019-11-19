@@ -10,9 +10,9 @@ load_dotenv()
 TENANT_ID = os.environ.get('TENANT_ID')
 APP_ID = os.environ.get('SP_APP_ID')
 APP_SECRET = os.environ.get('SP_APP_SECRET')
-WORKSPACE_NAME = os.environ.get("BASE_NAME")+"-AML-WS"
+WORKSPACE_NAME = os.environ.get("WORKSPACE_NAME")
+RESOURCE_GROUP = os.environ.get("RESOURCE_GROUP")
 SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
-RESOURCE_GROUP = os.environ.get("BASE_NAME")+"-AML-RG"
 MODEL_NAME = os.environ.get('MODEL_NAME')
 MODEL_VERSION = os.environ.get('MODEL_VERSION')
 IMAGE_NAME = os.environ.get('IMAGE_NAME')

@@ -7,8 +7,8 @@ from workspace import get_workspace
 # Just an example of a unit test against
 # a utility function common_scoring.next_saturday
 def test_get_workspace():
-    workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
-    resource_group = os.environ.get("BASE_NAME")+"-AML-RG"
+    workspace_name = os.environ.get("WORKSPACE_NAME")
+    resource_group = os.environ.get("RESOURCE_GROUP")
     subscription_id = os.environ.get("SUBSCRIPTION_ID")
     tenant_id = os.environ.get("TENANT_ID")
     app_id = os.environ.get("SP_APP_ID")
