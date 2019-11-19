@@ -4,6 +4,7 @@ from azureml.core import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from dotenv import load_dotenv
 
+
 def main():
     load_dotenv()
     workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
@@ -18,16 +19,16 @@ def main():
     skip_train_execution = True
 
     service_principal = ServicePrincipalAuthentication(
-            tenant_id=tenant_id,
-            service_principal_id=app_id,
-            service_principal_password=app_secret)
+        tenant_id=tenant_id,
+        service_principal_id=app_id,
+        service_principal_password=app_secret)
 
     aml_workspace = Workspace.get(
         name=workspace_name,
         subscription_id=subscription_id,
         resource_group=resource_group,
         auth=service_principal
-        )
+    )
 
     # Find the pipeline that was published by the specified build ID
     pipelines = PublishedPipeline.list(aml_workspace)
@@ -47,11 +48,11 @@ def main():
         published_pipeline = matched_pipes[0]
         print("published pipeline id is", published_pipeline.id)
 
-        # Save the Pipeline ID to be used for other AzDO jobs after script is complete
+        # Save the Pipeline ID for other AzDO jobs after script is complete
         os.environ['amlpipeline_id'] = published_pipeline.id
         savePIDcmd = 'echo "export AMLPIPELINE_ID=$amlpipeline_id" >tmp.sh'
         os.system(savePIDcmd)
-        if(skip_train_execution == False):
+        if(skip_train_execution is False):
             pipeline_parameters = {"model_name": model_name}
             response = published_pipeline.submit(
                 aml_workspace,

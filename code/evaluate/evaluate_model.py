@@ -30,7 +30,7 @@ import argparse
 from azureml.core.authentication import ServicePrincipalAuthentication
 from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from model_helper import get_model_by_build_id
+# from model_helper import get_model_by_build_id
 
 
 run = Run.get_context()
@@ -62,7 +62,7 @@ if (run.id.startswith('OfflineRun')):
 else:
     exp = run.experiment
     ws = run.experiment.workspace
-    
+
 parser = argparse.ArgumentParser("register")
 parser.add_argument(
     "--build_id",
@@ -119,17 +119,19 @@ try:
     new_model_mse = new_model_run.get_metrics().get(metric_eval)
     if (production_model_mse is None or new_model_mse is None):
         print("Unable to find", metric_eval, "metrics, "
-        "exiting evaluation")
+              "exiting evaluation")
         sys.exit(0)
     else:
         print(
-            "Current Production model mse: {}, New trained model mse: {}".format(
+            "Current Production model mse: {}, "
+            "New trained model mse: {}".format(
                 production_model_mse, new_model_mse
             )
         )
-    
+
     if new_model_mse < production_model_mse:
-        print("New trained model performs better, thus it should be registered")
+        print("New trained model performs better, "
+              "thus it should be registered")
     else:
         print("New trained model metric is less than or equal to "
               "production model so skipping model registration.")

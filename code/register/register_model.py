@@ -24,7 +24,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
-import json
 import sys
 import argparse
 from azureml.core import Run, Experiment, Workspace
@@ -33,6 +32,7 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from model_helper import get_model_by_build_id
+
 
 def main():
     load_dotenv()
@@ -65,7 +65,7 @@ def main():
     else:
         exp = run.experiment
         ws = run.experiment.workspace
-        
+
     parser = argparse.ArgumentParser("register")
     parser.add_argument(
         "--build_id",
@@ -98,42 +98,48 @@ def main():
     else:
         register_aml_model(model_name, exp, run_id, build_id)
 
+
 def model_already_registered(model_name, exp, run_id):
-    model_list = AMLModel.list(exp.workspace,name=model_name,run_id=run_id)
+    model_list = AMLModel.list(exp.workspace, name=model_name, run_id=run_id)
     if len(model_list) >= 1:
-        print("Model name:", model_name, "in workspace", \
-            exp.workspace, "with run_id ", run_id, "is already registered.")
+        print("Model name:", model_name, "in workspace",
+              exp.workspace, "with run_id ", run_id, "is already registered.")
         sys.exit(0)
-        
+
+
 def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
     try:
         if (build_id != 'none'):
             get_model_by_build_id(model_name, build_id, exp.workspace)
             model_already_registered(model_name, exp, run_id)
             run = Run(experiment=exp, run_id=run_id)
-            tagsValue={"area": "diabetes", "type": "regression", "build_id": build_id, "run_id": run_id}
+            tagsValue = {"area": "diabetes", "type": "regression",
+                         "build_id": build_id, "run_id": run_id}
         else:
             run = Run(experiment=exp, run_id=run_id)
             if (run is not None):
-                tagsValue={"area": "diabetes", "type": "regression", "run_id": run_id}
+                tagsValue = {"area": "diabetes",
+                             "type": "regression", "run_id": run_id}
             else:
                 print("A model run for experiment", exp.name,
-                    "matching properties run_id =", run_id,
-                    "was not found. Skipping model registration.")
+                      "matching properties run_id =", run_id,
+                      "was not found. Skipping model registration.")
                 sys.exit(0)
 
         model = run.register_model(model_name=model_name,
-                                model_path="./outputs/" + model_name,
-                                tags=tagsValue)
+                                   model_path="./outputs/" + model_name,
+                                   tags=tagsValue)
         os.chdir("..")
         print(
-            "Model registered: {} \nModel Description: {} \nModel Version: {}".format(
+            "Model registered: {} \nModel Description: {} "
+            "\nModel Version: {}".format(
                 model.name, model.description, model.version
             )
         )
     except Exception as e:
         print(e)
         print("Model registration failed")
+
 
 if __name__ == '__main__':
     main()

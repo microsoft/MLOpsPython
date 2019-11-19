@@ -106,7 +106,7 @@ def main():
 
     evaluate_step.run_after(train_step)
     register_step.run_after(evaluate_step)
-    steps = [train_step,evaluate_step,register_step]
+    steps = [train_step, evaluate_step, register_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
