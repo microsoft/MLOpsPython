@@ -29,7 +29,6 @@ import argparse
 from azureml.core import Run, Experiment, Workspace
 from azureml.core.model import Model as AMLModel
 from azureml.core.authentication import ServicePrincipalAuthentication
-from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from model_helper import get_model_by_build_id
 
@@ -38,6 +37,7 @@ def main():
 
     run = Run.get_context()
     if (run.id.startswith('OfflineRun')):
+        from dotenv import load_dotenv
         # For local development, set values in this section
         load_dotenv()
         workspace_name = os.environ.get("WORKSPACE_NAME")

@@ -24,17 +24,13 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
-import sys
 from azureml.core import Model, Run, Workspace, Experiment
 import argparse
 from azureml.core.authentication import ServicePrincipalAuthentication
-from dotenv import load_dotenv
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-# from model_helper import get_model_by_build_id
 
 run = Run.get_context()
-print("the current run id name is: ", run.id)
 if (run.id.startswith('OfflineRun')):
+    from dotenv import load_dotenv
     # For local development, set values in this section
     load_dotenv()
     workspace_name = os.environ.get("WORKSPACE_NAME")
