@@ -36,9 +36,9 @@ import numpy as np
 
 parser = argparse.ArgumentParser("train")
 parser.add_argument(
-    "--release_id",
+    "--build_id",
     type=str,
-    help="The ID of the release triggering this pipeline run",
+    help="The build ID of the build triggering this pipeline run",
 )
 parser.add_argument(
     "--model_name",
@@ -49,11 +49,11 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-print("Argument 1: %s" % args.release_id)
+print("Argument 1: %s" % args.build_id)
 print("Argument 2: %s" % args.model_name)
 
 model_name = args.model_name
-release_id = args.release_id
+build_id = args.build_id
 
 run = Run.get_context()
 exp = run.experiment
@@ -72,16 +72,11 @@ print("Running train.py")
 alphas = np.arange(0.0, 1.0, 0.05)
 alpha = alphas[np.random.choice(alphas.shape[0], 1, replace=False)][0]
 print(alpha)
-run.log("alpha", alpha)
+run.parent.log("alpha", alpha)
 reg = Ridge(alpha=alpha)
 reg.fit(data["train"]["X"], data["train"]["y"])
 preds = reg.predict(data["test"]["X"])
-run.log("mse", mean_squared_error(preds, data["test"]["y"]))
-
-
-# Save model as part of the run history
-
-# model_name = "."
+run.parent.log("mse", mean_squared_error(preds, data["test"]["y"]),"Mean squared error metric")
 
 with open(model_name, "wb") as file:
     joblib.dump(value=reg, filename=model_name)
@@ -96,7 +91,7 @@ print("Following files are uploaded ")
 print(run.get_file_names())
 
 # Add properties to identify this specific training run
-run.add_properties({"release_id": release_id, "run_type": "train"})
-print(f"added properties: {run.properties}")
+run.tag({"BuildId": build_id, "run_type": "train"})
+print(f"tags now present for run: {run.tags}")
 
 run.complete()
