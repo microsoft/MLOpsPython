@@ -32,8 +32,8 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 # from model_helper import get_model_by_build_id
 
-
 run = Run.get_context()
+print("the current run id name is: ", run.id)
 if (run.id.startswith('OfflineRun')):
     # For local development, set values in this section
     load_dotenv()
@@ -102,7 +102,6 @@ try:
             model_list,
         )
     )
-    # TODO add logic for 1st time registering model evaluation
     production_model_run_id = production_model.run_id
 
     # Get the run history for both production model and
@@ -110,8 +109,8 @@ try:
     production_model_run = Run(exp, run_id=production_model_run_id)
     new_model_run = run.parent
     if (production_model_run.id == new_model_run.id):
-        print("Production and new model are same run.")
-        sys.exit(0)
+        print("Production and new model are same.")
+        firstRegistration = True
     else:
         print("Production model run is", production_model_run)
 
@@ -120,7 +119,7 @@ try:
     if (production_model_mse is None or new_model_mse is None):
         print("Unable to find", metric_eval, "metrics, "
               "exiting evaluation")
-        sys.exit(0)
+        run.parent.cancel()
     else:
         print(
             "Current Production model mse: {}, "
@@ -129,14 +128,14 @@ try:
             )
         )
 
-    if new_model_mse < production_model_mse:
+    if (new_model_mse < production_model_mse or firstRegistration):
         print("New trained model performs better, "
               "thus it should be registered")
     else:
         print("New trained model metric is less than or equal to "
               "production model so skipping model registration.")
         run.parent.cancel()
-        # sys.exit(1)
+
 except Exception as e:
     print(e)
     print("Something went wrong trying to evaluate. Exiting.")

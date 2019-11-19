@@ -35,19 +35,19 @@ from model_helper import get_model_by_build_id
 
 
 def main():
-    load_dotenv()
-    workspace_name = os.environ.get("WORKSPACE_NAME")
-    resource_group = os.environ.get("RESOURCE_GROUP")
-    subscription_id = os.environ.get("SUBSCRIPTION_ID")
-    tenant_id = os.environ.get("TENANT_ID")
-    model_name = os.environ.get("MODEL_NAME")
-    app_id = os.environ.get('SP_APP_ID')
-    app_secret = os.environ.get('SP_APP_SECRET')
-    build_id = os.environ.get('BUILD_BUILDID')
 
     run = Run.get_context()
     if (run.id.startswith('OfflineRun')):
         # For local development, set values in this section
+        load_dotenv()
+        workspace_name = os.environ.get("WORKSPACE_NAME")
+        resource_group = os.environ.get("RESOURCE_GROUP")
+        subscription_id = os.environ.get("SUBSCRIPTION_ID")
+        tenant_id = os.environ.get("TENANT_ID")
+        model_name = os.environ.get("MODEL_NAME")
+        app_id = os.environ.get('SP_APP_ID')
+        app_secret = os.environ.get('SP_APP_SECRET')
+        build_id = os.environ.get('BUILD_BUILDID')
         service_principal = ServicePrincipalAuthentication(
             tenant_id=tenant_id,
             service_principal_id=app_id,
