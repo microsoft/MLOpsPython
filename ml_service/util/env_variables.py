@@ -16,6 +16,8 @@ class Env(Singleton):
     def __init__(self):
         load_dotenv()
         self._workspace_name = os.environ.get("WORKSPACE_NAME")
+        if not self._workspace_name:
+            self._workspace_name = os.environ.get("BASE_NAME") + "-AML-WS"
         self._resource_group = os.environ.get("RESOURCEGROUP_NAME")
         self._subscription_id = os.environ.get("SUBSCRIPTION_ID")
         self._tenant_id = os.environ.get("TENANT_ID")
