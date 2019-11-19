@@ -12,7 +12,7 @@ trigger:
 
 variables:
 - group: devopsforai-aml-vg
-# Choose from default, build_train_pipelinewith_r.py, or build_train_pipeline_with_r_on_dbricks.py
+# Choose from default, build_train_pipeline_with_r.py, or build_train_pipeline_with_r_on_dbricks.py
 - name: build-train-script
   value: 'build_train_pipeline.py'
 # Automatically triggers the train, evaluate, register pipeline after the CI steps. 

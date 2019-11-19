@@ -53,11 +53,12 @@ if (run.id.startswith('OfflineRun')):
         auth=service_principal
     )
     ws = aml_workspace
-    exp = Experiment(ws, "abtest")
+    exp = Experiment(ws, workspace_name)
     run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
 else:
     exp = run.experiment
     ws = run.experiment.workspace
+    run_id = 'amlcompute'
 
 parser = argparse.ArgumentParser("evaluate")
 parser.add_argument(
@@ -82,7 +83,7 @@ if (args.build_id is not None):
     build_id = args.build_id
 if (args.run_id is not None):
     run_id = args.run_id
-if (run_id is None):
+if (run_id == 'amlcompute'):
     run_id = run.parent.id()
 model_name = args.model_name
 metric_eval = "mse"

@@ -63,8 +63,9 @@ def main():
         exp = Experiment(ws, workspace_name)
         run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
     else:
-        exp = run.experiment
         ws = run.experiment.workspace
+        exp = run.experiment
+        run = 'amlcompute'
 
     parser = argparse.ArgumentParser("register")
     parser.add_argument(
@@ -95,7 +96,7 @@ def main():
         build_id = args.build_id
     if (args.run_id is not None):
         run_id = args.run_id
-    if (run_id is None):
+    if (run_id == 'amlcompute'):
         run_id = run.parent.id()
     if (args.validate is not None):
         validate = args.validate
