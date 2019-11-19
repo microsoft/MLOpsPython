@@ -26,16 +26,36 @@
       "metadata": {
         "description": "Specifies the location for all resources."
       }
+    },
+    "workspace": {
+      "type": "string",
+      "defaultValue": "[concat(parameters('baseName'),'-AML-WS')]"
+    },
+    "storageAccount": {
+      "type": "string",
+      "defaultValue": "[concat(toLower(parameters('baseName')), 'amlsa')]"
+    },
+    "keyvault": {
+      "type": "string",
+      "defaultValue": "[concat(parameters('baseName'),'-AML-KV')]"
+    },
+    "appInsights": {
+      "type": "string",
+      "defaultValue": "[concat(parameters('baseName'),'-AML-AI')]"
+    },
+    "acr": {
+      "type": "string",
+      "defaultValue": "[concat(toLower(parameters('baseName')),'amlcr')]"
     }
   },
   "variables": {
-    "amlWorkspaceName": "[concat(parameters('baseName'),'-AML-WS')]",
-    "storageAccountName": "[concat(toLower(parameters('baseName')), 'amlsa')]",
+    "amlWorkspaceName": "[parameters('workspace')]",
+    "storageAccountName": "[parameters('storageAccount')]",
     "storageAccountType": "Standard_LRS",
-    "keyVaultName": "[concat(parameters('baseName'),'-AML-KV')]",
+    "keyVaultName": "[parameters('keyvault')]",
     "tenantId": "[subscription().tenantId]",
-    "applicationInsightsName": "[concat(parameters('baseName'),'-AML-AI')]",
-    "containerRegistryName": "[concat(toLower(parameters('baseName')),'amlcr')]"
+    "applicationInsightsName": "[parameters('appInsights')]",
+    "containerRegistryName": "[parameters('acr')]"
   },
   "resources": [
     {

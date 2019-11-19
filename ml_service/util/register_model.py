@@ -1,47 +1,35 @@
 import sys
 import os
 import os.path
-from dotenv import load_dotenv
 from azureml.core import Workspace
 from azureml.core.model import Model
 from azureml.core.authentication import ServicePrincipalAuthentication
+from env_variables import Env
 
-# Load the environment variables from .env in case this script
-# is called outside an existing process
-load_dotenv()
+e = Env()
 
-TENANT_ID = os.environ.get('TENANT_ID')
-APP_ID = os.environ.get('SP_APP_ID')
-APP_SECRET = os.environ.get('SP_APP_SECRET')
-MODEL_PATH = os.environ.get('MODEL_PATH')
-MODEL_NAME = os.environ.get('MODEL_NAME')
-WORKSPACE_NAME = os.environ.get("BASE_NAME")+"-AML-WS"
-SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
-RESOURCE_GROUP = os.environ.get("BASE_NAME")+"-AML-RG"
-
-
-if os.path.isfile(MODEL_PATH) is False:
-    print("The given model path %s is invalid" % (MODEL_PATH))
+if os.path.isfile(e.model_path) is False:
+    print("The given model path %s is invalid" % (e.model_path))
     sys.exit(1)
 
 SP_AUTH = ServicePrincipalAuthentication(
-    tenant_id=TENANT_ID,
-    service_principal_id=APP_ID,
-    service_principal_password=APP_SECRET)
+    tenant_id=e.tenant_id,
+    service_principal_id=e.app_id,
+    service_principal_password=e.app_secret)
 
 WORKSPACE = Workspace.get(
-    WORKSPACE_NAME,
+    e.workspace_name,
     SP_AUTH,
-    SUBSCRIPTION_ID,
-    RESOURCE_GROUP
+    e.subscription_id,
+    e.resource_group
 )
 
 try:
     MODEL = Model.register(
-        model_path=MODEL_PATH,
-        model_name=MODEL_NAME,
+        model_path=e.model_path,
+        model_name=e.model_name,
         description="Forecasting Model",
-        workspace=WORKSPACE)
+        workspace=e.workspace)
 
     print("Model registered successfully. ID: " + MODEL.id)
 except Exception as caught_error:

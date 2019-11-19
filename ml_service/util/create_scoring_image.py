@@ -2,36 +2,25 @@ import os
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
 from azureml.core.model import Model
-from dotenv import load_dotenv
 from azureml.core.authentication import ServicePrincipalAuthentication
+from env_variables import Env
 
-load_dotenv()
-
-TENANT_ID = os.environ.get('TENANT_ID')
-APP_ID = os.environ.get('SP_APP_ID')
-APP_SECRET = os.environ.get('SP_APP_SECRET')
-WORKSPACE_NAME = os.environ.get("BASE_NAME")+"-AML-WS"
-SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
-RESOURCE_GROUP = os.environ.get("BASE_NAME")+"-AML-RG"
-MODEL_NAME = os.environ.get('MODEL_NAME')
-MODEL_VERSION = os.environ.get('MODEL_VERSION')
-IMAGE_NAME = os.environ.get('IMAGE_NAME')
-
+e = Env()
 
 SP_AUTH = ServicePrincipalAuthentication(
-    tenant_id=TENANT_ID,
-    service_principal_id=APP_ID,
-    service_principal_password=APP_SECRET)
+    tenant_id=e.tenant_id,
+    service_principal_id=e.app_id,
+    service_principal_password=e.app_secret)
 
 ws = Workspace.get(
-    WORKSPACE_NAME,
+    e.workspace_name,
     SP_AUTH,
-    SUBSCRIPTION_ID,
-    RESOURCE_GROUP
+    e.subscription_id,
+    e.resource_group
 )
 
 
-model = Model(ws, name=MODEL_NAME, version=MODEL_VERSION)
+model = Model(ws, name=e.model_name, version=e.model_version)
 os.chdir("./code/scoring")
 
 image_config = ContainerImage.image_configuration(
@@ -43,7 +32,7 @@ image_config = ContainerImage.image_configuration(
 )
 
 image = Image.create(
-    name=IMAGE_NAME, models=[model], image_config=image_config, workspace=ws
+    name=e.image_name, models=[model], image_config=image_config, workspace=ws
 )
 
 image.wait_for_creation(show_output=True)
