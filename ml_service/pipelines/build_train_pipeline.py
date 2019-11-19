@@ -56,11 +56,10 @@ def main():
     )
     run_config.environment.docker.enabled = True
 
-    model_name = PipelineParameter(
+    model_name_param = PipelineParameter(
         name="model_name", default_value=model_name)
-    build_id = PipelineParameter(
-        name="build_id", default_value="0"
-    )
+    build_id_param = PipelineParameter(
+        name="build_id", default_value=build_id)
 
     train_step = PythonScriptStep(
         name="Train Model",
@@ -68,8 +67,8 @@ def main():
         compute_target=aml_compute,
         source_directory=sources_directory_train,
         arguments=[
-            "--build_id", build_id,
-            "--model_name", model_name,
+            "--build_id", build_id_param,
+            "--model_name", model_name_param,
         ],
         runconfig=run_config,
         allow_reuse=False,
@@ -82,8 +81,8 @@ def main():
         compute_target=aml_compute,
         source_directory=sources_directory_train,
         arguments=[
-            "--build_id", build_id,
-            "--model_name", model_name,
+            "--build_id", build_id_param,
+            "--model_name", model_name_param,
         ],
         runconfig=run_config,
         allow_reuse=False,
@@ -96,8 +95,8 @@ def main():
         compute_target=aml_compute,
         source_directory=sources_directory_train,
         arguments=[
-            "--build_id", build_id,
-            "--model_name", model_name,
+            "--build_id", build_id_param,
+            "--model_name", model_name_param,
         ],
         runconfig=run_config,
         allow_reuse=False,

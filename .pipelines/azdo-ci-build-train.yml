@@ -55,7 +55,7 @@ stages:
         source $(Build.SourcesDirectory)/tmp.sh
         echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINE_ID"
       name: 'getpipelineid'
-      displayName: 'Trigger Training Pipeline'
+      displayName: 'Get Pipeline ID'
       env:
         SP_APP_SECRET: '$(SP_APP_SECRET)'
   - job: "Run_ML_Pipeline"

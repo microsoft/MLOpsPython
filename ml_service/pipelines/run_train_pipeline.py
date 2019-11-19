@@ -16,6 +16,7 @@ def main():
     app_id = os.environ.get('SP_APP_ID')
     app_secret = os.environ.get('SP_APP_SECRET')
     build_id = os.environ.get('BUILD_BUILDID')
+    pipeline_name = os.environ.get("TRAINING_PIPELINE_NAME")
     skip_train_execution = True
 
     service_principal = ServicePrincipalAuthentication(
@@ -35,8 +36,9 @@ def main():
     matched_pipes = []
 
     for p in pipelines:
-        if p.version == build_id:
-            matched_pipes.append(p)
+        if p.name == pipeline_name:
+            if p.version == build_id:
+                matched_pipes.append(p)
 
     if(len(matched_pipes) > 1):
         published_pipeline = None
