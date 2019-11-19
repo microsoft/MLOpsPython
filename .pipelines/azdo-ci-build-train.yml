@@ -28,7 +28,7 @@ stages:
     displayName: "Model CI Pipeline"
     pool: 'davete'
       # vmImage: 'ubuntu-latest'
-    container: mcr.microsoft.com/mlops/python:latest
+    # container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
     - template: azdo-base-pipeline.yml
@@ -47,7 +47,7 @@ stages:
     displayName: "Get Pipeline ID for execution"
     pool: 'davete'
       # vmImage: 'ubuntu-latest'
-    container: mcr.microsoft.com/mlops/python:latest
+    # container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
     - script: |
@@ -77,7 +77,7 @@ stages:
     displayName: "Determine if evaluation succeeded and new model is registered"
     pool: 'davete'
       # vmImage: 'ubuntu-latest'
-    container: mcr.microsoft.com/mlops/python:latest
+    # container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
     - script: |
