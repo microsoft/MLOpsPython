@@ -47,27 +47,17 @@ Click on **Library** in the **Pipelines** section as indicated below:
 Please name your variable group **``devopsforai-aml-vg``** as we are using this
 name within our build yaml file.
 
-The variable group should contain the following variables:
+The variable group should contain the following required variables:
 
 | Variable Name               | Suggested Value                    |
 | --------------------------- | -----------------------------------|
-| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2                    |
-| AML_COMPUTE_CLUSTER_NAME    | train-cluster                      |
 | BASE_NAME                   | [unique base name]                 |
-| DB_CLUSTER_ID               | [Optional Databricks cluster Id]   |
-| DATABRICKS_COMPUTE_NAME     | [Optional Databricks compute name] |
-| EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py         |
-| EXPERIMENT_NAME             | mlopspython                        |
 | LOCATION                    | centralus                          |
-| MODEL_NAME                  | sklearn_regression_model.pkl       |
-| REGISTER_SCRIPT_PATH        | register/register_model.py         |
-| SOURCES_DIR_TRAIN           | code                               |
 | SP_APP_ID                   |                                    |
 | SP_APP_SECRET               |                                    |
 | SUBSCRIPTION_ID             |                                    |
 | TENANT_ID                   |                                    |
-| TRAIN_SCRIPT_PATH           | training/train.py                  |
-| TRAINING_PIPELINE_NAME      | training-pipeline                  |
+| RESOURCE_GROUP              |                                    |
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
@@ -79,8 +69,32 @@ BASE_NAME variable (e.g. MyUniqueML), so that the created resources will have
 unique names (e.g. MyUniqueML-AML-RG, MyUniqueML-AML-WS, etc.). The length of
 the BASE_NAME value should not exceed 10 characters.
 
+> You can also adjust the pipeline `environment_setup/iac-create-environment.yml` to include the following parameters to specify individual names for each resource within the resource-group: `workspace` (Azure Machine Learning Workspace name), `storageAccount` (Azure Storage Account name), `keyvault` (Azure Key Vault name),  `appInsights` (Application Insights Name) and `acr` (Azure Container Registry name).
+
 Make sure to select the **Allow access to all pipelines** checkbox in the
 variable group configuration.
+
+## Adjust .pipelines/azdo-variables.yml
+
+Non subscription related variables are stored as variable template in the file `.pipelines/azdo-variables.yml`. In order to change the predefined once feel free to adjust the values as needed. They're prepopulated as follows:
+
+| Variable Name               | Suggested Value                    |
+| --------------------------- | -----------------------------------|
+| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2                    |
+| AML_COMPUTE_CLUSTER_NAME    | train-cluster                      |
+| AML_CLUSTER_MIN_NODES       | 0                                  |
+| AML_CLUSTER_MAX_NODES       | 4                                  |
+| AML_CLUSTER_PRIORITY        | lowpriority                        |
+| BUILD_BUILDID               | 001                                |
+| DB_CLUSTER_ID               | [Optional Databricks cluster Id]   |
+| EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py         |
+| EXPERIMENT_NAME             | mlopspython                        |
+| IMAGE_NAME                  |                                    |
+| MODEL_NAME                  | sklearn_regression_model.pkl       |
+| REGISTER_SCRIPT_PATH        | register/register_model.py         |
+| SOURCES_DIR_TRAIN           | code                               |
+| TRAIN_SCRIPT_PATH           | training/train.py                  |
+| TRAINING_PIPELINE_NAME      | training-pipeline                  |
 
 Up until now you should have:
 
