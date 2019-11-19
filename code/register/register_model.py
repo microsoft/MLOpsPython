@@ -97,7 +97,7 @@ def main():
     if (args.run_id is not None):
         run_id = args.run_id
     if (run_id == 'amlcompute'):
-        run_id = run.parent.id()
+        run_id = run.parent.id
     if (args.validate is not None):
         validate = args.validate
     model_name = args.model_name
