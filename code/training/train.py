@@ -92,7 +92,8 @@ print("Following files are uploaded ")
 print(run.get_file_names())
 
 # Add properties to identify this specific training run
-run.tag({"BuildId": build_id, "run_type": "train"})
+run.tag("BuildId", value=build_id)
+run.tag("run_type", value="train")
 print(f"tags now present for run: {run.tags}")
 
 run.complete()
