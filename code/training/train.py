@@ -76,7 +76,8 @@ run.parent.log("alpha", alpha)
 reg = Ridge(alpha=alpha)
 reg.fit(data["train"]["X"], data["train"]["y"])
 preds = reg.predict(data["test"]["X"])
-run.parent.log("mse", mean_squared_error(preds, data["test"]["y"]),"Mean squared error metric")
+run.parent.log("mse", mean_squared_error(
+    preds, data["test"]["y"]), "Mean squared error metric")
 
 with open(model_name, "wb") as file:
     joblib.dump(value=reg, filename=model_name)
