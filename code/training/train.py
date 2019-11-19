@@ -72,12 +72,15 @@ print("Running train.py")
 alphas = np.arange(0.0, 1.0, 0.05)
 alpha = alphas[np.random.choice(alphas.shape[0], 1, replace=False)][0]
 print(alpha)
+run.log("alpha", alpha)
 run.parent.log("alpha", alpha)
 reg = Ridge(alpha=alpha)
 reg.fit(data["train"]["X"], data["train"]["y"])
 preds = reg.predict(data["test"]["X"])
+run.log("mse", mean_squared_error(
+    preds, data["test"]["y"]), description="Mean squared error metric")
 run.parent.log("mse", mean_squared_error(
-    preds, data["test"]["y"]), "Mean squared error metric")
+    preds, data["test"]["y"]), description="Mean squared error metric")
 
 with open(model_name, "wb") as file:
     joblib.dump(value=reg, filename=model_name)

@@ -65,7 +65,7 @@ def main():
     else:
         ws = run.experiment.workspace
         exp = run.experiment
-        run = 'amlcompute'
+        run_id = 'amlcompute'
 
     parser = argparse.ArgumentParser("register")
     parser.add_argument(
