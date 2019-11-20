@@ -2,17 +2,19 @@ import sys
 import os
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from workspace import get_workspace
+from env_variables import Env
 
 
 # Just an example of a unit test against
 # a utility function common_scoring.next_saturday
 def test_get_workspace():
-    workspace_name = os.environ.get("WORKSPACE_NAME")
-    resource_group = os.environ.get("RESOURCE_GROUP")
-    subscription_id = os.environ.get("SUBSCRIPTION_ID")
-    tenant_id = os.environ.get("TENANT_ID")
-    app_id = os.environ.get("SP_APP_ID")
-    app_secret = os.environ.get("SP_APP_SECRET")
+    e = Env()
+    workspace_name = e.workspace_name
+    resource_group = e.resource_group
+    subscription_id = e.subscription_id
+    tenant_id = e.tenant_id
+    app_id = e.app_id
+    app_secret = e.app_secret
 
     aml_workspace = get_workspace(
         workspace_name,

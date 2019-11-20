@@ -11,14 +11,9 @@ trigger:
     - ml_service/util/create_scoring_image.py
 
 variables:
+- template: azdo-variables.yml
 - group: devopsforai-aml-vg
-# Choose from default, build_train_pipeline_with_r.py, or build_train_pipeline_with_r_on_dbricks.py
-- name: build-train-script
-  value: 'build_train_pipeline.py'
-# Automatically triggers the train, evaluate, register pipeline after the CI steps. 
-# Uncomment to set to false or add same variable name at queue time with value of false to disable.
-# - name: auto-trigger-training
-#   value: false
+
 
 stages:
 - stage: 'Model_CI'
@@ -34,7 +29,7 @@ stages:
     - template: azdo-base-pipeline.yml
     - script: |
         # Invoke the Python building and publishing a training pipeline
-        python3 $(Build.SourcesDirectory)/ml_service/pipelines/$(build-train-script)
+        python3 $(Build.SourcesDirectory)/ml_service/pipelines/${{ variables.BUILD_TRAIN_SCRIPT }}
       failOnStderr: 'false'
       env:
         SP_APP_SECRET: '$(SP_APP_SECRET)'

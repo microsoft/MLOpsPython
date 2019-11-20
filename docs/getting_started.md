@@ -47,40 +47,47 @@ Click on **Library** in the **Pipelines** section as indicated below:
 Please name your variable group **``devopsforai-aml-vg``** as we are using this
 name within our build yaml file.
 
-The variable group should contain the following variables:
+The variable group should contain the following required variables:
 
 | Variable Name               | Suggested Value                    |
 | --------------------------- | -----------------------------------|
-| AML_COMPUTE_CLUSTER_CPU_SKU | STANDARD_DS2_V2                    |
-| AML_COMPUTE_CLUSTER_NAME    | train-cluster                      |
 | BASE_NAME                   | [unique base name]                 |
-| DB_CLUSTER_ID               | [Optional Databricks cluster Id]   |
-| DATABRICKS_COMPUTE_NAME     | [Optional Databricks compute name] |
-| EVALUATE_SCRIPT_PATH        | evaluate/evaluate_model.py         |
-| EXPERIMENT_NAME             | mlopspython                        |
 | LOCATION                    | centralus                          |
-| MODEL_NAME                  | sklearn_regression_model.pkl       |
-| REGISTER_SCRIPT_PATH        | register/register_model.py         |
-| SOURCES_DIR_TRAIN           | code                               |
 | SP_APP_ID                   |                                    |
 | SP_APP_SECRET               |                                    |
 | SUBSCRIPTION_ID             |                                    |
 | TENANT_ID                   |                                    |
-| TRAIN_SCRIPT_PATH           | training/train.py                  |
-| TRAINING_PIPELINE_NAME      | training-pipeline                  |
+| RESOURCE_GROUP              |                                    |
+| WORKSPACE_NAME              | mlops-AML-WS                       |
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
-**Note:** The **BASE_NAME** parameter is used throughout the solution for naming
+**Note:** 
+
+The **WORKSPACE_NAME** parameter is used for the Azure Machine Learning Workspace creation. You can provide here an existing AML Workspace if you have one.
+
+The **BASE_NAME** parameter is used throughout the solution for naming
 Azure resources. When the solution is used in a shared subscription, there can
 be naming collisions with resources that require unique names like azure blob
 storage and registry DNS naming. Make sure to give a unique value to the
 BASE_NAME variable (e.g. MyUniqueML), so that the created resources will have
-unique names (e.g. MyUniqueML-AML-RG, MyUniqueML-AML-WS, etc.). The length of
-the BASE_NAME value should not exceed 10 characters.
+unique names (e.g. MyUniqueML-AML-RG, MyUniqueML-AML-KV, etc.). The length of
+the BASE_NAME value should not exceed 10 characters. 
 
 Make sure to select the **Allow access to all pipelines** checkbox in the
 variable group configuration.
+
+## More variable options
+
+There are more variables used in the project. They're defined in two places one for local execution one for using Azure DevOps Pipelines
+
+### Local configuration
+
+In order to configure the project locally you have to create a copy from `.env.example` to the root and name it `.env`. Fill out all missing values and adjust the existing ones to your needs. Please be aware that the local environment also needs access to the Azure subscription so you have to provide the credentials of your service principal and Azure account information here as well.
+
+### Azure DevOps configuration
+
+For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/azdo-variables.yml`. Adjust as needed the variables, also the defaults will give you an easy jump start.
 
 Up until now you should have:
 
