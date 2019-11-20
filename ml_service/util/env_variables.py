@@ -16,16 +16,16 @@ class Env(Singleton):
     def __init__(self):
         load_dotenv()
         self._workspace_name = os.environ.get("WORKSPACE_NAME")
-        if not self._workspace_name:
-            self._workspace_name = os.environ.get("BASE_NAME") + "-AML-WS"
-        self._resource_group = os.environ.get("RESOURCEGROUP_NAME")
+        self._resource_group = os.environ.get("RESOURCE_GROUP")
         self._subscription_id = os.environ.get("SUBSCRIPTION_ID")
         self._tenant_id = os.environ.get("TENANT_ID")
         self._app_id = os.environ.get("SP_APP_ID")
         self._app_secret = os.environ.get("SP_APP_SECRET")
         self._vm_size = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
         self._compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
-        self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
+        self._vm_priority = os.environ.get("AML_CLUSTER_PRIORITY", 'lowpriority') # noqa E501
+        self._min_nodes = int(os.environ.get("AML_CLUSTER_MIN_NODES", 0))
+        self._max_nodes = int(os.environ.get("AML_CLUSTER_MAX_NODES", 4))
         self._build_id = os.environ.get("BUILD_BUILDID")
         self._pipeline_name = os.environ.get("TRAINING_PIPELINE_NAME")
         self._sources_directory_train = os.environ.get("SOURCES_DIR_TRAIN")
@@ -33,12 +33,10 @@ class Env(Singleton):
         self._evaluate_script_path = os.environ.get("EVALUATE_SCRIPT_PATH")
         self._model_name = os.environ.get("MODEL_NAME")
         self._experiment_name = os.environ.get("EXPERIMENT_NAME")
-        self._vm_priority = os.environ.get("AML_CLUSTER_PRIORITY", 'lowpriority') # noqa E501
-        self._min_nodes = int(os.environ.get("AML_CLUSTER_MIN_NODES", 0))
-        self._max_nodes = int(os.environ.get("AML_CLUSTER_MAX_NODES", 4))
         self._model_version = os.environ.get('MODEL_VERSION')
         self._image_name = os.environ.get('IMAGE_NAME')
         self._model_path = os.environ.get('MODEL_PATH')
+        self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
 
     @property
     def workspace_name(self):

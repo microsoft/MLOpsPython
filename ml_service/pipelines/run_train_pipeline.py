@@ -1,6 +1,9 @@
 from azureml.pipeline.core import PublishedPipeline
 from azureml.core import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
+import os
+import sys
+sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from env_variables import Env
 
 

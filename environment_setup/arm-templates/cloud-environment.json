@@ -28,8 +28,7 @@
       }
     },
     "workspace": {
-      "type": "string",
-      "defaultValue": "[concat(parameters('baseName'),'-AML-WS')]"
+      "type": "string"
     },
     "storageAccount": {
       "type": "string",
