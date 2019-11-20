@@ -31,6 +31,7 @@ class Env(Singleton):
         self._sources_directory_train = os.environ.get("SOURCES_DIR_TRAIN")
         self._train_script_path = os.environ.get("TRAIN_SCRIPT_PATH")
         self._evaluate_script_path = os.environ.get("EVALUATE_SCRIPT_PATH")
+        self._register_script_path = os.environ.get("REGISTER_SCRIPT_PATH")
         self._model_name = os.environ.get("MODEL_NAME")
         self._experiment_name = os.environ.get("EXPERIMENT_NAME")
         self._model_version = os.environ.get('MODEL_VERSION')
@@ -93,6 +94,10 @@ class Env(Singleton):
     @property
     def evaluate_script_path(self):
         return self._evaluate_script_path
+
+    @property
+    def register_script_path(self):
+        return self._register_script_path
 
     @property
     def model_name(self):
