@@ -125,11 +125,12 @@ def model_already_registered(model_name, exp, run_id):
     model_list = AMLModel.list(exp.workspace, name=model_name, run_id=run_id)
     if len(model_list) >= 1:
         e = ("Model name:", model_name, "in workspace",
-              exp.workspace, "with run_id ", run_id, "is already registered.")
+             exp.workspace, "with run_id ", run_id, "is already registered.")
         print(e)
         raise Exception(e)
     else:
         print("Model is not registered for this run.")
+
 
 def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
     try:
