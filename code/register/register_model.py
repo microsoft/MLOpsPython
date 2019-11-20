@@ -138,7 +138,7 @@ def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
             model_already_registered(model_name, exp, run_id)
             run = Run(experiment=exp, run_id=run_id)
             tagsValue = {"area": "diabetes", "type": "regression",
-                         "build_id": build_id, "run_id": run_id}
+                         "BuildId": build_id, "run_id": run_id}
         else:
             run = Run(experiment=exp, run_id=run_id)
             if (run is not None):
@@ -164,6 +164,7 @@ def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
         print(e)
         print("Model registration failed")
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
