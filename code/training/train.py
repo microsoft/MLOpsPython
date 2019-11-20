@@ -85,14 +85,15 @@ run.parent.log("mse", mean_squared_error(
 with open(model_name, "wb") as file:
     joblib.dump(value=reg, filename=model_name)
 
-# upload the model file explicitly into artifacts
-run.upload_file(name="./outputs/" + model_name, path_or_stream=model_name)
+# upload model file explicitly into artifacts for parent run
+run.parent.upload_file(name="./outputs/" + model_name,
+                       path_or_stream=model_name)
 print("Uploaded the model {} to experiment {}".format(
     model_name, run.experiment.name))
 dirpath = os.getcwd()
 print(dirpath)
 print("Following files are uploaded ")
-print(run.get_file_names())
+print(run.parent.get_file_names())
 
 # Add properties to identify this specific training run
 run.tag("BuildId", value=build_id)
