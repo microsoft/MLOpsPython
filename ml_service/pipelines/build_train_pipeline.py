@@ -5,45 +5,32 @@ from azureml.core.runconfig import RunConfiguration, CondaDependencies
 # from azureml.core import Datastore
 import os
 import sys
-from dotenv import load_dotenv
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from workspace import get_workspace
 from attach_compute import get_compute
+from env_variables import Env
 
 
 def main():
-    load_dotenv()
-    workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
-    resource_group = os.environ.get("BASE_NAME")+"-AML-RG"
-    subscription_id = os.environ.get("SUBSCRIPTION_ID")
-    tenant_id = os.environ.get("TENANT_ID")
-    app_id = os.environ.get("SP_APP_ID")
-    app_secret = os.environ.get("SP_APP_SECRET")
-    sources_directory_train = os.environ.get("SOURCES_DIR_TRAIN")
-    train_script_path = os.environ.get("TRAIN_SCRIPT_PATH")
-    evaluate_script_path = os.environ.get("EVALUATE_SCRIPT_PATH")
-    vm_size = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
-    compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
-    model_name = os.environ.get("MODEL_NAME")
-    build_id = os.environ.get("BUILD_BUILDID")
-    pipeline_name = os.environ.get("TRAINING_PIPELINE_NAME")
-
+    e = Env()
     # Get Azure machine learning workspace
     aml_workspace = get_workspace(
-        workspace_name,
-        resource_group,
-        subscription_id,
-        tenant_id,
-        app_id,
-        app_secret)
+        e.workspace_name,
+        e.resource_group,
+        e.subscription_id,
+        e.tenant_id,
+        e.app_id,
+        e.app_secret)
+    print("get_workspace:")
     print(aml_workspace)
 
     # Get Azure machine learning cluster
     aml_compute = get_compute(
         aml_workspace,
-        compute_name,
-        vm_size)
+        e.compute_name,
+        e.vm_size)
     if aml_compute is not None:
+        print("aml_compute:")
         print(aml_compute)
 
     run_config = RunConfiguration(conda_dependencies=CondaDependencies.create(
@@ -56,16 +43,16 @@ def main():
     run_config.environment.docker.enabled = True
 
     model_name = PipelineParameter(
-        name="model_name", default_value=model_name)
+        name="model_name", default_value=e.model_name)
     release_id = PipelineParameter(
         name="release_id", default_value="0"
     )
 
     train_step = PythonScriptStep(
         name="Train Model",
-        script_name=train_script_path,
+        script_name=e.train_script_path,
         compute_target=aml_compute,
-        source_directory=sources_directory_train,
+        source_directory=e.sources_directory_train,
         arguments=[
             "--release_id", release_id,
             "--model_name", model_name,
@@ -77,9 +64,9 @@ def main():
 
     evaluate_step = PythonScriptStep(
         name="Evaluate Model ",
-        script_name=evaluate_script_path,
+        script_name=e.evaluate_script_path,
         compute_target=aml_compute,
-        source_directory=sources_directory_train,
+        source_directory=e.sources_directory_train,
         arguments=[
             "--release_id", release_id,
             "--model_name", model_name,
@@ -95,9 +82,9 @@ def main():
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
     published_pipeline = train_pipeline.publish(
-        name=pipeline_name,
+        name=e.pipeline_name,
         description="Model training/retraining pipeline",
-        version=build_id
+        version=e.build_id
     )
     print(f'Published pipeline: {published_pipeline.name}')
     print(f'for build {published_pipeline.version}')

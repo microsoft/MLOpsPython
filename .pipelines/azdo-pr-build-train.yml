@@ -11,6 +11,7 @@ container: mcr.microsoft.com/mlops/python:latest
 
 
 variables:
+- template: azdo-variables.yml
 - group: devopsforai-aml-vg
 
 

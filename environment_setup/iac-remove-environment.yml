@@ -18,7 +18,7 @@ steps:
   inputs:
     azureSubscription: 'AzureResourceConnection'
     action: 'DeleteRG'
-    resourceGroupName: '$(BASE_NAME)-AML-RG'
+    resourceGroupName: '$(RESOURCE_GROUP)'
     location: $(LOCATION)
   displayName: 'Delete resources in Azure'
 
