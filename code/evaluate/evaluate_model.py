@@ -34,6 +34,7 @@ if (run.id.startswith('OfflineRun')):
     # For local development, set values in this section
     load_dotenv()
     workspace_name = os.environ.get("WORKSPACE_NAME")
+    experiment_name = os.environ.get("EXPERIMENT_NAME")
     resource_group = os.environ.get("RESOURCE_GROUP")
     subscription_id = os.environ.get("SUBSCRIPTION_ID")
     tenant_id = os.environ.get("TENANT_ID")
@@ -53,7 +54,7 @@ if (run.id.startswith('OfflineRun')):
         auth=service_principal
     )
     ws = aml_workspace
-    exp = Experiment(ws, workspace_name)
+    exp = Experiment(ws, experiment_name)
     run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
 else:
     exp = run.experiment
@@ -87,6 +88,7 @@ if (run_id == 'amlcompute'):
     run_id = run.parent.id
 model_name = args.model_name
 metric_eval = "mse"
+run.tag("BuildId", value=build_id)
 
 # Paramaterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated

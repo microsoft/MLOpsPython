@@ -29,8 +29,6 @@ import argparse
 from azureml.core import Run, Experiment, Workspace
 from azureml.core.model import Model as AMLModel
 from azureml.core.authentication import ServicePrincipalAuthentication
-sys.path.append(os.path.abspath("./util"))  # NOQA: E402
-from model_helper import get_model_by_build_id
 
 
 def main():
@@ -38,9 +36,12 @@ def main():
     run = Run.get_context()
     if (run.id.startswith('OfflineRun')):
         from dotenv import load_dotenv
+        sys.path.append(os.path.abspath("./code/util"))  # NOQA: E402
+        from model_helper import get_model_by_build_id
         # For local development, set values in this section
         load_dotenv()
         workspace_name = os.environ.get("WORKSPACE_NAME")
+        experiment_name = os.environ.get("EXPERIMENT_NAME")
         resource_group = os.environ.get("RESOURCE_GROUP")
         subscription_id = os.environ.get("SUBSCRIPTION_ID")
         tenant_id = os.environ.get("TENANT_ID")
@@ -60,9 +61,11 @@ def main():
             auth=service_principal
         )
         ws = aml_workspace
-        exp = Experiment(ws, workspace_name)
-        run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
+        exp = Experiment(ws, experiment_name)
+        run_id = "bd184a18-2ac8-4951-8e78-e290bef3b012"
     else:
+        sys.path.append(os.path.abspath("./util"))  # NOQA: E402
+        from model_helper import get_model_by_build_id
         ws = run.experiment.workspace
         exp = run.experiment
         run_id = 'amlcompute'
@@ -114,22 +117,23 @@ def main():
         if (build_id is None):
             register_aml_model(model_name, exp, run_id)
         else:
+            run.tag("BuildId", value=build_id)
             register_aml_model(model_name, exp, run_id, build_id)
 
 
 def model_already_registered(model_name, exp, run_id):
     model_list = AMLModel.list(exp.workspace, name=model_name, run_id=run_id)
     if len(model_list) >= 1:
-        print("Model name:", model_name, "in workspace",
+        e = ("Model name:", model_name, "in workspace",
               exp.workspace, "with run_id ", run_id, "is already registered.")
+        print(e)
+        raise Exception(e)
     else:
-        raise Exception("Model is not registered")
-
+        print("Model is not registered for this run.")
 
 def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
     try:
         if (build_id != 'none'):
-            get_model_by_build_id(model_name, build_id, exp.workspace)
             model_already_registered(model_name, exp, run_id)
             run = Run(experiment=exp, run_id=run_id)
             tagsValue = {"area": "diabetes", "type": "regression",
