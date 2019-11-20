@@ -82,7 +82,7 @@ stages:
     steps:
     - script: |
         python $(Build.SourcesDirectory)/code/register/register_model.py --build_id $(Build.BuildId) --validate True
-      displayName: 'Trigger Training Pipeline'
+      displayName: 'Check if new model registered'
       env:
         SP_APP_SECRET: '$(SP_APP_SECRET)'
     - task: CopyFiles@2
