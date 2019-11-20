@@ -24,6 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
+import sys
 from azureml.core import Model, Run, Workspace, Experiment
 import argparse
 from azureml.core.authentication import ServicePrincipalAuthentication
@@ -107,6 +108,7 @@ try:
     # newly trained model and compare mse
     production_model_run = Run(exp, run_id=production_model_run_id)
     new_model_run = run.parent
+    firstRegistration = False
     if (production_model_run.id == new_model_run.id):
         print("Production and new model are same.")
         firstRegistration = True
@@ -138,3 +140,4 @@ try:
 except Exception as e:
     print(e)
     print("Something went wrong trying to evaluate. Exiting.")
+    sys.exit(1)
