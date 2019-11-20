@@ -24,7 +24,7 @@ variables:
   value: '1'
   # AML Pipeline Config 
 - name: TRAINING_PIPELINE_NAME
-  value: 'Training Pipeline'
+  value: 'Training-Pipeline'
 - name: MODEL_PATH
   value: ''
 - name: EVALUATE_SCRIPT_PATH
@@ -34,7 +34,7 @@ variables:
 - name: SOURCES_DIR_TRAIN
   value: code
 - name: IMAGE_NAME
-  value: ''
+  value: 'mltrained'
   # Optional. Used by a training pipeline with R on Databricks
 - name: DB_CLUSTER_ID
   value: ''
