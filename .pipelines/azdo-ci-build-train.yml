@@ -60,7 +60,7 @@ stages:
     variables:
       AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
     steps:
-    - task: ms-air-aiagility.private-vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
       displayName: 'Invoke ML pipeline'
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
