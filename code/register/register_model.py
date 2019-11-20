@@ -163,7 +163,7 @@ def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
     except Exception as e:
         print(e)
         print("Model registration failed")
-
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
