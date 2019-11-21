@@ -62,7 +62,7 @@ def _get_model_by_tag(
                          "for the latest with {{tag_name: {tag_name},"
                          "tag_value: {tag_value}. "
                          "Models found: {model_list}}}")\
-        .format(model_name=model_name, tag_name=tag_value,
+        .format(model_name=model_name, tag_name=tag_name, tag_value=tag_value,
                 model_list=model_list)
     if len(model_list) > 1:
         raise ValueError(should_not_happen)
@@ -85,7 +85,9 @@ def get_model_by_tag(
     if model_list:
         return model_list[0]
 
-    no_model_found = ("Model not found with model_name: {model_name}"
-                      "tag {tag_name} {tag_value}")\
-        .format(model_name=model_name, tag_name=tag_value)
+    no_model_found = ("No Model found with {{tag_name: {tag_name} ,"
+                      "tag_value: {tag_value}.}}")\
+        .format(model_name=model_name, tag_name=tag_name, tag_value=tag_value,
+                model_list=model_list)
+
     raise Exception(no_model_found)

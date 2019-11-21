@@ -108,7 +108,8 @@ def main():
 
     if (validate):
         try:
-            get_model_by_tag(model_name, 'BuildId', build_id, exp.workspace)
+            tag_name = 'BuildId'
+            get_model_by_tag(model_name, tag_name, build_id, exp.workspace)
             print("Model was registered for this build.")
         except Exception as e:
             print(e)
