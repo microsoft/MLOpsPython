@@ -38,7 +38,7 @@ def main():
     if (run.id.startswith('OfflineRun')):
         from dotenv import load_dotenv
         sys.path.append(os.path.abspath("./code/util"))  # NOQA: E402
-        from model_helper import get_model_by_build_id
+        from model_helper import get_model_by_tag
         # For local development, set values in this section
         load_dotenv()
         workspace_name = os.environ.get("WORKSPACE_NAME")
@@ -66,7 +66,7 @@ def main():
         run_id = "bd184a18-2ac8-4951-8e78-e290bef3b012"
     else:
         sys.path.append(os.path.abspath("./util"))  # NOQA: E402
-        from model_helper import get_model_by_build_id
+        from model_helper import get_model_by_tag
         ws = run.experiment.workspace
         exp = run.experiment
         run_id = 'amlcompute'
@@ -108,7 +108,7 @@ def main():
 
     if (validate):
         try:
-            get_model_by_build_id(model_name, build_id, exp.workspace)
+            get_model_by_tag(model_name, 'BuildId', build_id, exp.workspace)
             print("Model was registered for this build.")
         except Exception as e:
             print(e)
@@ -139,12 +139,13 @@ def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
             model_already_registered(model_name, exp, run_id)
             run = Run(experiment=exp, run_id=run_id)
             tagsValue = {"area": "diabetes", "type": "regression",
-                         "BuildId": build_id, "run_id": run_id}
+                         "BuildId": build_id, "run_id": run_id,
+                         "experiment_name": exp.name}
         else:
             run = Run(experiment=exp, run_id=run_id)
             if (run is not None):
-                tagsValue = {"area": "diabetes",
-                             "type": "regression", "run_id": run_id}
+                tagsValue = {"area": "diabetes", "type": "regression",
+                             "run_id": run_id, "experiment_name": exp.name}
             else:
                 print("A model run for experiment", exp.name,
                       "matching properties run_id =", run_id,
