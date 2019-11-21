@@ -94,6 +94,7 @@ def main():
     steps = [train_step, evaluate_step, register_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
+    train_pipeline._set_experiment_name
     train_pipeline.validate()
     published_pipeline = train_pipeline.publish(
         name=e.pipeline_name,
