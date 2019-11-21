@@ -24,7 +24,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
-import sys
 from azureml.core import Model, Run, Workspace, Experiment
 import argparse
 from azureml.core.authentication import ServicePrincipalAuthentication
@@ -94,7 +93,7 @@ run.tag("BuildId", value=build_id)
 
 # Paramaterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
-try:    
+try:
     model_list = Model.list(ws)
     if (len(model_list) > 0):
         production_model = next(
@@ -112,11 +111,12 @@ try:
         new_model_run = run.parent
         print("Production model run is", production_model_run)
 
-        production_model_mse = production_model_run.get_metrics().get(metric_eval)
+        production_model_mse = \
+            production_model_run.get_metrics().get(metric_eval)
         new_model_mse = new_model_run.get_metrics().get(metric_eval)
         if (production_model_mse is None or new_model_mse is None):
             print("Unable to find", metric_eval, "metrics, "
-                    "exiting evaluation")
+                  "exiting evaluation")
             run.parent.cancel()
         else:
             print(
@@ -128,16 +128,15 @@ try:
 
         if (new_model_mse < production_model_mse):
             print("New trained model performs better, "
-                    "thus it should be registered")
+                  "thus it should be registered")
         else:
             print("New trained model metric is less than or equal to "
-                    "production model so skipping model registration.")
+                  "production model so skipping model registration.")
             run.parent.cancel()
     else:
         print("This is the first model, "
-            "thus it should be registered")
-except Exception as e:
+              "thus it should be registered")
+except Exception:
     traceback.print_exc(limit=None, file=None, chain=True)
     print("Something went wrong trying to evaluate. Exiting.")
     raise
-    
