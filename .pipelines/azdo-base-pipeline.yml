@@ -7,12 +7,12 @@ steps:
    flake8 --output-file=$(Build.BinariesDirectory)/lint-testresults.xml --format junit-xml  
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Run code quality tests'
-  enabled: 'true'
+  enabled: 'false'
   
 - script: |
    pytest --junitxml=$(Build.BinariesDirectory)/unit-testresults.xml $(Build.SourcesDirectory)/tests/unit
   displayName: 'Run unit tests'
-  enabled: 'true'
+  enabled: 'false'
   env:
     SP_APP_SECRET: '$(SP_APP_SECRET)'
 
