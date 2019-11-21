@@ -47,7 +47,7 @@ def main():
 
         # Set this to True for local development or
         # if not using Azure DevOps pipeline execution task
-        skip_train_execution = False
+        skip_train_execution = True
         if(skip_train_execution is False):
             pipeline_parameters = {"model_name": e.model_name}
             response = published_pipeline.submit(

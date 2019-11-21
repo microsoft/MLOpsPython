@@ -109,12 +109,7 @@ if (len(model_list) > 0):
     # newly trained model and compare mse
     production_model_run = Run(exp, run_id=production_model_run_id)
     new_model_run = run.parent
-    firstRegistration = False
-    if (production_model_run.id == new_model_run.id):
-        print("Production and new model are same.")
-        firstRegistration = True
-    else:
-        print("Production model run is", production_model_run)
+    print("Production model run is", production_model_run)
 
     production_model_mse = production_model_run.get_metrics().get(metric_eval)
     new_model_mse = new_model_run.get_metrics().get(metric_eval)
@@ -130,7 +125,7 @@ if (len(model_list) > 0):
             )
         )
 
-    if (new_model_mse < production_model_mse or firstRegistration):
+    if (new_model_mse < production_model_mse):
         print("New trained model performs better, "
                 "thus it should be registered")
     else:
@@ -139,11 +134,9 @@ if (len(model_list) > 0):
         run.parent.cancel()
 else:
     print("This is the first model, "
-          "thus it should be registered")
-
-
-
+        "thus it should be registered")
 # except Exception as e:
 #     print(e)
 #     print("Something went wrong trying to evaluate. Exiting.")
 #     sys.exit(1)
+#     run.parent.fail()
