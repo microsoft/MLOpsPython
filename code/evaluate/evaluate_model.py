@@ -112,7 +112,7 @@ try:
     if (firstRegistration is False):
         model_list = get_model_by_tag(
             model_name, tag_name, exp.name, ws)
-        production_model_run_id = model_list[0].run_id
+        production_model_run_id = model_list.run_id
 
         # Get the run history for both production model and
         # newly trained model and compare mse
