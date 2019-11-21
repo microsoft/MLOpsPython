@@ -1,10 +1,5 @@
-trigger:
-  branches:
-    include:
-    - master
-  paths:
-    include:
-    - environment_setup/arm-templates/*
+pr: none
+trigger: none
 
 pool:
   vmImage: 'ubuntu-latest'

@@ -31,6 +31,16 @@ subscription. Contact your subscription administrator if you don't have the
 permissions. Normally a subscription admin can create a Service principal and
 can provide you the details.
 
+## Create an Azure DevOps Azure ML Workspace Service Connection
+You need to create a service connection to your ML workspace so the Azure DevOps Azure ML task can execute the Azure ML training pipeline. To get there, go to your Azure DevOps project settings page (by clicking on the cog wheel to the bottom left of the screen), and then click on **Service connections** under the **Pipelines** section:
+
+**Note:** Creating service connection using Azure Machine Learning extension requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
+
+This is how your service connection looks like. Make sure to pick your resource group and type AML workspace.  The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group below.
+
+![](./images/svc-connection.png)
+
+
 ## Create a Variable Group for your Pipelines
 
 We make use of variable group inside Azure DevOps to store variables and their
@@ -59,6 +69,7 @@ The variable group should contain the following required variables:
 | TENANT_ID                   |                                    |
 | RESOURCE_GROUP              |                                    |
 | WORKSPACE_NAME              | mlops-AML-WS                       |
+| WORKSPACE_SVC_CONNECTION    | aml-workspace-connection           | 
 
 Mark **SP_APP_SECRET** variable as a secret one.
 

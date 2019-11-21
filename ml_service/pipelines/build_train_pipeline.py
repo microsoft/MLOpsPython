@@ -42,11 +42,10 @@ def main():
     )
     run_config.environment.docker.enabled = True
 
-    model_name = PipelineParameter(
+    model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)
-    release_id = PipelineParameter(
-        name="release_id", default_value="0"
-    )
+    build_id_param = PipelineParameter(
+        name="build_id", default_value=e.build_id)
 
     train_step = PythonScriptStep(
         name="Train Model",
@@ -54,8 +53,8 @@ def main():
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
         arguments=[
-            "--release_id", release_id,
-            "--model_name", model_name,
+            "--build_id", build_id_param,
+            "--model_name", model_name_param,
         ],
         runconfig=run_config,
         allow_reuse=False,
@@ -68,18 +67,34 @@ def main():
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
         arguments=[
-            "--release_id", release_id,
-            "--model_name", model_name,
+            "--build_id", build_id_param,
+            "--model_name", model_name_param,
         ],
         runconfig=run_config,
         allow_reuse=False,
     )
     print("Step Evaluate created")
 
+    register_step = PythonScriptStep(
+        name="Register Model ",
+        script_name=e.register_script_path,
+        compute_target=aml_compute,
+        source_directory=e.sources_directory_train,
+        arguments=[
+            "--build_id", build_id_param,
+            "--model_name", model_name_param,
+        ],
+        runconfig=run_config,
+        allow_reuse=False,
+    )
+    print("Step Register created")
+
     evaluate_step.run_after(train_step)
-    steps = [evaluate_step]
+    register_step.run_after(evaluate_step)
+    steps = [train_step, evaluate_step, register_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
+    train_pipeline._set_experiment_name
     train_pipeline.validate()
     published_pipeline = train_pipeline.publish(
         name=e.pipeline_name,
