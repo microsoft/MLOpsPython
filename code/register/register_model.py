@@ -26,6 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 import os
 import sys
 import argparse
+import traceback
 from azureml.core import Run, Experiment, Workspace
 from azureml.core.model import Model as AMLModel
 from azureml.core.authentication import ServicePrincipalAuthentication
@@ -160,10 +161,10 @@ def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
                 model.name, model.description, model.version
             )
         )
-    except Exception as e:
-        print(e)
+    except Exception:
+        traceback.print_exc(limit=None, file=None, chain=True)
         print("Model registration failed")
-        sys.exit(1)
+        raise
 
 
 if __name__ == '__main__':
