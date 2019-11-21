@@ -104,7 +104,7 @@ try:
                 model_list,
             )
         )
-        production_model_run_id = production_model.run_id + 1
+        production_model_run_id = production_model.run_id
 
         # Get the run history for both production model and
         # newly trained model and compare mse
