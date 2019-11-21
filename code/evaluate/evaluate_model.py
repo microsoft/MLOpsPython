@@ -139,4 +139,5 @@ try:
 except Exception as e:
     traceback.print_exc(limit=None, file=None, chain=True)
     print("Something went wrong trying to evaluate. Exiting.")
-    run.parent.fail()
+    raise
+    
