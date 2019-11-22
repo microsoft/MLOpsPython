@@ -7,7 +7,7 @@ class Singleton(object):
 
     def __new__(class_, *args, **kwargs):
         if class_ not in class_._instances:
-            class_._instances[class_] = super(Singleton, class_).__new__(class_, *args, **kwargs) # noqa E501
+            class_._instances[class_] = super(Singleton, class_).__new__(class_, *args, **kwargs)  # noqa E501
         return class_._instances[class_]
 
 
@@ -23,7 +23,7 @@ class Env(Singleton):
         self._app_secret = os.environ.get("SP_APP_SECRET")
         self._vm_size = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
         self._compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
-        self._vm_priority = os.environ.get("AML_CLUSTER_PRIORITY", 'lowpriority') # noqa E501
+        self._vm_priority = os.environ.get("AML_CLUSTER_PRIORITY", 'lowpriority')  # noqa E501
         self._min_nodes = int(os.environ.get("AML_CLUSTER_MIN_NODES", 0))
         self._max_nodes = int(os.environ.get("AML_CLUSTER_MAX_NODES", 4))
         self._build_id = os.environ.get("BUILD_BUILDID")

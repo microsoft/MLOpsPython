@@ -10,9 +10,9 @@ from env_variables import Env
 def main():
     e = Env()
     service_principal = ServicePrincipalAuthentication(
-            tenant_id=e.tenant_id,
-            service_principal_id=e.app_id,
-            service_principal_password=e.app_secret)
+        tenant_id=e.tenant_id,
+        service_principal_id=e.app_id,
+        service_principal_password=e.app_secret)
 
     aml_workspace = Workspace.get(
         name=e.workspace_name,

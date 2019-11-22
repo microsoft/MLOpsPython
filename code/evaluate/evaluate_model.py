@@ -24,7 +24,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
-from azureml.core import Model, Run, Workspace, Experiment
+import sys
+from azureml.core import Run, Workspace, Experiment
 import argparse
 from azureml.core.authentication import ServicePrincipalAuthentication
 import traceback
@@ -32,6 +33,8 @@ import traceback
 run = Run.get_context()
 if (run.id.startswith('OfflineRun')):
     from dotenv import load_dotenv
+    sys.path.append(os.path.abspath("./code/util"))  # NOQA: E402
+    from model_helper import get_model_by_tag
     # For local development, set values in this section
     load_dotenv()
     workspace_name = os.environ.get("WORKSPACE_NAME")
@@ -56,8 +59,10 @@ if (run.id.startswith('OfflineRun')):
     )
     ws = aml_workspace
     exp = Experiment(ws, experiment_name)
-    run_id = "e78b2c27-5ceb-49d9-8e84-abe7aecf37d5"
+    run_id = "57fee47f-5ae8-441c-bc0c-d4c371f32d70"
 else:
+    sys.path.append(os.path.abspath("./util"))  # NOQA: E402
+    from model_helper import get_model_by_tag
     exp = run.experiment
     ws = run.experiment.workspace
     run_id = 'amlcompute'
@@ -94,16 +99,15 @@ run.tag("BuildId", value=build_id)
 # Paramaterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
 try:
-    model_list = Model.list(ws)
-    if (len(model_list) > 0):
-        production_model = next(
-            filter(
-                lambda x: x.created_time == max(
-                    model.created_time for model in model_list),
-                model_list,
-            )
-        )
-        production_model_run_id = production_model.run_id
+    firstRegistration = False
+    tag_name = 'experiment_name'
+
+    model = get_model_by_tag(
+        model_name, tag_name, exp.name, ws)
+
+    if (model is not None):
+
+        production_model_run_id = model.run_id
 
         # Get the run history for both production model and
         # newly trained model and compare mse
@@ -136,6 +140,7 @@ try:
     else:
         print("This is the first model, "
               "thus it should be registered")
+
 except Exception:
     traceback.print_exc(limit=None, file=None, chain=True)
     print("Something went wrong trying to evaluate. Exiting.")
