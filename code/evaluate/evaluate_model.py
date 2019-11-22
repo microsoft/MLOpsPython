@@ -101,17 +101,13 @@ run.tag("BuildId", value=build_id)
 try:
     firstRegistration = False
     tag_name = 'experiment_name'
-    try:
-        model_list = get_model_by_tag(
-            model_name, tag_name, exp.name, ws)
-    except Exception as e:
-        firstRegistration = True
-        print(e)
-        print("This is the first model, "
-              "thus it should be registered")
-    if (firstRegistration is False):
 
-        production_model_run_id = model_list.run_id
+    model = get_model_by_tag(
+        model_name, tag_name, exp.name, ws)
+
+    if (model is not None):
+
+        production_model_run_id = model.run_id
 
         # Get the run history for both production model and
         # newly trained model and compare mse
@@ -141,6 +137,9 @@ try:
             print("New trained model metric is less than or equal to "
                   "production model so skipping model registration.")
             run.parent.cancel()
+    else:
+        print("This is the first model, "
+              "thus it should be registered")
 
 except Exception:
     traceback.print_exc(limit=None, file=None, chain=True)

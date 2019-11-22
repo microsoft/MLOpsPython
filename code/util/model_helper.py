@@ -71,8 +71,10 @@ def get_model_by_tag(
 
         if len(model_list) > 1:
             raise ValueError(should_not_happen)
-        else:
+        if len(model_list) == 1:
             return model_list[0]
+        else:
+            print(no_model_found)
+            return None
     except Exception:
-        print(no_model_found)
         raise
