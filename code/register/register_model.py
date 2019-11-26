@@ -109,7 +109,8 @@ def main():
     if (validate):
         try:
             tag_name = 'BuildId'
-            model = get_model_by_tag(model_name, tag_name, build_id, exp.workspace)
+            model = get_model_by_tag(
+                model_name, tag_name, build_id, exp.workspace)
             if (model is not None):
                 print("Model was registered for this build.")
             if (model is None):
