@@ -1,0 +1,96 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - docs/
+    - environment_setup/
+    - charts/
+    - ml_service/util/create_scoring_image.py
+
+variables:
+- template: azdo-variables.yml
+- group: devopsforai-aml-vg
+
+
+stages:
+- stage: 'Model_CI'
+  displayName: 'Model CI'
+  jobs:
+  - job: "Model_CI_Pipeline"
+    displayName: "Model CI Pipeline"
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mcr.microsoft.com/mlops/python:latest
+    timeoutInMinutes: 0
+    steps:
+    - template: azdo-base-pipeline.yml
+    - script: |
+        # Invoke the Python building and publishing a training pipeline
+        python3 $(Build.SourcesDirectory)/ml_service/pipelines/${{ variables.BUILD_TRAIN_SCRIPT }}
+      failOnStderr: 'false'
+      env:
+        SP_APP_SECRET: '$(SP_APP_SECRET)'
+      displayName: 'Publish Azure Machine Learning Pipeline'
+- stage: 'Trigger_AML_Pipeline'
+  displayName: 'Train, evaluate, register model via previously published AML pipeline'
+  jobs:
+  - job: "Get_Pipeline_ID"
+    condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
+    displayName: "Get Pipeline ID for execution"
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mcr.microsoft.com/mlops/python:latest
+    timeoutInMinutes: 0
+    steps:
+    - script: |
+        python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py
+        source $(Build.SourcesDirectory)/tmp.sh
+        echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINE_ID"
+      name: 'getpipelineid'
+      displayName: 'Get Pipeline ID'
+      env:
+        SP_APP_SECRET: '$(SP_APP_SECRET)'
+  - job: "Run_ML_Pipeline"
+    dependsOn: "Get_Pipeline_ID"
+    displayName: "Trigger ML Training Pipeline"
+    pool: server
+    variables:
+      AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
+    steps:
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke ML pipeline'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        PipelineId: '$(AMLPIPELINE_ID)'
+        ExperimentName: '$(EXPERIMENT_NAME)'
+        PipelineParameters: '"model_name": "sklearn_regression_model.pkl"'
+  - job: "Training_Run_Report"
+    dependsOn: "Run_ML_Pipeline"
+    displayName: "Determine if evaluation succeeded and new model is registered"
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mcr.microsoft.com/mlops/python:latest
+    timeoutInMinutes: 0
+    steps:
+    - script: |
+        python $(Build.SourcesDirectory)/code/register/register_model.py --build_id $(Build.BuildId) --validate True
+      displayName: 'Check if new model registered'
+      env:
+        SP_APP_SECRET: '$(SP_APP_SECRET)'
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        Contents: |
+          code/scoring/**
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        ArtifactName: 'mlops-pipelines'
+        publishLocation: 'container'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+        TargetPath: '$(Build.ArtifactStagingDirectory)'
