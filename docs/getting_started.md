@@ -32,6 +32,10 @@ permissions. Normally a subscription admin can create a Service principal and
 can provide you the details.
 
 ## Create an Azure DevOps Azure ML Workspace Service Connection
+Install the **Azure Machine Learning** extension to your organization from the
+[marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
+so that you can set up a service connection to your AML workspace.
+
 Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group below.
 
 **Note:** Creating service connection using Azure Machine Learning extension requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
@@ -215,20 +219,6 @@ The pipeline consumes two artifacts:
 
 1. the result of the **Build Pipeline** as it contains configuration files
 1. the **model** trained and registered by the ML training pipeline
-
-Install the **Azure Machine Learning** extension to your organization from the
-[marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
-so that you can set up a service connection to your AML workspace.
-
-To configure a model artifact, there should be a service connection to
-**mlops-AML-WS** workspace. To get there, go to the project settings (by
-clicking on the cog wheel to the bottom left of the screen), and then click on
-**Service connections** under the **Pipelines** section:
-
-**Note:** Creating service connection using Azure Machine Learning extension
-requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
-
-![workspace connection](./images/workspace-connection.png)
 
 Add an artifact to the pipeline and select **AzureML Model Artifact** source
 type. Select the **Service Endpoint** and **Model Names** from the drop down
