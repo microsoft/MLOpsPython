@@ -50,6 +50,8 @@ def main():
         app_id = os.environ.get('SP_APP_ID')
         app_secret = os.environ.get('SP_APP_SECRET')
         build_id = os.environ.get('BUILD_BUILDID')
+        # run_id useful to query previous runs
+        run_id = "bd184a18-2ac8-4951-8e78-e290bef3b012"
         service_principal = ServicePrincipalAuthentication(
             tenant_id=tenant_id,
             service_principal_id=app_id,
@@ -63,7 +65,6 @@ def main():
         )
         ws = aml_workspace
         exp = Experiment(ws, experiment_name)
-        run_id = "bd184a18-2ac8-4951-8e78-e290bef3b012"
     else:
         sys.path.append(os.path.abspath("./util"))  # NOQA: E402
         from model_helper import get_model_by_tag
