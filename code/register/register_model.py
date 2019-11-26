@@ -109,8 +109,13 @@ def main():
     if (validate):
         try:
             tag_name = 'BuildId'
-            get_model_by_tag(model_name, tag_name, build_id, exp.workspace)
-            print("Model was registered for this build.")
+            model = get_model_by_tag(
+                model_name, tag_name, build_id, exp.workspace)
+            if (model is not None):
+                print("Model was registered for this build.")
+            if (model is None):
+                print("Model was not registered for this run.")
+                sys.exit(1)
         except Exception as e:
             print(e)
             print("Model was not registered for this run.")
