@@ -42,11 +42,6 @@ def main():
         type=str,
         help="Name of the Model"
     )
-    parser.add_argument(
-        "--output_model_version_file",
-        type=str,
-        help="Name of a file to write model version to"
-    )
 
     args = parser.parse_args()
     if (args.build_id is not None):

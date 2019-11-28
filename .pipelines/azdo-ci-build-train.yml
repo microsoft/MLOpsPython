@@ -98,7 +98,7 @@ stages:
         inlineScript: |
           set -e # fail on error
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          python $(Build.SourcesDirectory)/ml_service/pipelines/verify_train_pipeline.py --build_id $(Build.BuildId) --model_name "$(MODEL_NAME)" --output_model_version_file "model_version.txt"
+          python $(Build.SourcesDirectory)/ml_service/pipelines/verify_train_pipeline.py --build_id $(Build.BuildId) --model_name "$(MODEL_NAME)"
           echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true]$(cat model_version.txt)"
       displayName: "Determine if evaluation succeeded and new model is registered"
     - task: CopyFiles@2
