@@ -1,8 +1,9 @@
-pytest==4.3.0
+pytest>=5.3
 requests>=2.22
-azureml>=0.2
+numpy>=1.17
+pandas>=0.25
 azureml-sdk>=1.0
 python-dotenv>=0.10.3
-flake8
+flake8>=3.7
 flake8_formatter_junit_xml
-azure-cli==2.0.71
+azure-cli==2.0.76
