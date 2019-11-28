@@ -45,8 +45,8 @@ def main():
         savePIDcmd = 'echo "export AMLPIPELINE_ID=$amlpipeline_id" >tmp.sh'
         os.system(savePIDcmd)
 
-        # Set this to True for local development or
-        # if not using Azure DevOps pipeline execution task
+        # Set this to True for local development or if NOT
+        # using Azure DevOps Azure ML agentless pipeline execution task
         skip_train_execution = True
         if(skip_train_execution is False):
             pipeline_parameters = {"model_name": e.model_name}
