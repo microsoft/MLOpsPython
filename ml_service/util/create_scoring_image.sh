@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -euxo pipefail # strict mode, fail on error
+set -euo pipefail # strict mode, fail on error
 set -x # verbose
 
 docker run \
