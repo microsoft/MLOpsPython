@@ -27,7 +27,6 @@ import os
 import sys
 from azureml.core import Run, Workspace, Experiment
 import argparse
-from azureml.core.authentication import ServicePrincipalAuthentication
 import traceback
 
 run = Run.get_context()
@@ -48,16 +47,11 @@ if (run.id.startswith('OfflineRun')):
     build_id = os.environ.get('BUILD_BUILDID')
     # run_id useful to query previous runs
     run_id = "57fee47f-5ae8-441c-bc0c-d4c371f32d70"
-    service_principal = ServicePrincipalAuthentication(
-        tenant_id=tenant_id,
-        service_principal_id=app_id,
-        service_principal_password=app_secret)
 
     aml_workspace = Workspace.get(
         name=workspace_name,
         subscription_id=subscription_id,
-        resource_group=resource_group,
-        auth=service_principal
+        resource_group=resource_group
     )
     ws = aml_workspace
     exp = Experiment(ws, experiment_name)

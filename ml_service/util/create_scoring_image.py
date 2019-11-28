@@ -1,24 +1,19 @@
 import os
+import sys
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
 from azureml.core.model import Model
-from azureml.core.authentication import ServicePrincipalAuthentication
+sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from env_variables import Env
 
 e = Env()
 
-SP_AUTH = ServicePrincipalAuthentication(
-    tenant_id=e.tenant_id,
-    service_principal_id=e.app_id,
-    service_principal_password=e.app_secret)
-
+# Get Azure machine learning workspace
 ws = Workspace.get(
-    e.workspace_name,
-    SP_AUTH,
-    e.subscription_id,
-    e.resource_group
+    name=e.workspace_name,
+    subscription_id=e.subscription_id,
+    resource_group=e.resource_group
 )
-
 
 model = Model(ws, name=e.model_name, version=e.model_version)
 os.chdir("./code/scoring")

@@ -1,24 +1,34 @@
 from azureml.pipeline.core import PublishedPipeline
 from azureml.core import Workspace
-from azureml.core.authentication import ServicePrincipalAuthentication
 import os
 import sys
+import argparse
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from env_variables import Env
 
 
 def main():
+
+    parser = argparse.ArgumentParser("register")
+    parser.add_argument(
+        "--output_pipeline_id_file",
+        type=str,
+        help="Name of a file to write pipeline ID to"
+    )
+    parser.add_argument(
+        "--skip_train_execution",
+        action="store_true",
+        help=("Do not trigger the execution. "
+              "Use this in Azure DevOps when using a server job to trigger")
+    )
+    args = parser.parse_args()
+
     e = Env()
-    service_principal = ServicePrincipalAuthentication(
-        tenant_id=e.tenant_id,
-        service_principal_id=e.app_id,
-        service_principal_password=e.app_secret)
 
     aml_workspace = Workspace.get(
         name=e.workspace_name,
         subscription_id=e.subscription_id,
-        resource_group=e.resource_group,
-        auth=service_principal
+        resource_group=e.resource_group
     )
 
     # Find the pipeline that was published by the specified build ID
@@ -41,22 +51,18 @@ def main():
         print("published pipeline id is", published_pipeline.id)
 
         # Save the Pipeline ID for other AzDO jobs after script is complete
-        os.environ['amlpipeline_id'] = published_pipeline.id
-        savePIDcmd = 'echo "export AMLPIPELINE_ID=$amlpipeline_id" >tmp.sh'
-        os.system(savePIDcmd)
+        if args.output_pipeline_id_file is not None:
+            with open(args.output_pipeline_id_file, "w") as out_file:
+                out_file.write(published_pipeline.id)
 
-        # Set this to True for local development or if NOT
-        # using Azure DevOps Azure ML agentless pipeline execution task
-        skip_train_execution = True
-        if(skip_train_execution is False):
+        if(args.skip_train_execution is False):
             pipeline_parameters = {"model_name": e.model_name}
-            response = published_pipeline.submit(
+            run = published_pipeline.submit(
                 aml_workspace,
                 e.experiment_name,
                 pipeline_parameters)
 
-            run_id = response.id
-            print("Pipeline run initiated ", run_id)
+            print("Pipeline run initiated ", run.id)
 
 
 if __name__ == "__main__":

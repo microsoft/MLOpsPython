@@ -10,35 +10,25 @@ following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/
 
 If you already have Azure DevOps account, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
-## Create a Service Principal to login to Azure
+## Create an ARM Service Connection to deploy resources
 
-To create service principal, register an application entity in Azure Active
-Directory (Azure AD) and grant it the Contributor or Owner role of the
-subscription or the resource group where the web service belongs to. See
-[how to create service principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) and assign permissions to manage Azure
-resource.
+The repository includes a DevOps pipeline to deploy the Azure ML workspace and associated resources through Azure Resource Manager.
 
-Please make note of the following values after creating a service principal, we
-will need them in subsequent steps:
+The pipeline requires an **Azure Resource Manager**
+[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
+Given this service connection, you will be able to run the IaC pipeline
+and have the required permissions to generate resources.
 
-* Application (client) ID
-* Directory (tenant) ID
-* Application Secret
+![create service connection](./images/create-rm-service-connection.png)
 
-**Note:** You must have sufficient permissions to register an application with
-your Azure AD tenant, and assign the application to a role in your Azure
-subscription. Contact your subscription administrator if you don't have the
-permissions. Normally a subscription admin can create a Service principal and
-can provide you the details.
+Use **``AzureResourceConnection``** as the connection name, since it is used
+in the IaC pipeline definition. Leave the **``Resource Group``** field empty.
 
-## Create an Azure DevOps Azure ML Workspace Service Connection
-Install the **Azure Machine Learning** extension to your organization from the
-[marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
-so that you can set up a service connection to your AML workspace.
-
-Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group below.
-
-**Note:** Creating service connection using Azure Machine Learning extension requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
+**Note:** Creating the ARM service connection scope requires 'Owner' or 'User Access Administrator' permissions on the subscription.
+You must also have sufficient permissions to register an application with
+your Azure AD tenant, or receive the ID and secret of a service principal
+from your Azure AD Administrator. That principal must have 'Contributor'
+permissions on the subscription.
 
 ## Create a Variable Group for your Pipelines
 
@@ -62,15 +52,9 @@ The variable group should contain the following required variables:
 | --------------------------- | -----------------------------------|
 | BASE_NAME                   | [unique base name]                 |
 | LOCATION                    | centralus                          |
-| SP_APP_ID                   |                                    |
-| SP_APP_SECRET               |                                    |
-| SUBSCRIPTION_ID             |                                    |
-| TENANT_ID                   |                                    |
 | RESOURCE_GROUP              |                                    |
 | WORKSPACE_NAME              | mlops-AML-WS                       |
 | WORKSPACE_SVC_CONNECTION    | aml-workspace-connection           | 
-
-Mark **SP_APP_SECRET** variable as a secret one.
 
 **Note:** 
 
@@ -93,7 +77,10 @@ There are more variables used in the project. They're defined in two places one 
 
 ### Local configuration
 
-In order to configure the project locally you have to create a copy from `.env.example` to the root and name it `.env`. Fill out all missing values and adjust the existing ones to your needs. Please be aware that the local environment also needs access to the Azure subscription so you have to provide the credentials of your service principal and Azure account information here as well.
+In order to configure the project locally you have to create a copy from `.env.example` to the root and name it `.env`. Fill out all missing values and adjust the existing ones to your needs. 
+
+For local development, you will also need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). Azure CLI will be used to log you in interactively.
+Please be aware that the local environment also needs access to the Azure subscription so you have to have Contributor access on the Azure ML Workspace.
 
 ### Azure DevOps configuration
 
@@ -103,7 +90,6 @@ Up until now you should have:
 
 * Forked (or cloned) the repo
 * Created a devops account or use an existing one
-* Got service principal details and subscription id
 * A variable group with all configuration values
 
 ## Create Resources with Azure Pipelines
@@ -117,18 +103,6 @@ To set up this pipeline, you will need to do the following steps:
 
 1. Create an Azure Resource Manager Service Connection
 1. Create a Build IaC Pipeline
-
-### Create an Azure Resource Manager Service Connection
-
-The pipeline requires an **Azure Resource Manager**
-[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
-Given this service connection, you will be able to run the IaC pipeline
-and have the required permissions to generate resources.
-
-![create service connection](./images/create-rm-service-connection.png)
-
-Use **``AzureResourceConnection``** as the connection name, since it is used
-in the IaC pipeline definition. Leave the **``Resource Group``** field empty.
 
 ### Create a Build IaC Pipeline
 
@@ -152,8 +126,18 @@ Check out created resources in the [Azure Portal](portal.azure.com):
 Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-remove-environment.yml) that removes resources created for this project or
 you can just delete a resource group in the [Azure Portal](portal.azure.com).
 
-Once this resource group is created, be sure that the Service Principal you have
-created has access to this resource group.
+## Create an Azure DevOps Azure ML Workspace Service Connection
+Install the **Azure Machine Learning** extension to your organization from the
+[marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
+so that you can set up a service connection to your AML workspace.
+
+Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group below.
+
+**Note:** Creating service connection with Azure Machine Learning workspace scope requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
+You must also have sufficient permissions to register an application with
+your Azure AD tenant, or receive the ID and secret of a service principal
+from your Azure AD Administrator. That principal must have Contributor
+permissions on the Azure ML Workspace.
 
 ## Set up Build, Release Trigger, and Release Deployment Pipelines
 
@@ -241,10 +225,10 @@ Specify task parameters as it is shown in the table below:
 | ----------------------------- | ---------------------------------------------------------------------------------------------------- |
 | Display Name                  | Azure ML Model Deploy                                                                                |
 | Azure ML Workspace            | mlops-AML-WS                                                                                         |
-| Inference config Path         | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`      |
+| Inference config Path         | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
 | Model Deployment Target       | Azure Container Instance                                                                             |
 | Deployment Name               | mlopspython-aci                                                                                      |
-| Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aci.yml` |
+| Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aci.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
 | Overwrite existing deployment | X                                                                                                    |
 
 In a similar way, create a stage **Prod (AKS)** and add a single task to the job
@@ -259,11 +243,11 @@ Specify task parameters as it is shown in the table below:
 | --------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | Display Name                      | Azure ML Model Deploy                                                                                |
 | Azure ML Workspace                | mlops-AML-WS                                                                                         |
-| Inference config Path             | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`      |
+| Inference config Path             | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
 | Model Deployment Target           | Azure Kubernetes Service                                                                             |
 | Select AKS Cluster for Deployment | YOUR_DEPLOYMENT_K8S_CLUSTER                                                                          |
 | Deployment Name                   | mlopspython-aks                                                                                      |
-| Deployment Configuration file     | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aks.yml` |
+| Deployment Configuration file     | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aks.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
 | Overwrite existing deployment     | X                                                                                                    |
 
 **Note:** Creating of a Kubernetes cluster on AKS is out of scope of this
@@ -300,19 +284,33 @@ config. To learn more on how to create a container with AML SDK click
 [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).
 
 Below is release pipeline with two tasks one to create an image using the above
-script and second is the deploy the image to Web App for containers
-![release_webapp](./images/release-webapp-pipeline.PNG).
+script and second is the deploy the image to Web App for containers.
 
-For the bash script task to invoke the [Create Image Script](../ml_service/util/create_scoring_image.py), specify the following task parameters:
+![release_webapp](./images/release-webapp-pipeline.PNG)
+
+In the Variables tab, link the pipeline to your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variables:
+
+| Variable Name               | Suggested Value                    |
+| --------------------------- | -----------------------------------|
+| MODEL_NAME                  | sklearn_regression_model.pkl       |
+| IMAGE_NAME                  | diabetes                           |
+
+Add as an artifact to the pipeline the result of the **Build Pipeline** as it contains the necessary scripts.
+
+Use an Agent of type `ubuntu-16.04`.
+
+For the Azure CLI task to invoke the [Create Image Script](../ml_service/util/create_scoring_image.py), specify the following task parameters:
 
 | Parameter          | Value                                                                                               |
 | ------------------ | --------------------------------------------------------------------------------------------------- |
-| Display Name       | Create Scoring Image                                                                                |
-| Script             | python3 $(System.DefaultWorkingDirectory)/\_MLOpsPythonRepo/ml_service/util/create_scoring_image.py  |
+| Display name       | Create Scoring Image                                                                                |
+| Azure subscription | aml-workspace-connection                                                                            |
+| Script Path        | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipeline/ml_service/util/create_scoring_image.sh`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
+| Working directory  | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
 
 ![release_createimage](./images/release-task-createimage.PNG)
 
-Finally, for the Azure WebApp on Container Task, specify the following task
+Finally, for the Azure Web App for Containers Task, specify the following task
 parameters as it is shown in the table below:
 
 | Parameter          | Value                                                                                               |
