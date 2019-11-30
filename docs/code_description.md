@@ -24,6 +24,7 @@
 - `ml_service/pipelines/build_train_pipeline_with_r.py` : builds and publishes an ML training pipeline. It uses R on ML Compute.
 - `ml_service/pipelines/build_train_pipeline_with_r_on_dbricks.py` : builds and publishes an ML training pipeline. It uses R on Databricks Compute.
 - `ml_service/pipelines/run_train_pipeline.py` : invokes a published ML training pipeline (Python on ML Compute) via REST API.
+- `ml_service/pipelines/verify_train_pipeline.py` : determines whether the evaluate_model.py step of the training pipeline registered a new model.
 - `ml_service/util` : contains common utility functions used to build and publish an ML training pipeline.
 
 ### Code
