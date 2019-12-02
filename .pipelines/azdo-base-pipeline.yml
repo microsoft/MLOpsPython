@@ -10,7 +10,7 @@ steps:
   enabled: 'true'
   
 - script: |
-   pip install --user -r $(Build.SourcesDirectory)/tests/requirements.txt
+   pip install --user -r $(Build.SourcesDirectory)/tests/requirements.txt && \
    pytest --junitxml=$(Build.BinariesDirectory)/unit-testresults.xml $(Build.SourcesDirectory)/tests/unit
   displayName: 'Run unit tests'
   enabled: 'true'

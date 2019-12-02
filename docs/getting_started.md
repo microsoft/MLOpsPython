@@ -4,8 +4,8 @@
 
 ## Create an Azure DevOps account
 
-We use Azure DevOps for running our build(CI), retraining trigger and release
-(CD) pipelines. If you don't already have an Azure DevOps account, create one by
+We use Azure DevOps for running our multi-stage pipeline with build(CI), ML training and scoring service release
+(CD) stages. If you don't already have an Azure DevOps account, create one by
 following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
 If you already have Azure DevOps account, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
@@ -30,10 +30,10 @@ your Azure AD tenant, or receive the ID and secret of a service principal
 from your Azure AD Administrator. That principal must have 'Contributor'
 permissions on the subscription.
 
-## Create a Variable Group for your Pipelines
+## Create a Variable Group for your Pipeline
 
 We make use of variable group inside Azure DevOps to store variables and their
-values that we want to make available across multiple pipelines. You can either
+values that we want to make available across multiple pipelines or pipeline stages. You can either
 store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group)
 or connect to an Azure Key Vault in your subscription. Please refer to the
 documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to
@@ -55,6 +55,7 @@ The variable group should contain the following required variables:
 | RESOURCE_GROUP              |                                    |
 | WORKSPACE_NAME              | mlops-AML-WS                       |
 | WORKSPACE_SVC_CONNECTION    | aml-workspace-connection           | 
+| ACI_DEPLOYMENT_NAME         | diabetes-aci                       |
 
 **Note:** 
 
@@ -139,18 +140,19 @@ your Azure AD tenant, or receive the ID and secret of a service principal
 from your Azure AD Administrator. That principal must have Contributor
 permissions on the Azure ML Workspace.
 
-## Set up Build, Release Trigger, and Release Deployment Pipelines
+## Set up Build, Release Trigger, and Release Multi-Stage Pipeline
 
 Now that you have all the required resources created from the IaC pipeline,
-you can set up the rest of the pipelines necessary for deploying your ML model
-to production. These are the pipelines that you will be setting up:
+you can set up the pipeline necessary for deploying your ML model
+to production. The pipeline has a sequence of stages for:
 
-1. **Build pipeline:** triggered on code change to master branch on GitHub,
+1. **Model Code Continuous Integration:** triggered on code change to master branch on GitHub,
 performs linting, unit testing, publishing a training pipeline, and runs the published training pipeline to train, evaluate, and register a model.
-1. **Release Deployment pipeline:** deploys a model to QA (ACI) and Prod (AKS)
-environments.
+1. **Train Model**: invokes the Azure ML service to trigger model training.
+1. **Release Deployment:** deploys a model to QA (ACI) and Prod (AKS)
+environments, or alternatively to Azure App Service.
 
-### Set up a Build Training Pipeline
+### Set up the Pipeline
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
 pipeline referring to the [azdo-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml)
@@ -158,171 +160,105 @@ pipeline in your forked **GitHub** repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
 
-Name the pipeline **ci-build**. Once the pipline is finished, explore the
-execution logs:
+Once the pipeline is finished, explore the execution result:
 
-![ci build logs](./images/ci-build-logs.png)
+![build](./images/multi-stage-aci.png)
 
 and checkout a published training pipeline in the **mlops-AML-WS** workspace in
 [Azure Portal](https://ms.portal.azure.com/):
 
 ![training pipeline](./images/training-pipeline.png)
 
-Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master
-branch. The pipeline performs linting, unit testing, builds and publishes and executes a 
-**ML Training Pipeline** in a **ML Workspace**.
+Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master branch.
 
-**Note:** The build pipeline contains disabled steps to build and publish ML
-pipelines using R to train a model. Enable these steps if you want to play with
-this approach by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For the pipeline training a model with R on Databricks you have
+* The first stage of the pipeline, **Model CI**, perform linting, unit testing, build and publishes an **ML Training Pipeline** in a **ML Workspace**.
+
+  **Note:** The build pipeline also supports building and publishing ML
+pipelines using R to train a model. This is enabled
+by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For the pipeline training a model with R on Databricks you have
 to manually create a Databricks cluster and attach it to the ML Workspace as a
-compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables shoud be
+compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables should be
 specified).
 
-![running training pipeline](./images/running-training-pipeline.png)
+* The second stage of the pipeline, **Train model**, triggers the run of the ML Training Pipeline. The training pipeline will train, evaluate, and register a new model. The actual computation is performed in an [Azure Machine Learning Compute cluster](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute). In Azure DevOps, this stage runs an agentless job that waits for the completion of the Azure ML job, so it can wait for training completion for hours or even days without using agent resources.
 
-The training pipeline will train, evaluate, and register a new model. Wait until
-it is finished and make sure there is a new model in the **ML Workspace**:
+* The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). It then runs a *smoke test* to validate the deployment, i.e. sends a sample query to the scoring web service and verifies that it returns a response in the expected format.
+ 
+Wait until the pipeline finished and make sure there is a new model in the **ML Workspace**:
 
 ![trained model](./images/trained-model.png)
 
 To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\azdo-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
 
-### Set up a Release Deployment Pipeline to Deploy the Model
+### Deploy the Model to Azure Kubernetes Service
 
-The final step is to deploy the model across environments with a release
-pipeline. There will be a **``QA``** environment running on
-[Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/)
-and a **``Prod``** environment running on
+The final stage is to deploy the model to the production environment running on
 [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service).
-This is the final picture of what your release pipeline should look like:
-
-![deploy model](./images/deploy-model.png)
-
-The pipeline consumes two artifacts:
-
-1. the result of the **Build Pipeline** as it contains configuration files
-1. the **model** trained and registered by the ML training pipeline
-
-Add an artifact to the pipeline and select **AzureML Model Artifact** source
-type. Select the **Service Endpoint** and **Model Names** from the drop down
-lists. **Service Endpoint** refers to the **Service connection** created in
-the previous step:
-
-![model artifact](./images/model-artifact.png)
-
-Go to the new **Releases Pipelines** section, and click new to create a new
-release pipeline. A first stage is automatically created and choose
-**start with an Empty job**. Name the stage **QA (ACI)** and add a single task
-to the job **Azure ML Model Deploy**. Make sure that the Agent Specification
-is ubuntu-16.04 under the Agent Job:
-
-![deploy aci](./images/deploy-aci.png)
-
-Specify task parameters as it is shown in the table below:
-
-| Parameter                     | Value                                                                                                |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Display Name                  | Azure ML Model Deploy                                                                                |
-| Azure ML Workspace            | mlops-AML-WS                                                                                         |
-| Inference config Path         | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
-| Model Deployment Target       | Azure Container Instance                                                                             |
-| Deployment Name               | mlopspython-aci                                                                                      |
-| Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aci.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
-| Overwrite existing deployment | X                                                                                                    |
-
-In a similar way, create a stage **Prod (AKS)** and add a single task to the job
-**Azure ML Model Deploy**. Make sure that the Agent Specification is
-ubuntu-16.04 under the Agent Job:
-
-![deploy aks](./images/deploy-aks.png)
-
-Specify task parameters as it is shown in the table below:
-
-| Parameter                         | Value                                                                                                |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Display Name                      | Azure ML Model Deploy                                                                                |
-| Azure ML Workspace                | mlops-AML-WS                                                                                         |
-| Inference config Path             | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/inference_config.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
-| Model Deployment Target           | Azure Kubernetes Service                                                                             |
-| Select AKS Cluster for Deployment | YOUR_DEPLOYMENT_K8S_CLUSTER                                                                          |
-| Deployment Name                   | mlopspython-aks                                                                                      |
-| Deployment Configuration file     | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/code/scoring/deployment_config_aks.yml`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
-| Overwrite existing deployment     | X                                                                                                    |
 
 **Note:** Creating of a Kubernetes cluster on AKS is out of scope of this
 tutorial, but you can find set up information in the docs
 [here](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal#create-an-aks-cluster).
 
-Similarly to the **Invoke Training Pipeline** release pipeline, previously
-created, in order to trigger a coutinuous integration, click on the lightning
-bolt icon, make sure the **Continuous deployment trigger** is checked and
-save the trigger:
-
-![Automate Deploy Model Pipeline](./images/automate_deploy_model_pipeline.png)
-
-Congratulations! You have three pipelines set up end to end:
-
-* **Build pipeline:** triggered on code change to master branch on GitHub,
-performs linting, unit testing and publishing a training pipeline.
-* **Release Trigger pipeline:** runs a published training pipeline to train,
-evaluate and register a model.
-* **Release Deployment pipeline:** deploys a model to QA (ACI) and Prod (AKS)
-environments.
-
-## Deploy the trained model to Azure Web App for containers
-
-Note: This is an optional step and can be used only if you are deploying your
-scoring service on Azure Web Apps.
-
-[Create Image Script](../ml_service/util/create_scoring_image.py)
-can be used to create a scoring image from the release pipeline. The image
-created by this script will be registered under Azure Container Registry (ACR)
-instance that belongs to Azure Machine Learning Service. Any dependencies that
-scoring file depends on can also be packaged with the container with Image
-config. To learn more on how to create a container with AML SDK click
-[here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).
-
-Below is release pipeline with two tasks one to create an image using the above
-script and second is the deploy the image to Web App for containers.
-
-![release_webapp](./images/release-webapp-pipeline.PNG)
-
-In the Variables tab, link the pipeline to your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variables:
+In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variables:
 
 | Variable Name               | Suggested Value                    |
 | --------------------------- | -----------------------------------|
-| MODEL_NAME                  | sklearn_regression_model.pkl       |
-| IMAGE_NAME                  | diabetes                           |
+| AKS_COMPUTE_NAME            | aks                                |
+| AKS_DEPLOYMENT_NAME         | diabetes-aks                       |
 
-Add as an artifact to the pipeline the result of the **Build Pipeline** as it contains the necessary scripts.
+Set **AKS_COMPUTE_NAME** to the *Compute name* of the Inference Cluster referencing your AKS cluster in your Azure ML Workspace.
 
-Use an Agent of type `ubuntu-16.04`.
+After successfully deploying to Azure Container Instances, the next stage will deploy the model to Kubernetes and run a smoke test.
 
-For the Azure CLI task to invoke the [Create Image Script](../ml_service/util/create_scoring_image.py), specify the following task parameters:
+![build](./images/multi-stage-aci-aks.png)
 
-| Parameter          | Value                                                                                               |
-| ------------------ | --------------------------------------------------------------------------------------------------- |
-| Display name       | Create Scoring Image                                                                                |
-| Azure subscription | aml-workspace-connection                                                                            |
-| Script Path        | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipeline/ml_service/util/create_scoring_image.sh`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
-| Working directory  | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines`<br>_(The `_ci-build` part of the path is the source alias of your CI artifact)_ |
+## Deploy the Model to Azure App Service (Azure Web App for containers)
 
-![release_createimage](./images/release-task-createimage.PNG)
+Note: This is an optional step and can be used only if you are [deploying your
+scoring service on Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service).
 
-Finally, for the Azure Web App for Containers Task, specify the following task
-parameters as it is shown in the table below:
+In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variable:
 
-| Parameter          | Value                                                                                               |
-| ------------------ | --------------------------------------------------------------------------------------------------- |
-| Azure subscription | Subscription used to deploy Web App                                                                 |
-| App name           | Web App for Containers name                                                                         |
-| Image name         | Specify the fully qualified container image name. For example, 'myregistry.azurecr.io/nginx:latest' |
+| Variable Name               | Suggested Value                    |
+| --------------------------- | -----------------------------------|
+| WEBAPP_DEPLOYMENT_NAME      | mlopswebapp                        |
 
-![release_webapp](./images/release-task-webappdeploy.PNG)
+Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. Delete the **ACI_DEPLOYMENT_NAME** variable.
 
-Save the pipeline and create a release to trigger it manually. To create the
-trigger, click on the "Create release" button on the top right of your screen,
-leave the fields blank and click on **Create** at the bottom of the screen.
-Once the pipeline execution is finished, check out deployments in the
-**mlops-AML-WS** workspace.
+The pipeline uses the [Create Image Script](../ml_service/util/create_scoring_image.py)
+to create a scoring image. The image
+created by this script will be registered under Azure Container Registry (ACR)
+instance that belongs to Azure Machine Learning Service. Any dependencies that
+scoring file depends on can also be packaged with the container with Image
+config.
+[Learn more on how to create a container with AML SDK](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).
+
+Make sure your webapp has the credentials to pull the image from the Azure Container Registry created by the Infrastructure as Code pipeline. You could do this by following the instructions in the section [Configure registry credentials in web app](https://docs.microsoft.com/en-us/azure/devops/pipelines/targets/webapp-on-container-linux?view=azure-devops&tabs=dotnet-core%2Cyaml#configure-registry-credentials-in-web-app). Note that you must have run the pipeline once (including the Deploy to Webapp stage up to the `Create scoring image` step) so that an image is present in the registry, before you can connect the Webapp to the Azure Container Registry in the Azure Portal.
+
+![build](./images/multi-stage-webapp.png)
+
+# Next steps
+
+* The provided pipeline definition YAML file is a sample starting point, which you should tailor to your processes and environment.
+* You should edit the pipeline definition to remove unused stages. For example, if you are deploying to ACI and AKS, you should delete the unused `Deploy_Webapp` stage.
+* The sample pipeline generates a random value for a model hyperparameter (ridge regression [*alpha*](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)) to generate 'interesting' charts when testing the sample. In a real application you should use fixed hyperparameter values. You can [tune hyperparameter values using Azure ML](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-tune-hyperparameters), and manage their values in Azure DevOps Variable Groups.
+* You may wish to enable [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+* You can explore aspects of model observability in the solution, such as:
+  * **Logging**: navigate to the Application Insights instance linked to the Azure ML Portal,
+    then to the Logs (Analytics) pane. The following sample query correlates HTTP requests with custom logs
+    generated in `score.py`, and can be used for example to analyze query duration vs. scoring batch size:
+
+        let Traceinfo=traces
+        | extend d=parse_json(tostring(customDimensions.Content))
+        | project workspace=customDimensions.["Workspace Name"],
+            service=customDimensions.["Service Name"],
+            NumberOfPredictions=tostring(d.NumberOfPredictions),
+            id=tostring(d.RequestId),
+            TraceParent=tostring(d.TraceParent);
+        requests
+        | project timestamp, id, success, resultCode, duration
+        | join kind=fullouter Traceinfo on id
+        | project-away id1
+
+  * **Distributed tracing**: The smoke test client code sets an HTTP `traceparent` header (per the [W3C Trace Context proposed specification](https://www.w3.org/TR/trace-context-1)), and the `score.py` code logs this header. The query above shows how to surface this value. You can adapt this to your tracing framework.
+  * **Monitoring**: You can use [Azure Monitor for containers](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-overview) to monitor the Azure ML scoring containers' performance, just as for any other container.
