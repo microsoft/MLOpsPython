@@ -7,8 +7,7 @@ trigger:
     exclude:
     - docs/
     - environment_setup/
-    - charts/
-    - ml_service/util/create_scoring_image.py
+    - ml_service/util/create_scoring_image.*
 
 variables:
 - template: azdo-variables.yml
@@ -27,12 +26,15 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: azdo-base-pipeline.yml
-    - script: |
-        # Invoke the Python building and publishing a training pipeline
-        python3 $(Build.SourcesDirectory)/ml_service/pipelines/${{ variables.BUILD_TRAIN_SCRIPT }}
-      failOnStderr: 'false'
-      env:
-        SP_APP_SECRET: '$(SP_APP_SECRET)'
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          # Invoke the Python building and publishing a training pipeline
+          python $(Build.SourcesDirectory)/ml_service/pipelines/${{ variables.BUILD_TRAIN_SCRIPT }}
       displayName: 'Publish Azure Machine Learning Pipeline'
 - stage: 'Trigger_AML_Pipeline'
   displayName: 'Train, evaluate, register model via previously published AML pipeline'
@@ -45,22 +47,35 @@ stages:
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - script: |
-        python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py
-        # Set AMLPIPELINEID variable for next AML Pipeline task in next job
-        source $(Build.SourcesDirectory)/tmp.sh
-        echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINE_ID"
-        rm $(Build.SourcesDirectory)/tmp.sh
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py --output_pipeline_id_file "pipeline_id.txt" --skip_train_execution
+          # Set AMLPIPELINEID variable for next AML Pipeline task in next job
+          AMLPIPELINEID="$(cat pipeline_id.txt)"
+          echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINEID"
       name: 'getpipelineid'
       displayName: 'Get Pipeline ID'
-      env:
-        SP_APP_SECRET: '$(SP_APP_SECRET)'
+    - bash: |
+          # Generate a hyperparameter value as a random number between 0 and 1.
+          # A random value is used here to make the Azure ML dashboards "interesting" when testing
+          # the solution sample.
+          alpha=$(printf "0.%03d\n" $((($RANDOM*1000)/32767)))
+          echo "Alpha: $alpha"
+          echo "##vso[task.setvariable variable=ALPHA;isOutput=true]$alpha"
+      name: 'getalpha'
+      displayName: 'Generate random value for hyperparameter alpha'
   - job: "Run_ML_Pipeline"
     dependsOn: "Get_Pipeline_ID"
     displayName: "Trigger ML Training Pipeline"
     pool: server
     variables:
       AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
+      ALPHA: $[ dependencies.Get_Pipeline_ID.outputs['getalpha.ALPHA'] ]
     steps:
     - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
       displayName: 'Invoke ML pipeline'
@@ -68,7 +83,7 @@ stages:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         PipelineId: '$(AMLPIPELINE_ID)'
         ExperimentName: '$(EXPERIMENT_NAME)'
-        PipelineParameters: '"model_name": "sklearn_regression_model.pkl"'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)", "hyperparameter_alpha": "$(ALPHA)"}'
   - job: "Training_Run_Report"
     dependsOn: "Run_ML_Pipeline"
     displayName: "Determine if evaluation succeeded and new model is registered"
@@ -77,11 +92,15 @@ stages:
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - script: |
-        python $(Build.SourcesDirectory)/code/register/register_model.py --build_id $(Build.BuildId) --validate True
-      displayName: 'Check if new model registered'
-      env:
-        SP_APP_SECRET: '$(SP_APP_SECRET)'
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python $(Build.SourcesDirectory)/ml_service/pipelines/verify_train_pipeline.py --build_id $(Build.BuildId)
+      displayName: "Determine if evaluation succeeded and new model is registered"
     - task: CopyFiles@2
       displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
       inputs:
@@ -89,6 +108,7 @@ stages:
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
         Contents: |
           code/scoring/**
+          ml_service/util/**
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact'
       inputs:

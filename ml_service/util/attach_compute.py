@@ -39,4 +39,4 @@ def get_compute(
     except ComputeTargetException as e:
         print(e)
         print('An error occurred trying to provision compute.')
-        exit()
+        exit(1)

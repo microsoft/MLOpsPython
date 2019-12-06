@@ -39,14 +39,10 @@ def init():
 
 
 def run(raw_data):
-    try:
-        data = json.loads(raw_data)["data"]
-        data = numpy.array(data)
-        result = model.predict(data)
-        return json.dumps({"result": result.tolist()})
-    except Exception as e:
-        result = str(e)
-        return json.dumps({"error": result})
+    data = json.loads(raw_data)["data"]
+    data = numpy.array(data)
+    result = model.predict(data)
+    return {"result": result.tolist()}
 
 
 if __name__ == "__main__":

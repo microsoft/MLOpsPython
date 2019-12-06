@@ -1,12 +1,11 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
-from azureml.pipeline.core import Pipeline  # , PipelineData
+from azureml.pipeline.core import Pipeline
+from azureml.core import Workspace
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
-# from azureml.core import Datastore
 import os
 import sys
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from workspace import get_workspace
 from attach_compute import get_compute
 from env_variables import Env
 
@@ -14,13 +13,11 @@ from env_variables import Env
 def main():
     e = Env()
     # Get Azure machine learning workspace
-    aml_workspace = get_workspace(
-        e.workspace_name,
-        e.resource_group,
-        e.subscription_id,
-        e.tenant_id,
-        e.app_id,
-        e.app_secret)
+    aml_workspace = Workspace.get(
+        name=e.workspace_name,
+        subscription_id=e.subscription_id,
+        resource_group=e.resource_group
+    )
     print("get_workspace:")
     print(aml_workspace)
 
@@ -46,6 +43,8 @@ def main():
         name="model_name", default_value=e.model_name)
     build_id_param = PipelineParameter(
         name="build_id", default_value=e.build_id)
+    hyperparameter_alpha_param = PipelineParameter(
+        name="hyperparameter_alpha", default_value=0.5)
 
     train_step = PythonScriptStep(
         name="Train Model",
@@ -55,6 +54,7 @@ def main():
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
+            "--alpha", hyperparameter_alpha_param,
         ],
         runconfig=run_config,
         allow_reuse=False,
