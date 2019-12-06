@@ -94,15 +94,7 @@ stages:
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - task: AzureCLI@1
-        inputs:
-        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
-        scriptLocation: inlineScript
-        inlineScript: |
-            set -e # fail on error
-            export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-            python $(Build.SourcesDirectory)/ml_service/pipelines/verify_train_pipeline.py --build_id $(Build.BuildId)
-        displayName: "Determine if evaluation succeeded and new model is registered"
+    - template: azdo-template-get-model-version.yml
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
   dependsOn: Trigger_AML_Pipeline
