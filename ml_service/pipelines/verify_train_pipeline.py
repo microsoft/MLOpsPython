@@ -5,6 +5,7 @@ from azureml.core import Run, Experiment, Workspace
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from env_variables import Env
 
+
 def main():
 
     run = Run.get_context()
@@ -64,6 +65,7 @@ def main():
     if args.output_model_version_file is not None:
         with open(args.output_model_version_file, "w") as out_file:
             out_file.write(str(model.version))
+
 
 if __name__ == '__main__':
     main()
