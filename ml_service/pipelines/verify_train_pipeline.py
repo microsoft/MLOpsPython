@@ -2,7 +2,8 @@ import os
 import sys
 import argparse
 from azureml.core import Run, Experiment, Workspace
-
+sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
+from env_variables import Env
 
 def main():
 
@@ -31,27 +32,19 @@ def main():
         ws = run.experiment.workspace
         exp = run.experiment
 
+    e = Env()
+
     parser = argparse.ArgumentParser("register")
     parser.add_argument(
         "--build_id",
         type=str,
         help="The Build ID of the build triggering this pipeline run",
     )
-    parser.add_argument(
-        "--model_name",
-        type=str,
-        help="Name of the Model"
-    )
-    parser.add_argument(
-        "--output_model_version_file",
-        type=str,
-        help="Name of a file to write model version to"
-    )
 
     args = parser.parse_args()
     if (args.build_id is not None):
         build_id = args.build_id
-    model_name = args.model_name
+    model_name = e.model_name
 
     try:
         tag_name = 'BuildId'
@@ -71,7 +64,6 @@ def main():
     if args.output_model_version_file is not None:
         with open(args.output_model_version_file, "w") as out_file:
             out_file.write(str(model.version))
-
 
 if __name__ == '__main__':
     main()

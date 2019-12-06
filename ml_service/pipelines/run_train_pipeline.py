@@ -13,6 +13,7 @@ def main():
     parser.add_argument(
         "--output_pipeline_id_file",
         type=str,
+        default="pipeline_id.txt",
         help="Name of a file to write pipeline ID to"
     )
     parser.add_argument(
