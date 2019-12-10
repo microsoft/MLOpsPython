@@ -24,7 +24,7 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: azdo-helm-upgrade.yml
-      paramters:
+      parameters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
         releaseName: $(blueReleaseName) 
         overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.tag=$(imgTag),deployment.image.name=$(imgName)'
@@ -60,7 +60,7 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: azdo-helm-upgrade.yml
-      paramters:
+      parameters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
         releaseName: 'abtest-istio' 
         overrideValues: 'weight.blue=50,weight.green=50'
@@ -96,7 +96,7 @@ stages:
         deploy:
           steps:
           - template: azdo-helm-upgrade.yml
-            paramters:
+            parameters:
               chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
               releaseName: 'abtest-istio' 
               overrideValues: 'weight.blue=100,weight.green=0'
@@ -133,7 +133,7 @@ stages:
         deploy:
           steps:
           - template: azdo-helm-upgrade.yml
-            paramters:
+            parameters:
               chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
               releaseName: 'abtest-istio' 
               overrideValues: 'weight.blue=0,weight.green=100'
@@ -166,7 +166,7 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: azdo-helm-upgrade.yml
-      paramters:
+      parameters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
         releaseName: $(greenReleaseName) 
         overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,deployment.image.tag=$(imgTag),initialDeployment=true,deployment.image.name=$(imgName)'
@@ -197,7 +197,7 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: azdo-helm-upgrade.yml
-      paramters:
+      parameters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
         releaseName: 'abtest-istio' 
         overrideValues: 'weight.blue=0,weight.green=100'
