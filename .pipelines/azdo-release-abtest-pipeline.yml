@@ -26,7 +26,7 @@ stages:
     timeoutInMinutes: 0
     pool:
       vmImage: 'ubuntu-latest'
-    container: mcr.microsoft.com/mlops/python:latest
+    # container: mcr.microsoft.com/mlops/python:latest
     steps:
     - task: AzureCLI@1
       inputs:
@@ -43,7 +43,8 @@ stages:
       displayName: 'Create Scoring Image'
       name: 'buildscoringimage'
     - script: |
-        echo $IMAGE_LOCATION
+          cat image_location.txt
+          ls -ltr
       displayName: 'Test Variable'
 
 
