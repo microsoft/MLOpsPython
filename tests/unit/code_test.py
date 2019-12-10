@@ -1,25 +1,25 @@
 import sys
 import os
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from workspace import get_workspace
+import numpy as np
+from azureml.core.run import Run
+from unittest.mock import Mock
+sys.path.append(os.path.abspath("./code/training"))  # NOQA: E402
+from train import train_model
 
 
-# Just an example of a unit test against
-# a utility function common_scoring.next_saturday
-def test_get_workspace():
-    workspace_name = os.environ.get("BASE_NAME")+"-AML-WS"
-    resource_group = os.environ.get("BASE_NAME")+"-AML-RG"
-    subscription_id = os.environ.get("SUBSCRIPTION_ID")
-    tenant_id = os.environ.get("TENANT_ID")
-    app_id = os.environ.get("SP_APP_ID")
-    app_secret = os.environ.get("SP_APP_SECRET")
+def test_train_model():
+    X_train = np.array([1, 2, 3, 4, 5, 6]).reshape(-1,  1)
+    y_train = np.array([10, 9, 8, 8, 6, 5])
+    X_test = np.array([3, 4]).reshape(-1,  1)
+    y_test = np.array([8, 7])
+    data = {"train": {"X": X_train, "y": y_train},
+            "test": {"X": X_test, "y": y_test}}
 
-    aml_workspace = get_workspace(
-        workspace_name,
-        resource_group,
-        subscription_id,
-        tenant_id,
-        app_id,
-        app_secret)
+    run = Mock(Run)
+    reg = train_model(run, data, alpha=1.2)
 
-    assert aml_workspace.name == workspace_name
+    run.log.assert_called_with("mse", 0.029843893480256872,
+                               description='Mean squared error metric')
+
+    preds = reg.predict([[1], [2]])
+    np.testing.assert_equal(preds, [9.93939393939394, 9.03030303030303])
