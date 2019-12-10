@@ -38,7 +38,7 @@ stages:
           echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
       displayName: 'Create Scoring Image'
     - script: |
-      echo $IMAGE_LOCATION
+        echo $IMAGE_LOCATION
       displayName: 'Test Variable'
 
 
