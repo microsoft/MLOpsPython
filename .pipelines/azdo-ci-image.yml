@@ -22,7 +22,6 @@ variables:
 - name: 'SCORE_SCRIPT'
   value: 'scoreB.py'
 
-name: $(Date:yyyyMMdd)$(Rev:r)
 steps:
 
 - task: AzureCLI@1
