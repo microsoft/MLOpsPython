@@ -63,7 +63,7 @@ stages:
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(blueReleaseName) 
-              overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.name=$(IMAGE_LOCATION)'
+              overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.name=$IMAGE_LOCATION'
 
 - stage: 'Blue_50'
   jobs:
@@ -127,7 +127,7 @@ stages:
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(greenReleaseName) 
-              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,initialDeployment=true,deployment.image.name=$(IMAGE_LOCATION)'
+              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,initialDeployment=true,deployment.image.name=$IMAGE_LOCATION'
 
 - stage: 'Green_100'
   jobs:
