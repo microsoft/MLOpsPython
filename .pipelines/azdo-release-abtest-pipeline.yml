@@ -35,11 +35,12 @@ stages:
         inlineScript: |
           set -e
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt
-          # Output image location to Azure DevOps job
-          IMAGE_LOCATION="$(cat image_location.txt)"
-          echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+          # python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt
+          # IMAGE_LOCATION="$(cat image_location.txt)"
+          IMAGE_LOCATION="test value"
+          echo "##vso[task.setvariable variable=IMAGE_LOCATION;isOutput=true]$IMAGE_LOCATION"
       displayName: 'Create Scoring Image'
+      name: 'buildscoringimage'
     - script: |
         echo $IMAGE_LOCATION
       displayName: 'Test Variable'
@@ -51,6 +52,9 @@ stages:
 - stage: 'Blue_Staging'
   jobs:
   - job: "Deploy_to_Staging"
+    dependsOn: "Build_Scoring_image"
+    variables:
+      IMAGE_LOCATION: $[ dependencies.Build_Scoring_image.outputs['buildscoringimage.IMAGE_LOCATION'] ]
     timeoutInMinutes: 0
     steps:
     - script: |
