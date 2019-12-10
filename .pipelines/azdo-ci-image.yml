@@ -26,7 +26,6 @@ name: $(Date:yyyyMMdd)$(Rev:r)
 steps:
 
 - bash: |
-   # Invoke the Python building and publishing a training pipeline with Python on ML Compute
    python3 $(Build.SourcesDirectory)/ml_service/util/create_scoring_image.py   
   failOnStderr: 'false'
   env:
