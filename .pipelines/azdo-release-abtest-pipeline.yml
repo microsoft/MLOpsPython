@@ -39,6 +39,7 @@ stages:
           # IMAGE_LOCATION="$(cat image_location.txt)"
           IMAGE_LOCATION="test value"
           echo "##vso[task.setvariable variable=IMAGE_LOCATION;isOutput=true]$IMAGE_LOCATION"
+          echo "mlopspyciamlcr.azurecr.io/scoringimg:2" > image_location.txt
       displayName: 'Create Scoring Image'
       name: 'buildscoringimage'
     - script: |
@@ -46,18 +47,16 @@ stages:
       displayName: 'Test Variable'
 
 
-    # - publish: $(System.DefaultWorkingDirectory)/charts
-    #   artifact: allcharts
+    - publish: image_location.txt
+      artifact: image_location
 
 - stage: 'Blue_Staging'
   jobs:
   - job: "Deploy_to_Staging"
-    dependsOn: "Build_Scoring_image"
-    variables:
-      IMAGE_LOCATION: $[ dependencies.Build_Scoring_image.outputs['buildscoringimage.IMAGE_LOCATION'] ]
     timeoutInMinutes: 0
     steps:
     - script: |
+        IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
         echo $IMAGE_LOCATION
       displayName: 'Test Variable'
     - template: azdo-helm-upgrade.yml
