@@ -50,6 +50,9 @@ stages:
   - job: "Deploy_to_Staging"
     timeoutInMinutes: 0
     steps:
+    - script: |
+        echo $IMAGE_LOCATION
+      displayName: 'Test Variable'
     - template: azdo-helm-upgrade.yml
       parameters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
