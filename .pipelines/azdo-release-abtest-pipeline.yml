@@ -12,12 +12,39 @@ variables:
   value: 'model-blue'
 - name: 'greenReleaseName'
   value: 'model-green'
+- name: 'SCORE_SCRIPT'
+  value: 'scoreB.py'
 
 
 trigger:
 - master
 
 stages:
+- stage: 'Building'
+  jobs:
+  - job: "Build_Scoring_image"
+    timeoutInMinutes: 0
+    steps:
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt
+          # Output image location to Azure DevOps job
+          IMAGE_LOCATION="$(cat image_location.txt)"
+          echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+      displayName: 'Create Scoring Image'
+    - script: |
+      echo $IMAGE_LOCATION
+      displayName: 'Test Variable'
+
+
+    # - publish: $(System.DefaultWorkingDirectory)/charts
+    #   artifact: allcharts
+
 - stage: 'Blue_Staging'
   jobs:
   - job: "Deploy_to_Staging"
