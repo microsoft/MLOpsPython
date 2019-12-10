@@ -58,13 +58,13 @@ stages:
           steps:
           - script: |
               IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
-              echo $IMAGE_LOCATION
+              echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
             displayName: 'Get Image Location'
           - template: azdo-helm-upgrade.yml
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(blueReleaseName) 
-              overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.name=$IMAGE_LOCATION'
+              overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.name=$(IMAGE_LOCATION)'
 
 - stage: 'Blue_50'
   jobs:
@@ -123,12 +123,13 @@ stages:
           steps:
           - script: |
               IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
+              echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
             displayName: 'Get Image Location'
           - template: azdo-helm-upgrade.yml
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(greenReleaseName) 
-              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,initialDeployment=true,deployment.image.name=$IMAGE_LOCATION'
+              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,initialDeployment=true,deployment.image.name=$(IMAGE_LOCATION)'
 
 - stage: 'Green_100'
   jobs:
