@@ -1,3 +1,15 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - docs/
+    - environment_setup/
+    - ml_service/util/create_scoring_image.*
+    - ml_service/util/smoke_test_scoring_service.py
+
 variables:
 - group: 'devopsforai-aml-vg'
 - name: 'helmVersion'
@@ -11,9 +23,6 @@ variables:
 - name: 'SCORE_SCRIPT'
   value: 'scoreA.py'
 
-
-trigger:
-- master
 
 stages:
 - stage: 'Building'
