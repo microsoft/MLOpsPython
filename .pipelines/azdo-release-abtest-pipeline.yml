@@ -61,7 +61,7 @@ stages:
             displayName: 'Get Image Location'
           - template: azdo-helm-upgrade.yml
             parameters:
-              chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
+              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(blueReleaseName) 
               overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.name=$(IMAGE_LOCATION)'
 
@@ -125,7 +125,7 @@ stages:
             displayName: 'Get Image Location'
           - template: azdo-helm-upgrade.yml
             parameters:
-              chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
+              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(greenReleaseName) 
               overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,initialDeployment=true,deployment.image.name=$(IMAGE_LOCATION)'
 
