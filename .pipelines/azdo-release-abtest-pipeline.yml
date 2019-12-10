@@ -1,5 +1,9 @@
 variables:
 - group: 'devopsforai-aml-vg'
+- name: 'helmVersion'
+  value: 'v3.0.0-rc.3'
+- name: 'helmDownloadURL'
+  value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
 - name: 'blueReleaseName'
   value: 'model-blue'
 - name: 'greenReleaseName'
@@ -18,7 +22,7 @@ stages:
     timeoutInMinutes: 0
     pool:
       vmImage: 'ubuntu-latest'
-    # container: mcr.microsoft.com/mlops/python:latest
+    container: mcr.microsoft.com/mlops/python:latest
     steps:
     - task: AzureCLI@1
       inputs:
@@ -27,6 +31,7 @@ stages:
         inlineScript: |
           set -e
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt
       displayName: 'Create Scoring Image'
       name: 'buildscoringimage'
     - script: |
