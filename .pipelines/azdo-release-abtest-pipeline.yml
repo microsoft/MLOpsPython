@@ -2,18 +2,17 @@ variables:
 - group: 'devopsforai-aml-vg'
 - name: 'helmVersion'
   value: 'v3.0.0-rc.3'
+- name: 'helmDownloadURL'
+  value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
 - name: 'imgTag'
   value: 1
 - name: 'imgName'
-  value: mlopspyciamlcr.azurecr.io/$(IMAGE_NAME)-$(Build.TriggeredBy.BuildNumber)
-- name: 'kubernetesServiceConnection'
-  value: 'abtesting-cluster'
+  value: $(IMAGE_REPO_NAME)/$(IMAGE_NAME)-$(Build.TriggeredBy.BuildNumber)
 - name: 'blueReleaseName'
   value: 'model-blue'
 - name: 'greenReleaseName'
   value: 'model-green'
-- name: 'kubernetesNamespace'
-  value: 'abtesting'
+
 
 trigger:
 - master
@@ -24,26 +23,33 @@ stages:
   - job: "Deploy_to_Staging"
     timeoutInMinutes: 0
     steps:
-    - task: Bash@3
-      displayName: 'Install Helm $(helmVersion)'
-      inputs:
-        targetType: inline
-        script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm && helm version
-      env:
-        HELM_VERSION: $(helmVersion)
-        FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
-    - task: HelmDeploy@0
-      displayName: 'helm upgrade'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceConnection: $(kubernetesServiceConnection)
-        command: upgrade
-        chartType: FilePath
+    - template: azdo-helm-upgrade.yml
+      paramters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
-        releaseName: $(blueReleaseName)
+        releaseName: $(blueReleaseName) 
         overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.tag=$(imgTag),deployment.image.name=$(imgName)'
-        install: true
-        arguments: --namespace $(kubernetesNamespace)
+
+    # - task: Bash@3
+    #   displayName: 'Install Helm $(helmVersion)'
+    #   inputs:
+    #     targetType: inline
+    #     script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm && helm version
+    #   env:
+    #     HELM_VERSION: $(helmVersion)
+    #     FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
+    # - task: HelmDeploy@0
+    #   displayName: 'helm upgrade'
+    #   inputs:
+    #     connectionType: 'Kubernetes Service Connection'
+    #     kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+    #     command: upgrade
+    #     chartType: FilePath
+    #     chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
+    #     releaseName: $(blueReleaseName)
+    #     overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.tag=$(imgTag),deployment.image.name=$(imgName)'
+    #     install: true
+    #     arguments: --namespace $(K8S_AB_NAMESPACE)
+
     - publish: $(System.DefaultWorkingDirectory)/charts
       artifact: allcharts
 
@@ -53,26 +59,32 @@ stages:
     displayName: 50 50 rollout to blue environment
     timeoutInMinutes: 0
     steps:
-    - task: Bash@3
-      displayName: 'Install Helm $(helmVersion)'
-      inputs:
-        targetType: inline
-        script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
-      env:
-        HELM_VERSION: $(helmVersion)
-        FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
-    - task: HelmDeploy@0
-      displayName: 'helm upgrade'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceConnection: $(kubernetesServiceConnection)
-        command: upgrade
-        chartType: FilePath
+    - template: azdo-helm-upgrade.yml
+      paramters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
-        releaseName: 'abtest-istio'
+        releaseName: 'abtest-istio' 
         overrideValues: 'weight.blue=50,weight.green=50'
-        install: true
-        arguments: --namespace $(kubernetesNamespace)
+
+    # - task: Bash@3
+    #   displayName: 'Install Helm $(helmVersion)'
+    #   inputs:
+    #     targetType: inline
+    #     script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+    #   env:
+    #     HELM_VERSION: $(helmVersion)
+    #     FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
+    # - task: HelmDeploy@0
+    #   displayName: 'helm upgrade'
+    #   inputs:
+    #     connectionType: 'Kubernetes Service Connection'
+    #     kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+    #     command: upgrade
+    #     chartType: FilePath
+    #     chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
+    #     releaseName: 'abtest-istio'
+    #     overrideValues: 'weight.blue=50,weight.green=50'
+    #     install: true
+    #     arguments: --namespace $(K8S_AB_NAMESPACE)
 
 - stage: 'Blue_100'
   jobs:
@@ -83,25 +95,31 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: Bash@3
-            displayName: 'Install Helm $(helmVersion)'
-            inputs:
-              targetType: inline
-              script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
-            env:
-              HELM_VERSION: $(helmVersion)
-              FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
-          - task: HelmDeploy@0
-            displayName: 'helm upgrade'
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceConnection: $(kubernetesServiceConnection)
-              command: upgrade
-              chartType: FilePath
-              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
-              releaseName: 'abtest-istio'
+          - template: azdo-helm-upgrade.yml
+            paramters:
+              chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
+              releaseName: 'abtest-istio' 
               overrideValues: 'weight.blue=100,weight.green=0'
-              arguments: --namespace $(kubernetesNamespace)
+
+          # - task: Bash@3
+          #   displayName: 'Install Helm $(helmVersion)'
+          #   inputs:
+          #     targetType: inline
+          #     script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+          #   env:
+          #     HELM_VERSION: $(helmVersion)
+          #     FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
+          # - task: HelmDeploy@0
+          #   displayName: 'helm upgrade'
+          #   inputs:
+          #     connectionType: 'Kubernetes Service Connection'
+          #     kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+          #     command: upgrade
+          #     chartType: FilePath
+          #     chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
+          #     releaseName: 'abtest-istio'
+          #     overrideValues: 'weight.blue=100,weight.green=0'
+          #     arguments: --namespace $(K8S_AB_NAMESPACE)
 
 - stage: 'Rollback'
   dependsOn: 'Blue_100'
@@ -114,25 +132,31 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: Bash@3
-            displayName: 'Install Helm $(helmVersion)'
-            inputs:
-              targetType: inline
-              script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
-            env:
-              HELM_VERSION: $(helmVersion)
-              FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
-          - task: HelmDeploy@0
-            displayName: 'helm upgrade'
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceConnection: $(kubernetesServiceConnection)
-              command: upgrade
-              chartType: FilePath
-              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
-              releaseName: 'abtest-istio'
+          - template: azdo-helm-upgrade.yml
+            paramters:
+              chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
+              releaseName: 'abtest-istio' 
               overrideValues: 'weight.blue=0,weight.green=100'
-              arguments: --namespace $(kubernetesNamespace)
+
+          # - task: Bash@3
+          #   displayName: 'Install Helm $(helmVersion)'
+          #   inputs:
+          #     targetType: inline
+          #     script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+          #   env:
+          #     HELM_VERSION: $(helmVersion)
+          #     FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
+          # - task: HelmDeploy@0
+          #   displayName: 'helm upgrade'
+          #   inputs:
+          #     connectionType: 'Kubernetes Service Connection'
+          #     kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+          #     command: upgrade
+          #     chartType: FilePath
+          #     chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
+          #     releaseName: 'abtest-istio'
+          #     overrideValues: 'weight.blue=0,weight.green=100'
+          #     arguments: --namespace $(K8S_AB_NAMESPACE)
 
 - stage: 'Set_Production_Tag'
   dependsOn: 'Blue_100'
@@ -141,50 +165,62 @@ stages:
   - job: 'green_blue_tagging'
     timeoutInMinutes: 0
     steps:
-    - task: Bash@3
-      displayName: 'Install Helm $(helmVersion)'
-      inputs:
-        targetType: inline
-        script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
-      env:
-        HELM_VERSION: $(helmVersion)
-        FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
-    - task: HelmDeploy@0
-      displayName: 'helm upgrade'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceConnection: $(kubernetesServiceConnection)
-        command: upgrade
-        chartType: FilePath
+    - template: azdo-helm-upgrade.yml
+      paramters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
-        releaseName: $(greenReleaseName)
+        releaseName: $(greenReleaseName) 
         overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,deployment.image.tag=$(imgTag),initialDeployment=true,deployment.image.name=$(imgName)'
-        arguments: --namespace $(kubernetesNamespace)
+
+    # - task: Bash@3
+    #   displayName: 'Install Helm $(helmVersion)'
+    #   inputs:
+    #     targetType: inline
+    #     script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+    #   env:
+    #     HELM_VERSION: $(helmVersion)
+    #     FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
+    # - task: HelmDeploy@0
+    #   displayName: 'helm upgrade'
+    #   inputs:
+    #     connectionType: 'Kubernetes Service Connection'
+    #     kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+    #     command: upgrade
+    #     chartType: FilePath
+    #     chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
+    #     releaseName: $(greenReleaseName)
+    #     overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,deployment.image.tag=$(imgTag),initialDeployment=true,deployment.image.name=$(imgName)'
+    #     arguments: --namespace $(K8S_AB_NAMESPACE)
 
 - stage: 'Green_100'
   jobs:
   - job: 'Prod_Rollout_100'
     timeoutInMinutes: 0
     steps:
-    - task: Bash@3
-      displayName: 'Install Helm $(helmVersion)'
-      inputs:
-        targetType: inline
-        script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
-      env:
-        HELM_VERSION: $(helmVersion)
-        FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
-    - task: HelmDeploy@0
-      displayName: 'helm upgrade'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceConnection: $(kubernetesServiceConnection)
-        command: upgrade
-        chartType: FilePath
+    - template: azdo-helm-upgrade.yml
+      paramters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
-        releaseName: 'abtest-istio'
+        releaseName: 'abtest-istio' 
         overrideValues: 'weight.blue=0,weight.green=100'
-        arguments: --namespace $(kubernetesNamespace)
+
+    # - task: Bash@3
+    #   displayName: 'Install Helm $(helmVersion)'
+    #   inputs:
+    #     targetType: inline
+    #     script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+    #   env:
+    #     HELM_VERSION: $(helmVersion)
+    #     FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
+    # - task: HelmDeploy@0
+    #   displayName: 'helm upgrade'
+    #   inputs:
+    #     connectionType: 'Kubernetes Service Connection'
+    #     kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+    #     command: upgrade
+    #     chartType: FilePath
+    #     chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
+    #     releaseName: 'abtest-istio'
+    #     overrideValues: 'weight.blue=0,weight.green=100'
+    #     arguments: --namespace $(K8S_AB_NAMESPACE)
 
 - stage: 'Disable_blue'
   condition: always()
@@ -192,18 +228,11 @@ stages:
   - job: 'blue_disable'
     timeoutInMinutes: 0
     steps:
-    - task: Bash@3
-      displayName: 'Install Helm $(helmVersion)'
-      inputs:
-        targetType: inline
-        script:  wget -q https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
-      env:
-        HELM_VERSION: $(helmVersion)
-        FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz
+    - template: azdo-helm-install.yml
     - task: HelmDeploy@0
       displayName: 'helm uninstall blue'
       inputs:
         connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceConnection: $(kubernetesServiceConnection)
+        kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
         command: delete
-        arguments: $(blueReleaseName) --namespace $(kubernetesNamespace)
+        arguments: $(blueReleaseName) --namespace $(K8S_AB_NAMESPACE)
