@@ -9,7 +9,7 @@ variables:
 - name: 'greenReleaseName'
   value: 'model-green'
 - name: 'SCORE_SCRIPT'
-  value: 'scoreB.py'
+  value: 'scoreA.py'
 
 
 trigger:
@@ -22,7 +22,7 @@ stages:
     timeoutInMinutes: 0
     pool:
       vmImage: 'ubuntu-latest'
-    #  container: mcr.microsoft.com/mlops/python:latest
+    container: mcr.microsoft.com/mlops/python:latest
     steps:
     - task: AzureCLI@1
       inputs:
@@ -31,14 +31,9 @@ stages:
         inlineScript: |
           set -e
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          # python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt
-          echo "mlopspyciamlcr.azurecr.io/scoringimg:4" > image_location.txt
+          python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt          
       displayName: 'Create Scoring Image'
       name: 'buildscoringimage'
-    - script: |
-          cat image_location.txt
-          ls -ltr
-      displayName: 'Test Variable'
 
     - publish: image_location.txt
       artifact: image_location
