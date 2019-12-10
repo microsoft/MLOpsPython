@@ -25,12 +25,13 @@ variables:
 name: $(Date:yyyyMMdd)$(Rev:r)
 steps:
 
-- bash: |
-   python3 $(Build.SourcesDirectory)/ml_service/util/create_scoring_image.py   
-  failOnStderr: 'false'
-  env:
-    SP_APP_SECRET: '$(SP_APP_SECRET)'
-    MODEL_VERSION: 1
+- task: AzureCLI@1
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e
+      export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+      python3 $(Build.SourcesDirectory)/ml_service/util/create_scoring_image.py   
   displayName: 'Create Scoring Image'
-  enabled: 'true'
 
