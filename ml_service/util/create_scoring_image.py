@@ -7,28 +7,7 @@ from azureml.core.model import Model
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from env_variables import Env
 
-<<<<<<< HEAD
-load_dotenv()
-
-TENANT_ID = os.environ.get('TENANT_ID')
-APP_ID = os.environ.get('SP_APP_ID')
-APP_SECRET = os.environ.get('SP_APP_SECRET')
-WORKSPACE_NAME = os.environ.get('WORKSPACE_NAME')
-SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
-RESOURCE_GROUP = os.environ.get("RESOURCE_GROUP")
-MODEL_NAME = os.environ.get('MODEL_NAME')
-MODEL_VERSION = os.environ.get('MODEL_VERSION')
-IMAGE_NAME = os.environ.get('IMAGE_NAME')
-SCORE_SCRIPT = os.environ.get('SCORE_SCRIPT')
-BUILD_NUMBER = os.environ.get('BUILD_BUILDNUMBER')
-
-SP_AUTH = ServicePrincipalAuthentication(
-    tenant_id=TENANT_ID,
-    service_principal_id=APP_ID,
-    service_principal_password=APP_SECRET)
-=======
 e = Env()
->>>>>>> master
 
 # Get Azure machine learning workspace
 ws = Workspace.get(
@@ -58,11 +37,7 @@ image_config = ContainerImage.image_configuration(
 )
 
 image = Image.create(
-<<<<<<< HEAD
-    name=IMAGE_NAME + "-" + BUILD_NUMBER, models=[model], image_config=image_config, workspace=ws
-=======
     name=e.image_name, models=[model], image_config=image_config, workspace=ws
->>>>>>> master
 )
 
 os.chdir("../..")
