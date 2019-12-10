@@ -25,11 +25,12 @@ Make sure that the release pipeline is configured to be triggered once the scori
 
 {Picture}
 
-Approvals!!!!!
+Check variables (aka image_name, model_name,)!!!!!
+Kubernetes Service Connection
 
 Manually run a pipeline builing scoring image. The result of the pipeline will be a registered Docker image in the ACR repository attached to the AML Service:
 
-The release pipeline will be triggered automatically and it will deploy the scroring imnage to the Kubernetes cluster. 
+The release pipeline will be triggered automatically and it will deploy the scroring image to the Kubernetes cluster. 
 
 4. Build a new Scoring Image.
 
@@ -60,7 +61,9 @@ curl $GATEWAY_IP/score
 
 You can also emulate a simple load test on the gateway with the load_test.sh:
 
-./charts/load_test.sh $GATEWAY_IP 10
+./charts/load_test.sh 10 
+
+Add Kiali!!!
 
 The command above sends 10 requests to the gateway. So, if the pipeline has completted stage Blue_50, the result will look like this:
 .
@@ -71,7 +74,7 @@ The command above sends 10 requests to the gateway. So, if the pipeline has comp
 
 Despite what blue/green weights are configured now on the cluster you can perform A/B testing and send requests directly to either blue or green images:
 
-./charts/load_test.sh $GATEWAY_IP 10 blue
+./charts/load_test.sh 10 $GATEWAY_IP/score blue
 
-./charts/load_test.sh $GATEWAY_IP 10 green
+./charts/load_test.sh 10 $GATEWAY_IP/score green
 
