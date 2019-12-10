@@ -24,6 +24,9 @@ stages:
   jobs:
   - job: "Build_Scoring_image"
     timeoutInMinutes: 0
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mcr.microsoft.com/mlops/python:latest
     steps:
     - task: AzureCLI@1
       inputs:
