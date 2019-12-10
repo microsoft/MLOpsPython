@@ -20,7 +20,7 @@ container: mcr.microsoft.com/mlops/python:latest
 variables:
 - group: devopsforai-aml-vg
 - name: 'SCORE_SCRIPT'
-  value: 'scoreA.py'
+  value: 'scoreB.py'
 
 name: $(Date:yyyyMMdd)$(Rev:r)
 steps:
