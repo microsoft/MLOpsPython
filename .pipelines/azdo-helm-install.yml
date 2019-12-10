@@ -1,3 +1,9 @@
+variables:
+- name: 'helmVersion'
+  value: 'v3.0.0-rc.3'
+- name: 'helmDownloadURL'
+  value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
+
 steps:
 - task: Bash@3
   displayName: 'Install Helm $(helmVersion)'

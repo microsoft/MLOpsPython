@@ -1,13 +1,5 @@
 variables:
 - group: 'devopsforai-aml-vg'
-- name: 'helmVersion'
-  value: 'v3.0.0-rc.3'
-- name: 'helmDownloadURL'
-  value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
-- name: 'imgTag'
-  value: 1
-- name: 'imgName'
-  value: $(IMAGE_REPO_NAME)/$(IMAGE_NAME)-$(Build.TriggeredBy.BuildNumber)
 - name: 'blueReleaseName'
   value: 'model-blue'
 - name: 'greenReleaseName'
@@ -35,11 +27,6 @@ stages:
         inlineScript: |
           set -e
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          # python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt
-          # IMAGE_LOCATION="$(cat image_location.txt)"
-          IMAGE_LOCATION="test value"
-          echo "##vso[task.setvariable variable=IMAGE_LOCATION;isOutput=true]$IMAGE_LOCATION"
-          echo "mlopspyciamlcr.azurecr.io/scoringimg:2" > image_location.txt
       displayName: 'Create Scoring Image'
       name: 'buildscoringimage'
     - script: |
@@ -66,12 +53,12 @@ stages:
           - script: |
               IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
               echo $IMAGE_LOCATION
-            displayName: 'Test Variable'
+            displayName: 'Get Image Location'
           - template: azdo-helm-upgrade.yml
             parameters:
               chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
               releaseName: $(blueReleaseName) 
-              overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.tag=$(imgTag),deployment.image.name=$(imgName)'
+              overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.name=$(IMAGE_LOCATION)'
 
 - stage: 'Blue_50'
   jobs:
@@ -121,14 +108,21 @@ stages:
   dependsOn: 'Blue_100'
   condition: succeeded()
   jobs:
-  - job: 'green_blue_tagging'
+  - deployment: 'green_blue_tagging'
     timeoutInMinutes: 0
-    steps:
-    - template: azdo-helm-upgrade.yml
-      parameters:
-        chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
-        releaseName: $(greenReleaseName) 
-        overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,deployment.image.tag=$(imgTag),initialDeployment=true,deployment.image.name=$(imgName)'
+    environment: abtestenv
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
+            displayName: 'Get Image Location'
+          - template: azdo-helm-upgrade.yml
+            parameters:
+              chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-model'
+              releaseName: $(greenReleaseName) 
+              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,initialDeployment=true,deployment.image.name=$(IMAGE_LOCATION)'
 
 - stage: 'Green_100'
   jobs:
