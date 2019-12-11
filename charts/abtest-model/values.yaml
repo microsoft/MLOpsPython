@@ -7,12 +7,7 @@ deployment:
   container:
     name: model  
     port: 5001
-  image:
-    name: amlabtest74c95585.azurecr.io/abtestimg
-    tag: 2 
 
 svc:
   name: model-svc
   port: 5001
-
-initialDeployment: false

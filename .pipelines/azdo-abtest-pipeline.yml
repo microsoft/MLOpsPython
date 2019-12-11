@@ -21,7 +21,7 @@ variables:
 - name: 'greenReleaseName'
   value: 'model-green'
 - name: 'SCORE_SCRIPT'
-  value: 'scoreA.py'
+  value: 'scoreB.py'
 
 
 stages:
@@ -133,7 +133,7 @@ stages:
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(greenReleaseName) 
-              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,initialDeployment=true,deployment.image.name=$(IMAGE_LOCATION)'
+              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,deployment.image.name=$(IMAGE_LOCATION)'
 
 - stage: 'Green_100'
   jobs:

@@ -46,6 +46,9 @@ model-green   1/1     1            1           19h
 #### 4. Build a new Scoring Image.
 
 Change value of the ***SCORE_SCRIPT*** variable in the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) to point to ***scoreA.py*** and merge it to the master branch.
+
+**Note:** ***scoreA.py*** and ***scoreB.py*** files used in this tutorial are just mockups returning either "New Model A" or "New Model B" respectively. They are used to demonstrate the concept of testing two scoring images with different models or scoring code. In real life you would implement a scoring file similar to [score.py](./../code/scoring/score.py) (see [getting started](./getting_started.md).
+
 It will automatically trigger the pipeline and deploy a new scoring image with the following stages implementing ***Canary*** deployment strategy:
 
 | Stage               | Green Weight| Blue Weight| Description                                                     |
@@ -86,6 +89,15 @@ The command above sends 10 requests to the gateway. So if the pipeline has compl
 Despite what blue/green weights are configured now on the cluster, you can perform ***A/B testing*** and send requests directly to either blue or green images:
 
 ```bash
+curl --header "x-api-version: blue" $GATEWAY_IP/score
+curl --header "x-api-version: green" $GATEWAY_IP/score
+```
+
+or with the load_test.sh:
+
+```bash
 ./charts/load_test.sh 10 $GATEWAY_IP/score blue
 ./charts/load_test.sh 10 $GATEWAY_IP/score green
 ```
+
+In this case the Istio Virtual Service analizes the request header and routes the traffic directly to the specified model verison.
