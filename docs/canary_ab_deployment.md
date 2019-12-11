@@ -1,4 +1,4 @@
-## Model deployment to a Kubernetes cluster with Canary and A/B testing deployemnt strategies.
+## Model deployment to AKS cluster with Canary deployemnt
 
 If your target deployment environment is a K8s cluster and you want to implement [Canary and/or A/B testing deployemnt strategies](http://adfpractice-fedor.blogspot.com/2019/04/deployment-strategies-with-kubernetes.html) you can follow this sample guidance.
 
@@ -16,7 +16,7 @@ GATEWAY_IP=$(kubectl get svc istio-ingressgateway -n istio-system -o jsonpath='{
 
 #### 2. Set up variables
 
-There are some extra variables that you need to setup in ***devopsforai-aml-vg*** variable group:
+There are some extra variables that you need to setup in ***devopsforai-aml-vg*** variable group (see [getting started](./getting_started.md)):
 
 | Variable Name               | Suggested Value                                      |
 | --------------------------- | -----------------------------------------------------|
@@ -27,42 +27,13 @@ There are some extra variables that you need to setup in ***devopsforai-aml-vg**
 
 #### 3. Configure a pipeline to build and deploy a scoring Image
 
-Use [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) to configure a multistage deployment pipeline:
+Import and run the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) multistage deployment pipeline.
 
-```yaml
-pr: none
-trigger:
-  branches:
-    include:
-    - master
-  paths:
-    exclude:
-    - docs/
-    - environment_setup/
-    - ml_service/util/create_scoring_image.*
-    - ml_service/util/smoke_test_scoring_service.py
-
-variables:
-- group: 'devopsforai-aml-vg'
-- name: 'helmVersion'
-  value: 'v3.0.0-rc.3'
-- name: 'helmDownloadURL'
-  value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
-- name: 'blueReleaseName'
-  value: 'model-blue'
-- name: 'greenReleaseName'
-  value: 'model-green'
-- name: 'SCORE_SCRIPT'
-  value: 'scoreA.py'
-
-...
-```
-
-Manually Run a pipeline building a scoring image. The result of the pipeline will be a registered Docker image in the ACR repository attached to the AML Service:
+The result of the pipeline will be a registered Docker image in the ACR repository attached to the AML Service:
 
 ![scoring image](./images/scoring_image.png)
 
-The pipeline will also deploy the scroring image to the Kubernetes cluster. 
+The pipeline will also deploy the scoring image to the Kubernetes cluster. 
 
 ```bash
 kubectl get deployments --namespace abtesting
@@ -73,7 +44,7 @@ model-green   1/1     1            1           19h
 #### 4. Build a new Scoring Image.
 
 Change value of the ***SCORE_SCRIPT*** variable in the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) to point to ***scoreA.py*** and merge it to the master branch.
-It will automatically trigger the pipeline and it will deploy a new scoring image with the following stages implementing ***Canary*** deployment strategy:
+It will automatically trigger the pipeline and deploy a new scoring image with the following stages implementing ***Canary*** deployment strategy:
 
 | Stage               | Green Weight| Blue Weight| Description                                                     |
 | ------------------- |-------------|------------|-----------------------------------------------------------------|
@@ -83,7 +54,7 @@ It will automatically trigger the pipeline and it will deploy a new scoring imag
 | Blue_Green          |0            |100         |Old green image is removed. The new blue image is copied as green.<br>Blue and Green images are equal.<br>All traffic (100%) is routed to the blue image.|
 | Green_100           |100          |0           |All traffic (100%) is routed to the green image.<br>The blue image is removed
 
-At ecah stage you can verify how the traffic is routed sending requests to $GATEWAY_IP/score with ***Postman*** or with ***curl***:
+At each stage you can verify how the traffic is routed sending requests to $GATEWAY_IP/score with ***Postman*** or with ***curl***:
 
 ```bash
 curl $GATEWAY_IP/score
