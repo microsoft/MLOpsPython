@@ -68,7 +68,7 @@ curl $GATEWAY_IP/score
 You can also emulate a simple load test on the gateway with the ***load_test.sh***:
 
 ```bash
-./charts/load_test.sh 10 
+./charts/load_test.sh 10 $GATEWAY_IP/score
 ```
 
 The command above sends 10 requests to the gateway. So if the pipeline has completted stage Blue_50, the result will look like this:
