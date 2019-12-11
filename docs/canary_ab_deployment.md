@@ -1,5 +1,7 @@
 ## Model deployment to AKS cluster with Canary deployemnt
 
+[![Build Status](https://aidemos.visualstudio.com/MLOps/_apis/build/status/microsoft.MLOpsPython-Canary?branchName=master)](https://aidemos.visualstudio.com/MLOps/_build/latest?definitionId=133&branchName=master)
+
 If your target deployment environment is a K8s cluster and you want to implement [Canary and/or A/B testing deployemnt strategies](http://adfpractice-fedor.blogspot.com/2019/04/deployment-strategies-with-kubernetes.html) you can follow this sample guidance.
 
 **Note:** It is assumed that you have an AKS instance and configured ***kubectl*** to communicate with the cluster.
