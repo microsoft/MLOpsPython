@@ -47,7 +47,7 @@ model-green   1/1     1            1           19h
 
 Change value of the ***SCORE_SCRIPT*** variable in the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) to point to ***scoreA.py*** and merge it to the master branch.
 
-**Note:** ***scoreA.py*** and ***scoreB.py*** files used in this tutorial are just mockups returning either "New Model A" or "New Model B" respectively. They are used to demonstrate the concept of testing two scoring images with different models or scoring code. In real life you would implement a scoring file similar to [score.py](./../code/scoring/score.py) (see [getting started](./getting_started.md).
+**Note:** ***scoreA.py*** and ***scoreB.py*** files used in this tutorial are just mockups returning either "New Model A" or "New Model B" respectively. They are used to demonstrate the concept of testing two scoring images with different models or scoring code. In real life you would implement a scoring file similar to [score.py](./../code/scoring/score.py) (see [getting started](./getting_started.md)).
 
 It will automatically trigger the pipeline and deploy a new scoring image with the following stages implementing ***Canary*** deployment strategy:
 
