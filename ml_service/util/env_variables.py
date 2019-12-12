@@ -38,6 +38,7 @@ class Env(Singleton):
         self._image_name = os.environ.get('IMAGE_NAME')
         self._model_path = os.environ.get('MODEL_PATH')
         self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
+        self._score_script = os.environ.get("SCORE_SCRIPT")
 
     @property
     def workspace_name(self):
@@ -130,3 +131,7 @@ class Env(Singleton):
     @property
     def model_path(self):
         return self._model_path
+
+    @property
+    def score_script(self):
+        return self._score_script
