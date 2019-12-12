@@ -100,4 +100,4 @@ or with the load_test.sh:
 ./charts/load_test.sh 10 $GATEWAY_IP/score green
 ```
 
-In this case the Istio Virtual Service analizes the request header and routes the traffic directly to the specified model verison.
+In this case the Istio Virtual Service analyzes the request header and routes the traffic directly to the specified model verison.
