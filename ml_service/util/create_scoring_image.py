@@ -25,7 +25,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-model = Model(ws, name=e.model_name, version=e.model_version)
+model = Model(ws, name=e.model_name)
 os.chdir("./code/scoring")
 
 image_config = ContainerImage.image_configuration(
