@@ -201,6 +201,8 @@ The final stage is to deploy the model to the production environment running on
 tutorial, but you can find set up information in the docs
 [here](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal#create-an-aks-cluster).
 
+**Note:** If your target deployment environment is a K8s cluster and you want to implement Canary and/or A/B testing deployemnt strategies check out this [tutorial](./canary_ab_deployment.md).
+
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variables:
 
 | Variable Name               | Suggested Value                    |
