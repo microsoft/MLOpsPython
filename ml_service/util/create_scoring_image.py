@@ -29,7 +29,7 @@ model = Model(ws, name=e.model_name, version=e.model_version)
 os.chdir("./code/scoring")
 
 image_config = ContainerImage.image_configuration(
-    execution_script="score.py",
+    execution_script=e.score_script,
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",

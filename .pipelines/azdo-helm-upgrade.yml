@@ -1,0 +1,19 @@
+parameters:
+  chartPath: ''
+  releaseName: '' 
+  overrideValues: ''
+    
+steps:
+- template: azdo-helm-install.yml
+- task: HelmDeploy@0
+  displayName: 'helm upgrade'
+  inputs:
+    connectionType: 'Kubernetes Service Connection'
+    kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+    command: upgrade
+    chartType: FilePath
+    chartPath: ${{ parameters.chartPath }}
+    releaseName: ${{ parameters.releaseName }}  
+    overrideValues: ${{ parameters.overrideValues }}
+    install: true
+    arguments: --namespace $(K8S_AB_NAMESPACE)
