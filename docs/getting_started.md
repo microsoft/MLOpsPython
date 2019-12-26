@@ -1,18 +1,19 @@
 # Getting Started with this Repo
 
-## Clone or fork this repository
-
-## Create an Azure DevOps account
+## Create an Azure DevOps organization
 
 We use Azure DevOps for running our multi-stage pipeline with build(CI), ML training and scoring service release
-(CD) stages. If you don't already have an Azure DevOps account, create one by
+(CD) stages. If you don't already have an Azure DevOps organization, create one by
 following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
-If you already have Azure DevOps account, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
+If you already have an Azure DevOps organization, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
+
+## Clone or fork this repository
+Fork this repository within GitHub, or clone it into your Azure DevOps project.
 
 ## Create an ARM Service Connection to deploy resources
 
-The repository includes a DevOps pipeline to deploy the Azure ML workspace and associated resources through Azure Resource Manager.
+This repository includes a YAML pipeline definition file for an Azure DevOps pipeline that will create the Azure ML workspace and associated resources through Azure Resource Manager.
 
 The pipeline requires an **Azure Resource Manager**
 [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
@@ -32,7 +33,7 @@ permissions on the subscription.
 
 ## Create a Variable Group for your Pipeline
 
-We make use of variable group inside Azure DevOps to store variables and their
+We make use of a variable group inside Azure DevOps to store variables and their
 values that we want to make available across multiple pipelines or pipeline stages. You can either
 store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group)
 or connect to an Azure Key Vault in your subscription. Please refer to the
@@ -43,8 +44,7 @@ Click on **Library** in the **Pipelines** section as indicated below:
 
 ![library_variable groups](./images/library_variable_groups.png)
 
-Please name your variable group **``devopsforai-aml-vg``** as we are using this
-name within our build yaml file.
+Create a variable group named **``devopsforai-aml-vg``**. The YAML pipeline definitions in this repository refer to this variable group by name.
 
 The variable group should contain the following required variables:
 
@@ -52,46 +52,48 @@ The variable group should contain the following required variables:
 | --------------------------- | -----------------------------------|
 | BASE_NAME                   | [unique base name]                 |
 | LOCATION                    | centralus                          |
-| RESOURCE_GROUP              |                                    |
+| RESOURCE_GROUP              | mlops-RG                           |
 | WORKSPACE_NAME              | mlops-AML-WS                       |
 | WORKSPACE_SVC_CONNECTION    | aml-workspace-connection           | 
 | ACI_DEPLOYMENT_NAME         | diabetes-aci                       |
 
 **Note:** 
 
-The **WORKSPACE_NAME** parameter is used for the Azure Machine Learning Workspace creation. You can provide here an existing AML Workspace if you have one.
+The **WORKSPACE_NAME** parameter is used for the Azure Machine Learning Workspace creation. You can provide an existing AML Workspace here if you have one.
 
 The **BASE_NAME** parameter is used throughout the solution for naming
 Azure resources. When the solution is used in a shared subscription, there can
 be naming collisions with resources that require unique names like azure blob
 storage and registry DNS naming. Make sure to give a unique value to the
 BASE_NAME variable (e.g. MyUniqueML), so that the created resources will have
-unique names (e.g. MyUniqueML-AML-RG, MyUniqueML-AML-KV, etc.). The length of
+unique names (e.g. MyUniqueMLamlcr, MyUniqueML-AML-KV, etc.). The length of
 the BASE_NAME value should not exceed 10 characters. 
+
+The **RESOURCE_GROUP** parameter is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
 
 Make sure to select the **Allow access to all pipelines** checkbox in the
 variable group configuration.
 
 ## More variable options
 
-There are more variables used in the project. They're defined in two places one for local execution one for using Azure DevOps Pipelines
+There are more variables used in the project. They're defined in two places, one for local execution and one for using Azure DevOps Pipelines.
 
 ### Local configuration
 
-In order to configure the project locally you have to create a copy from `.env.example` to the root and name it `.env`. Fill out all missing values and adjust the existing ones to your needs. 
+In order to configure the project locally, create a copy of `.env.example` in the root directory and name it `.env`. Fill out all missing values and adjust the existing ones to suit your requirements. 
 
-For local development, you will also need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). Azure CLI will be used to log you in interactively.
+For local development, you will also need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). The Azure CLI will be used to log you in interactively.
 Please be aware that the local environment also needs access to the Azure subscription so you have to have Contributor access on the Azure ML Workspace.
 
 ### Azure DevOps configuration
 
-For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/azdo-variables.yml`. Adjust as needed the variables, also the defaults will give you an easy jump start.
+For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/azdo-variables.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
 
 Up until now you should have:
 
 * Forked (or cloned) the repo
-* Created a devops account or use an existing one
-* A variable group with all configuration values
+* Configured an Azure DevOps project with a service connection to Azure Resource Manager
+* Set up a variable group with all configuration values
 
 ## Create Resources with Azure Pipelines
 
@@ -100,19 +102,13 @@ Container Registry, Storage Account, etc.) is to leverage an
 "Infrastructure as Code" [pipeline in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of setting up
 all required resources based on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json).
 
-To set up this pipeline, you will need to do the following steps:
-
-1. Create an Azure Resource Manager Service Connection
-1. Create a Build IaC Pipeline
-
 ### Create a Build IaC Pipeline
 
-In your DevOps project, create a build pipeline from your forked **GitHub**
-repository:
+In your Azure DevOps project, create a build pipeline from your forked repository:
 
 ![build connnect step](./images/build-connect.png)
 
-Then, refer to an **Existing Azure Pipelines YAML file**:
+Select the **Existing Azure Pipelines YAML file** option and set the path to [/environment_setup/iac-create-environment.yml](../environment_setup/iac-remove-environment.yml):
 
 ![configure step](./images/select-iac-pipeline.png)
 
@@ -120,12 +116,11 @@ Having done that, run the pipeline:
 
 ![iac run](./images/run-iac-pipeline.png)
 
-Check out created resources in the [Azure Portal](portal.azure.com):
+Check out the newly created resources in the [Azure Portal](portal.azure.com):
 
 ![created resources](./images/created-resources.png)
 
-Alternatively, you can also use a [cleaning pipeline](../environment_setup/iac-remove-environment.yml) that removes resources created for this project or
-you can just delete a resource group in the [Azure Portal](portal.azure.com).
+(Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](portal.azure.com).
 
 ## Create an Azure DevOps Azure ML Workspace Service Connection
 Install the **Azure Machine Learning** extension to your organization from the
@@ -147,7 +142,7 @@ you can set up the pipeline necessary for deploying your ML model
 to production. The pipeline has a sequence of stages for:
 
 1. **Model Code Continuous Integration:** triggered on code change to master branch on GitHub,
-performs linting, unit testing, publishing a training pipeline, and runs the published training pipeline to train, evaluate, and register a model.
+performs linting, unit testing, publishes a training pipeline, and runs the published training pipeline to train, evaluate, and register a model.
 1. **Train Model**: invokes the Azure ML service to trigger model training.
 1. **Release Deployment:** deploys a model to QA (ACI) and Prod (AKS)
 environments, or alternatively to Azure App Service.
@@ -156,7 +151,7 @@ environments, or alternatively to Azure App Service.
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
 pipeline referring to the [azdo-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml)
-pipeline in your forked **GitHub** repository:
+pipeline definition in your forked repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
 
@@ -164,29 +159,29 @@ Once the pipeline is finished, explore the execution result:
 
 ![build](./images/multi-stage-aci.png)
 
-and checkout a published training pipeline in the **mlops-AML-WS** workspace in
+and check out the published training pipeline in the **mlops-AML-WS** workspace in
 [Azure Portal](https://ms.portal.azure.com/):
 
 ![training pipeline](./images/training-pipeline.png)
 
 Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master branch.
 
-* The first stage of the pipeline, **Model CI**, perform linting, unit testing, build and publishes an **ML Training Pipeline** in a **ML Workspace**.
+* The first stage of the pipeline, **Model CI**, performs linting, unit testing, build and publishes an **ML Training Pipeline** in an **ML Workspace**.
 
   **Note:** The build pipeline also supports building and publishing ML
 pipelines using R to train a model. This is enabled
-by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For the pipeline training a model with R on Databricks you have
+by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For pipeline training a model with R on Databricks you'll need
 to manually create a Databricks cluster and attach it to the ML Workspace as a
 compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables should be
 specified).
 
-* The second stage of the pipeline, **Train model**, triggers the run of the ML Training Pipeline. The training pipeline will train, evaluate, and register a new model. The actual computation is performed in an [Azure Machine Learning Compute cluster](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute). In Azure DevOps, this stage runs an agentless job that waits for the completion of the Azure ML job, so it can wait for training completion for hours or even days without using agent resources.
+* The second stage of the pipeline, **Train model**, triggers the run of the ML Training Pipeline. The training pipeline will train, evaluate, and register a new model. The actual computation is performed in an [Azure Machine Learning Compute cluster](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute). In Azure DevOps, this stage runs an agentless job that waits for the completion of the Azure ML job, allowing the pipeline to wait for training completion for hours or even days without using agent resources.
 
 **Note:** If the model evaluation determines that the new model does not perform better than the previous one then the new model will not be registered and the pipeline will be cancelled.
 
 * The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). It then runs a *smoke test* to validate the deployment, i.e. sends a sample query to the scoring web service and verifies that it returns a response in the expected format.
  
-Wait until the pipeline finished and make sure there is a new model in the **ML Workspace**:
+Wait until the pipeline finishes and verify that there is a new model in the **ML Workspace**:
 
 ![trained model](./images/trained-model.png)
 
@@ -197,11 +192,11 @@ To disable the automatic trigger of the training pipeline, change the `auto-trig
 The final stage is to deploy the model to the production environment running on
 [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service).
 
-**Note:** Creating of a Kubernetes cluster on AKS is out of scope of this
-tutorial, but you can find set up information in the docs
+**Note:** Creating a Kubernetes cluster on AKS is out of scope of this
+tutorial, but you can find set up information 
 [here](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal#create-an-aks-cluster).
 
-**Note:** If your target deployment environment is a K8s cluster and you want to implement Canary and/or A/B testing deployemnt strategies check out this [tutorial](./canary_ab_deployment.md).
+**Note:** If your target deployment environment is a K8s cluster and you want to implement Canary and/or A/B testing deployment strategies check out this [tutorial](./canary_ab_deployment.md).
 
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variables:
 
