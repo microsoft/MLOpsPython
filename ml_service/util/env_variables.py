@@ -39,6 +39,8 @@ class Env(Singleton):
         self._model_path = os.environ.get('MODEL_PATH')
         self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
         self._score_script = os.environ.get("SCORE_SCRIPT")
+        self._collection_uri = os.environ.get("SYSTEM_COLLECTIONURI")
+        self._teamproject_name = os.environ.get("SYSTEM_TEAMPROJECT")
 
     @property
     def workspace_name(self):
@@ -135,3 +137,11 @@ class Env(Singleton):
     @property
     def score_script(self):
         return self._score_script
+
+    @property
+    def collection_uri(self):
+        return self._collection_uri
+
+    @property
+    def teamproject_name(self):
+        return self._teamproject_name

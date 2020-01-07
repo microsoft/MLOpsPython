@@ -90,6 +90,10 @@ if (run_id == 'amlcompute'):
 model_name = args.model_name
 metric_eval = "mse"
 run.tag("BuildId", value=build_id)
+builduri_base = os.environ.get("BUILDURI_BASE")
+if (builduri_base is not None):
+    build_uri = builduri_base + build_id
+    run.tag("BuildUri", value=build_uri)
 
 # Paramaterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated

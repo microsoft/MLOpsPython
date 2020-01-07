@@ -101,9 +101,16 @@ def main():
     print("Following files are uploaded ")
     print(run.parent.get_file_names())
 
+    run.parent.tag("BuildId", value=build_id)
+
     # Add properties to identify this specific training run
     run.tag("BuildId", value=build_id)
     run.tag("run_type", value="train")
+    builduri_base = os.environ.get("BUILDURI_BASE")
+    if (builduri_base is not None):
+        build_uri = builduri_base + build_id
+        run.tag("BuildUri", value=build_uri)
+        run.parent.tag("BuildUri", value=build_uri)
     print(f"tags now present for run: {run.tags}")
 
     run.complete()
