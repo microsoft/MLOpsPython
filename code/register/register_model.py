@@ -88,7 +88,11 @@ def main():
         register_aml_model(model_name, exp, run_id)
     else:
         run.tag("BuildId", value=build_id)
-        register_aml_model(model_name, exp, run_id, build_id)
+        builduri_base = os.environ.get("BUILDURI_BASE")
+        if (builduri_base is not None):
+            build_uri = builduri_base + build_id
+            run.tag("BuildUri", value=build_uri)
+        register_aml_model(model_name, exp, run_id, build_id, build_uri)
 
 
 def model_already_registered(model_name, exp, run_id):
@@ -102,7 +106,13 @@ def model_already_registered(model_name, exp, run_id):
         print("Model is not registered for this run.")
 
 
-def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
+def register_aml_model(
+    model_name,
+    exp,
+    run_id,
+    build_id: str = 'none',
+    build_uri=None
+):
     try:
         if (build_id != 'none'):
             model_already_registered(model_name, exp, run_id)
@@ -110,6 +120,8 @@ def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
             tagsValue = {"area": "diabetes", "type": "regression",
                          "BuildId": build_id, "run_id": run_id,
                          "experiment_name": exp.name}
+            if (build_uri is not None):
+                tagsValue["BuildUri"] = build_uri
         else:
             run = Run(experiment=exp, run_id=run_id)
             if (run is not None):
