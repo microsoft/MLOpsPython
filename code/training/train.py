@@ -110,6 +110,7 @@ def main():
     if (builduri_base is not None):
         build_uri = builduri_base + build_id
         run.tag("BuildUri", value=build_uri)
+        run.parent.tag("BuildUri", value=build_uri)
     print(f"tags now present for run: {run.tags}")
 
     run.complete()
