@@ -42,8 +42,8 @@ class Env(Singleton):
         self._collection_uri = os.environ.get("SYSTEM_COLLECTIONURI")
         self._teamproject_name = os.environ.get("SYSTEM_TEAMPROJECT")
         self._datastore_name = os.environ.get("DATASTORE_NAME")
-        self._datafile_name = os.environ.get("DATAFILE_NAME")        
-        self._dataset_name = os.environ.get("DATASET_NAME")        
+        self._datafile_name = os.environ.get("DATAFILE_NAME")
+        self._dataset_name = os.environ.get("DATASET_NAME")
 
     @property
     def workspace_name(self):
