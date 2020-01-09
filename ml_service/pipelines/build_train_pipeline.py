@@ -58,8 +58,9 @@ def main():
     if (e.datastore_name is not None and e.datafile_name is not None):
         dataset_name = e.dataset_name
         datastore = Datastore.get(aml_workspace, e.datastore_name)
-        dataset = Dataset.Tabular.from_delimited_files(path=[(datastore,
-                                                              e.datafile_name)])
+        dataset = Dataset.Tabular.
+            from_delimited_files(path=[(datastore,
+                                        e.datafile_name)])
         dataset.register(workspace=aml_workspace,
                          name=e.dataset_name,
                          description="dataset with training data")
