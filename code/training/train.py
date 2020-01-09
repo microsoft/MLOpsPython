@@ -24,6 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 from azureml.core.run import Run
+from azureml.core import Dataset
 import os
 import argparse
 from sklearn.datasets import load_diabetes
@@ -68,20 +69,35 @@ def main():
         help=("Ridge regression regularization strength hyperparameter; "
               "must be a positive float.")
     )
-
+    
+    parser.add_argument(
+        "--dataset_name",
+        type=str,
+        help=("Dataset with the training data")
+    )
     args = parser.parse_args()
 
     print("Argument [build_id]: %s" % args.build_id)
     print("Argument [model_name]: %s" % args.model_name)
     print("Argument [alpha]: %s" % args.alpha)
+    print("Argument [dataset_name]: %s" % args.dataset_name)
 
     model_name = args.model_name
     build_id = args.build_id
     alpha = args.alpha
+    dataset_name = args.dataset_name
 
     run = Run.get_context()
+    ws = run.experiment.workspace
+    
+    if (dataset_name is not None):
+        dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
+        df = dataset.to_pandas_dataframe()
+        X = df.values
+        y = df.Y
+    else:
+        X, y = load_diabetes(return_X_y=True)
 
-    X, y = load_diabetes(return_X_y=True)
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=0)
     data = {"train": {"X": X_train, "y": y_train},

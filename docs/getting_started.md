@@ -122,6 +122,9 @@ Check out the newly created resources in the [Azure Portal](portal.azure.com):
 
 (Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](portal.azure.com).
 
+**Note:** The training ML pipelne uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. If you want to use your own dataset, you need to [create and resgister a datastore](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-access-data#azure-machine-learning-studio) in your ML workspace and put the datafile in the corresponding blob container (e.g. [diabetes.csv](./data/diabetes.csv)). Having done that, you'll need to configure DATASTORE_NAME and DATAFILE_NAME variables in ***devopsforai-aml-vg*** variable group. 
+
+
 ## Create an Azure DevOps Azure ML Workspace Service Connection
 Install the **Azure Machine Learning** extension to your organization from the
 [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
