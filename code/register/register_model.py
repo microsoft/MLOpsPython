@@ -89,7 +89,6 @@ def main():
     else:
         run.tag("BuildId", value=build_id)
         builduri_base = os.environ.get("BUILDURI_BASE")
-        build_uri = None
         if (builduri_base is not None):
             build_uri = builduri_base + build_id
             run.tag("BuildUri", value=build_uri)
