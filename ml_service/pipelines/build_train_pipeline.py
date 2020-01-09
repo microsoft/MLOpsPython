@@ -53,8 +53,8 @@ def main():
         name="build_id", default_value=e.build_id)
     hyperparameter_alpha_param = PipelineParameter(
         name="hyperparameter_alpha", default_value=0.5)
-
     
+    dataset_name = ""
     if (e.datastore_name is not None and e.datafile_name is not None):
         dataset_name = e.dataset_name
         datastore = Datastore.get(aml_workspace, e.datastore_name)    
@@ -62,9 +62,7 @@ def main():
         dataset.register(workspace=aml_workspace,
                         name=e.dataset_name,
                         description="dataset with training data")
-    else:
-        dataset_name = None                    
-
+                            
     train_step = PythonScriptStep(
         name="Train Model",
         script_name=e.train_script_path,

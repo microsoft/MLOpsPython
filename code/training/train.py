@@ -90,7 +90,7 @@ def main():
     run = Run.get_context()
     ws = run.experiment.workspace
     
-    if (dataset_name is not None):
+    if (dataset_name):
         dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
         df = dataset.to_pandas_dataframe()
         X = df.values
