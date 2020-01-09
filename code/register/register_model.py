@@ -93,7 +93,9 @@ def main():
         if (builduri_base is not None):
             build_uri = builduri_base + build_id
             run.tag("BuildUri", value=build_uri)
-        register_aml_model(model_name, exp, run_id, build_id, build_uri)
+            register_aml_model(model_name, exp, run_id, build_id, build_uri)
+        else:
+            register_aml_model(model_name, exp, run_id, build_id)
 
 
 def model_already_registered(model_name, exp, run_id):
