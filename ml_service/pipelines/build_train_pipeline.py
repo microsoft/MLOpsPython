@@ -62,7 +62,8 @@ def main():
         dataset = Dataset.Tabular.from_delimited_files(path=data_path)
         dataset.register(workspace=aml_workspace,
                          name=e.dataset_name,
-                         description="dataset with training data")
+                         description="dataset with training data",
+                         create_new_version=True)
 
     train_step = PythonScriptStep(
         name="Train Model",
