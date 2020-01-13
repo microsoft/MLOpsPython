@@ -40,3 +40,5 @@ variables:
   value: ''
 - name: SCORE_SCRIPT
   value: score.py
+- name: DATASET_NAME
+  value: diabetes_ds

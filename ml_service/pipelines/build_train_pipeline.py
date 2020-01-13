@@ -3,6 +3,7 @@ from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline
 from azureml.core import Workspace
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
+from azureml.core import Dataset, Datastore
 import os
 import sys
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
@@ -35,10 +36,10 @@ def main():
                         'scikit-learn', 'tensorflow', 'keras'],
         pip_packages=['azure', 'azureml-core',
                       'azure-storage',
-                      'azure-storage-blob'])
+                      'azure-storage-blob',
+                      'azureml-dataprep'])
     )
     run_config.environment.docker.enabled = True
-
     config_envvar = {}
     if (e.collection_uri is not None and e.teamproject_name is not None):
         builduri_base = e.collection_uri + e.teamproject_name
@@ -53,6 +54,17 @@ def main():
     hyperparameter_alpha_param = PipelineParameter(
         name="hyperparameter_alpha", default_value=0.5)
 
+    dataset_name = ""
+    if (e.datastore_name is not None and e.datafile_name is not None):
+        dataset_name = e.dataset_name
+        datastore = Datastore.get(aml_workspace, e.datastore_name)
+        data_path = [(datastore, e.datafile_name)]
+        dataset = Dataset.Tabular.from_delimited_files(path=data_path)
+        dataset.register(workspace=aml_workspace,
+                         name=e.dataset_name,
+                         description="dataset with training data",
+                         create_new_version=True)
+
     train_step = PythonScriptStep(
         name="Train Model",
         script_name=e.train_script_path,
@@ -62,6 +74,7 @@ def main():
             "--build_id", build_id_param,
             "--model_name", model_name_param,
             "--alpha", hyperparameter_alpha_param,
+            "--dataset_name", dataset_name,
         ],
         runconfig=run_config,
         allow_reuse=False,

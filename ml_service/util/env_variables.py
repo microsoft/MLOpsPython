@@ -41,6 +41,9 @@ class Env(Singleton):
         self._score_script = os.environ.get("SCORE_SCRIPT")
         self._collection_uri = os.environ.get("SYSTEM_COLLECTIONURI")
         self._teamproject_name = os.environ.get("SYSTEM_TEAMPROJECT")
+        self._datastore_name = os.environ.get("DATASTORE_NAME")
+        self._datafile_name = os.environ.get("DATAFILE_NAME")
+        self._dataset_name = os.environ.get("DATASET_NAME")
 
     @property
     def workspace_name(self):
@@ -145,3 +148,15 @@ class Env(Singleton):
     @property
     def teamproject_name(self):
         return self._teamproject_name
+
+    @property
+    def datastore_name(self):
+        return self._datastore_name
+
+    @property
+    def datafile_name(self):
+        return self._datafile_name
+
+    @property
+    def dataset_name(self):
+        return self._dataset_name
