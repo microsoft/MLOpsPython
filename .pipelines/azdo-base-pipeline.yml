@@ -1,26 +1,65 @@
-# this pipeline should be ignored for now
-parameters:
-  pipelineType: 'training'
+jobs:
+- job: BuildEnvironment
+  displayName: "Set up CI environment"
+  steps:
+  - task: AzureCLI@1
+    displayName: Generate build container
+    name: BuildContainer
+    inputs:
+      azureSubscription: AzureResourceConnection
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euxo pipefail  # fail on error
 
-steps:
-- script: |
-   flake8 --output-file=$(Build.BinariesDirectory)/lint-testresults.xml --format junit-xml  
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Run code quality tests'
-  enabled: 'true'
-  
-- script: |
-   pytest --junitxml=$(Build.BinariesDirectory)/unit-testresults.xml $(Build.SourcesDirectory)/tests/unit
-  displayName: 'Run unit tests'
-  enabled: 'true'
-  env:
-    SP_APP_SECRET: '$(SP_APP_SECRET)'
+        # Get name and server of the container registry linked to the Azure ML workspace.
+        acrId=$(az resource show -g "$RESOURCE_GROUP" -n "$WORKSPACE_NAME" --resource-type Microsoft.MachineLearningServices/workspaces --query properties.containerRegistry -o tsv)
+        read -r acrName acrServer <<< $(az resource show --id "$acrId" --query '[[name,properties.loginServer]]' -o tsv)
 
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '$(Build.BinariesDirectory)/*-testresults.xml'
-    testRunTitle: 'Linting & Unit tests'
-    failTaskOnFailedTests: true
-  displayName: 'Publish linting and unit test results'
-  enabled: 'true'
+        dockerDir=environment_setup/build-image
+        # Generate an tag with a reproducible checksum of all files in $dockerDir by doing a checksum of all files
+        # in alphabetical order, then another checksum of their names and checksums.
+        imageTag=$(find "$dockerDir" -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -f1 -d ' ')
+
+        # If the image with the generated tag doesn't already exist, build it.
+        repo="modelbuild/$(BUILDCONTAINER_NAME)"
+        if ! az acr repository show -n $acrName --image "$repo:$imageTag" -o table; then
+          az acr build \
+            -r "$acrName" \
+            -t "$repo:$imageTag" \
+            -t "$repo:latest" \
+            "$dockerDir"
+        fi
+
+        # Make image name available to subsequent jobs.
+        echo "##vso[task.setvariable variable=BUILD_IMAGE;isOutput=true]$acrServer/$repo:$imageTag"
+
+- job: "Model_CI"
+  displayName: "Model CI"
+  dependsOn: BuildEnvironment
+  variables:
+    BUILD_IMAGE: $[ dependencies.BuildEnvironment.outputs['BuildContainer.BUILD_IMAGE'] ]
+  container:
+    image: $(BUILD_IMAGE)
+    endpoint: ContainerRegistry
+  timeoutInMinutes: 0
+  steps:
+
+  - script: |
+     tox
+    displayName: 'Linting & unit tests'
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: '*-testresults.xml'
+      testRunTitle: 'Linting & Unit tests'
+      failTaskOnFailedTests: true
+    displayName: 'Publish test results'
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish coverage report'
+    condition: succeededOrFailed()
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: 'coverage.xml'
+      failIfCoverageEmpty: true

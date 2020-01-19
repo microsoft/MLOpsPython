@@ -80,10 +80,7 @@ There are more variables used in the project. They're defined in two places, one
 
 ### Local configuration
 
-In order to configure the project locally, create a copy of `.env.example` in the root directory and name it `.env`. Fill out all missing values and adjust the existing ones to suit your requirements. 
-
-For local development, you will also need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). The Azure CLI will be used to log you in interactively.
-Please be aware that the local environment also needs access to the Azure subscription so you have to have Contributor access on the Azure ML Workspace.
+For instructions on how to set up a local development environment, refer to the [Development environment setup instructions](development_setup.md).
 
 ### Azure DevOps configuration
 
@@ -139,6 +136,18 @@ your Azure AD tenant, or receive the ID and secret of a service principal
 from your Azure AD Administrator. That principal must have Contributor
 permissions on the Azure ML Workspace.
 
+## Create a Docker Service Connection to manage your build container
+
+The pipeline requires a **Docker Registry**
+[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#sep-docreg).
+As **Registry type**, choose **Azure Container Registry**.
+Point to the Azure Container Registry deployed by your IaC pipeline.
+
+Use **``ContainerRegistry``** as the connection name, since it is used
+in the Azure ML pipeline definition.
+
+![configure container registry service connection](images/create-acr-service-connection.png)
+
 ## Set up Build, Release Trigger, and Release Multi-Stage Pipeline
 
 Now that you have all the required resources created from the IaC pipeline,
@@ -172,9 +181,24 @@ Great, you now have the build pipeline set up which automatically triggers every
 
 * The first stage of the pipeline, **Model CI**, performs linting, unit testing, build and publishes an **ML Training Pipeline** in an **ML Workspace**.
 
+  * The **Generate build container** job creates a Docker container with
+    your ML dependencies, such as sklearn, or reuses the container
+    from a previous run if your container definition has not changed.
+  * The **Model CI** job runs on the Docker container generated in the
+    previous job and runs linting and unit tests. Test results and
+    code coverage reports can be found on your job output page.
+  * The **Publish AML Pipeline** job publishes the Azure ML pipeline
+    in your workspace. To save time, this job runs in parallel with
+    the **Model CI** job. If CI fails (for instance with unit test failures),
+    the AML Pipeline might have been published but will not be used
+    for training. The next run will publish a new AML Pipeline with
+    the same name and updated tags.
+
   **Note:** The build pipeline also supports building and publishing ML
 pipelines using R to train a model. This is enabled
-by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For pipeline training a model with R on Databricks you'll need
+by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`
+and uncommenting the R installation step in the `Dockerfile`.
+For a pipeline training a model with R on Databricks you'll need
 to manually create a Databricks cluster and attach it to the ML Workspace as a
 compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables should be
 specified).

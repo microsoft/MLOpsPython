@@ -4,11 +4,10 @@ LABEL org.label-schema.vendor = "Microsoft" \
       org.label-schema.url = "https://hub.docker.com/r/microsoft/mlopspython" \
       org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
-       
+RUN apt-get update && apt-get install -y \
+    gcc
 
-COPY environment_setup/requirements.txt  /setup/
-	
-RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt && \ 
-    conda install -c r r-essentials
 
-CMD ["python"]
+# Install Python modules
+COPY requirements.txt  /setup/
+RUN pip install --upgrade -r /setup/requirements.txt

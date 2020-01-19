@@ -2,15 +2,15 @@
 
 ### Environment Setup
 
-- `environment_setup/requirements.txt` : It consists of a list of python packages which are needed by the train.py to run successfully on host agent (locally).
+- `environment_setup/build-image/Dockerfile` : Dockerfile of a build agent containing Python 3.6 and all required packages.
+
+- `environment_setup/build-image/requirements.txt` : List of python packages which are needed by the train.py and associated unit tests to run successfully on host agent (locally).
 
 - `environment_setup/install_requirements.sh` : This script prepares the python environment i.e. install the Azure ML SDK and the packages specified in requirements.txt
 
 - `environment_setup/iac-*.yml, arm-templates` : Infrastructure as Code piplines to create and delete required resources along with corresponding arm-templates.
 
-- `environment_setup/Dockerfile` : Dockerfile of a build agent containing Python 3.6 and all required packages.
-
-- `environment_setup/docker-image-pipeline.yml` : An AzDo pipeline for building and pushing [microsoft/mlopspython](https://hub.docker.com/_/microsoft-mlops-python) image. 
+- `environment_setup/mlops-image/docker-image-pipeline.yml` : An AzDo pipeline for building and pushing [microsoft/mlopspython](https://hub.docker.com/_/microsoft-mlops-python) image. 
 
 ### Pipelines
 

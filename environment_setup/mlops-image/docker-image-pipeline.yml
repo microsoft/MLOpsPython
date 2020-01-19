@@ -11,7 +11,7 @@ trigger:
 
   paths:
     include:
-    - environment_setup/Dockerfile
+    - environment_setup/mlops-image/*
 
 variables:
   containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
@@ -27,5 +27,4 @@ steps:
       tags: |
        $(Build.BuildNumber)
        latest
-      buildContext: '$(Build.SourcesDirectory)' 
-      dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'
+      buildContext: '$(Build.SourcesDirectory)/environment_setup/mlops-image' 

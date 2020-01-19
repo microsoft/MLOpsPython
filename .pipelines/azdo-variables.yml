@@ -2,6 +2,9 @@ variables:
   # Azure ML Workspace Variables
 - name: EXPERIMENT_NAME
   value: mlopspython
+  # Azure DevOps build container
+- name: BUILDCONTAINER_NAME
+  value: diabetes
   # AML Compute Cluster Config
 - name: AML_COMPUTE_CLUSTER_CPU_SKU
   value: STANDARD_DS2_V2

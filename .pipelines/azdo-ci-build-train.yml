@@ -7,26 +7,26 @@ trigger:
     exclude:
     - docs/
     - environment_setup/
-    - ml_service/util/create_scoring_image.*
+    - ml_service/util/create_scoring_image.py
     - ml_service/util/smoke_test_scoring_service.py
 
 variables:
 - template: azdo-variables.yml
 - group: devopsforai-aml-vg
 
+pool:
+  vmImage: ubuntu-latest
 
 stages:
 - stage: 'Model_CI'
   displayName: 'Model CI'
   jobs:
-  - job: "Model_CI_Pipeline"
-    displayName: "Model CI Pipeline"
-    pool:
-      vmImage: 'ubuntu-latest'
+  - template: azdo-base-pipeline.yml
+  - job: "Publish_Pipeline"
+    displayName: "Publish AML Pipeline"
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - template: azdo-base-pipeline.yml
     - task: AzureCLI@1
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
@@ -35,7 +35,7 @@ stages:
           set -e # fail on error
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
           # Invoke the Python building and publishing a training pipeline
-          python $(Build.SourcesDirectory)/ml_service/pipelines/${{ variables.BUILD_TRAIN_SCRIPT }}
+          python ml_service/pipelines/${{ variables.BUILD_TRAIN_SCRIPT }}
       displayName: 'Publish Azure Machine Learning Pipeline'
 
 - stage: 'Trigger_AML_Pipeline'
@@ -44,8 +44,6 @@ stages:
   - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
     displayName: "Get Pipeline ID for execution"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -56,7 +54,7 @@ stages:
         inlineScript: |
           set -e # fail on error
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          python $(Build.SourcesDirectory)/ml_service/pipelines/run_train_pipeline.py --output_pipeline_id_file "pipeline_id.txt" --skip_train_execution
+          python ml_service/pipelines/run_train_pipeline.py --output_pipeline_id_file "pipeline_id.txt" --skip_train_execution
           # Set AMLPIPELINEID variable for next AML Pipeline task in next job
           AMLPIPELINEID="$(cat pipeline_id.txt)"
           echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINEID"
@@ -89,8 +87,6 @@ stages:
   - job: "Training_Run_Report"
     dependsOn: "Run_ML_Pipeline"
     displayName: "Determine if evaluation succeeded and new model is registered"
-    pool:
-        vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -102,8 +98,6 @@ stages:
   jobs:
   - job: "Deploy_ACI"
     displayName: "Deploy to ACI"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -137,8 +131,6 @@ stages:
   jobs:
   - job: "Deploy_AKS"
     displayName: "Deploy to AKS"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -173,8 +165,6 @@ stages:
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Deploy to Webapp"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:

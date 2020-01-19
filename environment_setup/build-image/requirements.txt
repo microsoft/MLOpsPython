@@ -1,0 +1,12 @@
+pytest>=5.3
+pytest-cov>=2.8.1
+requests>=2.22
+numpy>=1.17
+pandas>=0.25
+scikit-learn>=0.21.3
+azureml-sdk>=1.0
+python-dotenv>=0.10.3
+flake8>=3.7
+flake8_formatter_junit_xml>=0.0.6
+tox>=3.14.3
+azure-cli==2.0.76

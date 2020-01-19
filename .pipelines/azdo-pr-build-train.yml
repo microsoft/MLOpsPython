@@ -4,16 +4,12 @@ pr:
     include:
     - master
 
-pool: 
+pool:
   vmImage: 'ubuntu-latest'
-
-container: mcr.microsoft.com/mlops/python:latest  
-
 
 variables:
 - template: azdo-variables.yml
 - group: devopsforai-aml-vg
 
-
-steps:
+jobs:
 - template: azdo-base-pipeline.yml
