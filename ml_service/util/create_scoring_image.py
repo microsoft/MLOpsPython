@@ -1,30 +1,35 @@
 import os
+import sys
+import argparse
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
 from azureml.core.model import Model
-from azureml.core.authentication import ServicePrincipalAuthentication
+sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from env_variables import Env
 
 e = Env()
 
-SP_AUTH = ServicePrincipalAuthentication(
-    tenant_id=e.tenant_id,
-    service_principal_id=e.app_id,
-    service_principal_password=e.app_secret)
-
+# Get Azure machine learning workspace
 ws = Workspace.get(
-    e.workspace_name,
-    SP_AUTH,
-    e.subscription_id,
-    e.resource_group
+    name=e.workspace_name,
+    subscription_id=e.subscription_id,
+    resource_group=e.resource_group
 )
 
+parser = argparse.ArgumentParser("create scoring image")
+parser.add_argument(
+    "--output_image_location_file",
+    type=str,
+    help=("Name of a file to write image location to, "
+          "in format REGISTRY.azurecr.io/IMAGE_NAME:IMAGE_VERSION")
+)
+args = parser.parse_args()
 
 model = Model(ws, name=e.model_name, version=e.model_version)
 os.chdir("./code/scoring")
 
 image_config = ContainerImage.image_configuration(
-    execution_script="score.py",
+    execution_script=e.score_script,
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
@@ -34,6 +39,8 @@ image_config = ContainerImage.image_configuration(
 image = Image.create(
     name=e.image_name, models=[model], image_config=image_config, workspace=ws
 )
+
+os.chdir("../..")
 
 image.wait_for_creation(show_output=True)
 
@@ -48,3 +55,9 @@ print("{}(v.{} [{}]) stored at {} with build log {}".format(
     image.image_build_log_uri,
 )
 )
+
+# Save the Image Location for other AzDO jobs after script is complete
+if args.output_image_location_file is not None:
+    print("Writing image location to %s" % args.output_image_location_file)
+    with open(args.output_image_location_file, "w") as out_file:
+        out_file.write(str(image.image_location))

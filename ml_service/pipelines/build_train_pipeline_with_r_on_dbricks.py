@@ -1,8 +1,8 @@
 from azureml.pipeline.core import Pipeline
+from azureml.core import Workspace
 import os
 import sys
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from workspace import get_workspace
 from attach_compute import get_compute
 from azureml.pipeline.steps import DatabricksStep
 from env_variables import Env
@@ -11,13 +11,12 @@ from env_variables import Env
 def main():
     e = Env()
     # Get Azure machine learning workspace
-    aml_workspace = get_workspace(
-        e.workspace_name,
-        e.resource_group,
-        e.subscription_id,
-        e.tenant_id,
-        e.app_id,
-        e.app_secret)
+    aml_workspace = Workspace.get(
+        name=e.workspace_name,
+        subscription_id=e.subscription_id,
+        resource_group=e.resource_group
+    )
+    print("get_workspace:")
     print(aml_workspace)
 
     # Get Azure machine learning cluster
@@ -26,6 +25,7 @@ def main():
         e.compute_name,
         e.vm_size)
     if aml_compute is not None:
+        print("aml_compute:")
         print(aml_compute)
 
     train_step = DatabricksStep(

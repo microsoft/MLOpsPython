@@ -38,3 +38,7 @@ variables:
   # Optional. Used by a training pipeline with R on Databricks
 - name: DB_CLUSTER_ID
   value: ''
+- name: SCORE_SCRIPT
+  value: score.py
+- name: DATASET_NAME
+  value: diabetes_ds

@@ -29,7 +29,6 @@ import argparse
 import traceback
 from azureml.core import Run, Experiment, Workspace
 from azureml.core.model import Model as AMLModel
-from azureml.core.authentication import ServicePrincipalAuthentication
 
 
 def main():
@@ -37,37 +36,23 @@ def main():
     run = Run.get_context()
     if (run.id.startswith('OfflineRun')):
         from dotenv import load_dotenv
-        sys.path.append(os.path.abspath("./code/util"))  # NOQA: E402
-        from model_helper import get_model_by_tag
         # For local development, set values in this section
         load_dotenv()
         workspace_name = os.environ.get("WORKSPACE_NAME")
         experiment_name = os.environ.get("EXPERIMENT_NAME")
         resource_group = os.environ.get("RESOURCE_GROUP")
         subscription_id = os.environ.get("SUBSCRIPTION_ID")
-        tenant_id = os.environ.get("TENANT_ID")
-        model_name = os.environ.get("MODEL_NAME")
-        app_id = os.environ.get('SP_APP_ID')
-        app_secret = os.environ.get('SP_APP_SECRET')
         build_id = os.environ.get('BUILD_BUILDID')
         # run_id useful to query previous runs
         run_id = "bd184a18-2ac8-4951-8e78-e290bef3b012"
-        service_principal = ServicePrincipalAuthentication(
-            tenant_id=tenant_id,
-            service_principal_id=app_id,
-            service_principal_password=app_secret)
-
         aml_workspace = Workspace.get(
             name=workspace_name,
             subscription_id=subscription_id,
-            resource_group=resource_group,
-            auth=service_principal
+            resource_group=resource_group
         )
         ws = aml_workspace
         exp = Experiment(ws, experiment_name)
     else:
-        sys.path.append(os.path.abspath("./util"))  # NOQA: E402
-        from model_helper import get_model_by_tag
         ws = run.experiment.workspace
         exp = run.experiment
         run_id = 'amlcompute'
@@ -89,12 +74,6 @@ def main():
         help="Name of the Model",
         default="sklearn_regression_model.pkl",
     )
-    parser.add_argument(
-        "--validate",
-        type=str,
-        help="Set to true to only validate if model is registered for run",
-        default=False,
-    )
 
     args = parser.parse_args()
     if (args.build_id is not None):
@@ -103,29 +82,18 @@ def main():
         run_id = args.run_id
     if (run_id == 'amlcompute'):
         run_id = run.parent.id
-    if (args.validate is not None):
-        validate = args.validate
     model_name = args.model_name
 
-    if (validate):
-        try:
-            tag_name = 'BuildId'
-            model = get_model_by_tag(
-                model_name, tag_name, build_id, exp.workspace)
-            if (model is not None):
-                print("Model was registered for this build.")
-            if (model is None):
-                print("Model was not registered for this run.")
-                sys.exit(1)
-        except Exception as e:
-            print(e)
-            print("Model was not registered for this run.")
-            sys.exit(1)
+    if (build_id is None):
+        register_aml_model(model_name, exp, run_id)
     else:
-        if (build_id is None):
-            register_aml_model(model_name, exp, run_id)
+        run.tag("BuildId", value=build_id)
+        builduri_base = os.environ.get("BUILDURI_BASE")
+        if (builduri_base is not None):
+            build_uri = builduri_base + build_id
+            run.tag("BuildUri", value=build_uri)
+            register_aml_model(model_name, exp, run_id, build_id, build_uri)
         else:
-            run.tag("BuildId", value=build_id)
             register_aml_model(model_name, exp, run_id, build_id)
 
 
@@ -140,7 +108,13 @@ def model_already_registered(model_name, exp, run_id):
         print("Model is not registered for this run.")
 
 
-def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
+def register_aml_model(
+    model_name,
+    exp,
+    run_id,
+    build_id: str = 'none',
+    build_uri=None
+):
     try:
         if (build_id != 'none'):
             model_already_registered(model_name, exp, run_id)
@@ -148,6 +122,8 @@ def register_aml_model(model_name, exp, run_id, build_id: str = 'none'):
             tagsValue = {"area": "diabetes", "type": "regression",
                          "BuildId": build_id, "run_id": run_id,
                          "experiment_name": exp.name}
+            if (build_uri is not None):
+                tagsValue["BuildUri"] = build_uri
         else:
             run = Run(experiment=exp, run_id=run_id)
             if (run is not None):
