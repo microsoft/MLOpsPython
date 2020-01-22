@@ -32,10 +32,14 @@ import traceback
 run = Run.get_context()
 if (run.id.startswith('OfflineRun')):
     from dotenv import load_dotenv
-    sys.path.append(os.path.abspath("./code/util"))  # NOQA: E402
-    from model_helper import get_model_by_tag
     # For local development, set values in this section
     load_dotenv()
+    sources_dir = os.environ.get("SOURCES_DIR_TRAIN")
+    if (sources_dir is None):
+        sources_dir = 'code'
+    path_to_util = os.path.join(".", sources_dir, "util")
+    sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
+    from model_helper import get_model_by_tag
     workspace_name = os.environ.get("WORKSPACE_NAME")
     experiment_name = os.environ.get("EXPERIMENT_NAME")
     resource_group = os.environ.get("RESOURCE_GROUP")
