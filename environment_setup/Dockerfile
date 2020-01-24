@@ -4,11 +4,20 @@ LABEL org.label-schema.vendor = "Microsoft" \
       org.label-schema.url = "https://hub.docker.com/r/microsoft/mlopspython" \
       org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
-       
+# Utilities for package installation
+RUN apt-get update && apt-get install -y \
+    curl \
+    apt-transport-https \
+    gcc
 
-COPY environment_setup/requirements.txt  /setup/
-	
-RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt && \ 
-    conda install -c r r-essentials
+# Install dotnet runtime used to generate code coverage report
+RUN curl -O https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb
+RUN dpkg -i packages-microsoft-prod.deb
+RUN apt-get update && apt-get install -y dotnet-runtime-3.1
 
-CMD ["python"]
+# Packages for running R
+RUN conda install -c r r-essentials
+
+# Install Python modules
+COPY requirements.txt  /setup/
+RUN pip install --upgrade -r /setup/requirements.txt
