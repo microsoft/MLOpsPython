@@ -15,16 +15,16 @@ variables:
   value: lowpriority
   # Training Config
 - name: BUILD_TRAIN_SCRIPT
-  value: build_train_pipeline.py
+  value: diabetes_regression_build_train_pipeline.py
 - name: TRAIN_SCRIPT_PATH
   value: training/train.py
 - name: MODEL_NAME
-  value: sklearn_regression_model.pkl
+  value: diabetes_regression_model.pkl
 - name: MODEL_VERSION
   value: '1'
   # AML Pipeline Config 
 - name: TRAINING_PIPELINE_NAME
-  value: 'Training-Pipeline'
+  value: 'diabetes-Training-Pipeline'
 - name: MODEL_PATH
   value: ''
 - name: EVALUATE_SCRIPT_PATH
@@ -32,9 +32,9 @@ variables:
 - name: REGISTER_SCRIPT_PATH
   value: register/register_model.py
 - name: SOURCES_DIR_TRAIN
-  value: code
+  value: diabetes_regression
 - name: IMAGE_NAME
-  value: 'mltrained'
+  value: 'diabetestrained'
   # Optional. Used by a training pipeline with R on Databricks
 - name: DB_CLUSTER_ID
   value: ''

@@ -7,10 +7,10 @@ trigger:
     include:
     - ml_service/util/create_scoring_image.py
     - ml_service/util/Dockerfile
-    - code/scoring/
+    - diabetes_regression/scoring/
     exclude:
-    - code/scoring/deployment_config_aci.yml
-    - code/scoring/deployment_config_aks.yml    
+    - diabetes_regression/scoring/deployment_config_aci.yml
+    - diabetes_regression/scoring/deployment_config_aks.yml    
 
 pool: 
   vmImage: 'ubuntu-latest'

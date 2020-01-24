@@ -4,11 +4,11 @@ trigger:
     include:
     - master
   paths:
-    exclude:
-    - docs/
-    - environment_setup/
-    - ml_service/util/create_scoring_image.*
-    - ml_service/util/smoke_test_scoring_service.py
+    include:
+    - diabetes_regression/
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py
 
 variables:
 - template: azdo-variables.yml

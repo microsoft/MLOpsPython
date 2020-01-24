@@ -3,7 +3,7 @@ import os
 import numpy as np
 from azureml.core.run import Run
 from unittest.mock import Mock
-sys.path.append(os.path.abspath("./code/training"))  # NOQA: E402
+sys.path.append(os.path.abspath("./diabetes_regression/training"))  # NOQA: E402
 from train import train_model
 
 
