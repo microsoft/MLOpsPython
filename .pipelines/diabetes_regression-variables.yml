@@ -19,7 +19,7 @@ variables:
 - name: TRAIN_SCRIPT_PATH
   value: training/train.py
 - name: MODEL_NAME
-  value: diabetes_regression_model.pkl
+  value: sklearn_regression_model.pkl
 - name: MODEL_VERSION
   value: '1'
   # AML Pipeline Config 
