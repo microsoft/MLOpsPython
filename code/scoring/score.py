@@ -23,24 +23,43 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import json
 import numpy
-from azureml.core.model import Model
 import joblib
+import os
+from inference_schema.schema_decorators \
+    import input_schema, output_schema
+from inference_schema.parameter_types.numpy_parameter_type \
+    import NumpyParameterType
 
 
 def init():
+    # load the model from file into a global object
     global model
 
-    # load the model from file into a global object
-    model_path = Model.get_model_path(
-        model_name="sklearn_regression_model.pkl")
+    # AZUREML_MODEL_DIR is an environment variable created during service
+    # deployment. It contains the path to the folder containing the model.
+    path = os.environ['AZUREML_MODEL_DIR']
+    model_path = None
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if '.pkl' in file:
+                model_path = os.path.join(path, file)
+    if model_path is None:
+        raise ValueError(".pkl model not found")
     model = joblib.load(model_path)
 
 
-def run(raw_data, request_headers):
-    data = json.loads(raw_data)["data"]
-    data = numpy.array(data)
+input_sample = numpy.array([
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]])
+output_sample = numpy.array([10, 20])
+
+
+# Inference_schema generates a schema for your web service
+# It then creates an OpenAPI (Swagger) specification for the web service
+@input_schema('data', NumpyParameterType(input_sample))
+@output_schema(NumpyParameterType(output_sample))
+def run(data, request_headers):
     result = model.predict(data)
 
     # Demonstrate how we can log custom data into the Application Insights
