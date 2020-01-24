@@ -11,7 +11,7 @@ trigger:
     - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py
 
 variables:
-- template: azdo-variables.yml
+- template: diabetes_regression-variables.yml
 - group: devopsforai-aml-vg
 
 
