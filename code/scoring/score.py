@@ -52,11 +52,15 @@ def init():
 input_sample = numpy.array([
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]])
-output_sample = numpy.array([10, 20])
+output_sample = numpy.array([
+    5021.509689995557,
+    3693.645386402646])
+
 
 
 # Inference_schema generates a schema for your web service
 # It then creates an OpenAPI (Swagger) specification for the web service
+# at http://<scoring_base_url>/swagger.json
 @input_schema('data', NumpyParameterType(input_sample))
 @output_schema(NumpyParameterType(output_sample))
 def run(data, request_headers):
