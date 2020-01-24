@@ -8,9 +8,9 @@ from train import train_model
 
 
 def test_train_model():
-    X_train = np.array([1, 2, 3, 4, 5, 6]).reshape(-1,  1)
+    X_train = np.array([1, 2, 3, 4, 5, 6]).reshape(-1, 1)
     y_train = np.array([10, 9, 8, 8, 6, 5])
-    X_test = np.array([3, 4]).reshape(-1,  1)
+    X_test = np.array([3, 4]).reshape(-1, 1)
     y_test = np.array([8, 7])
     data = {"train": {"X": X_train, "y": y_train},
             "test": {"X": X_test, "y": y_test}}

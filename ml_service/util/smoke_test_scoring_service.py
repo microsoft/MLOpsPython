@@ -52,7 +52,7 @@ def call_web_app(url, headers):
             response.raise_for_status()
             return response.json()
         except requests.exceptions.HTTPError as e:
-            if i == retries-1:
+            if i == retries - 1:
                 raise e
             print(e)
             print("Retrying...")
