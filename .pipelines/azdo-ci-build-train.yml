@@ -21,8 +21,8 @@ stages:
 - stage: 'Model_CI'
   displayName: 'Model CI'
   jobs:
-  - job: "Publish_Pipeline"
-    displayName: "Publish AML Pipeline"
+  - job: "Model_CI_Pipeline"
+    displayName: "Model CI Pipeline"
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
