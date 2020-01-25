@@ -87,7 +87,7 @@ Please be aware that the local environment also needs access to the Azure subscr
 
 ### Azure DevOps configuration
 
-For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/azdo-variables.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
+For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/diabetes_regression-variables.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
 
 Up until now you should have:
 
@@ -131,7 +131,7 @@ Install the **Azure Machine Learning** extension to your organization from the
 [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
 so that you can set up a service connection to your AML workspace.
 
-Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group below.
+Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group above.
 
 **Note:** Creating service connection with Azure Machine Learning workspace scope requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
 You must also have sufficient permissions to register an application with
@@ -154,7 +154,7 @@ environments, or alternatively to Azure App Service.
 ### Set up the Pipeline
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
-pipeline referring to the [azdo-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml)
+pipeline referring to the [diabetes_regression-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml)
 pipeline definition in your forked repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
@@ -174,7 +174,7 @@ Great, you now have the build pipeline set up which automatically triggers every
 
   **Note:** The build pipeline also supports building and publishing ML
 pipelines using R to train a model. This is enabled
-by changing the `build-train-script` pipeline variable to either `build_train_pipeline_with_r.py`, or `build_train_pipeline_with_r_on_dbricks.py`. For pipeline training a model with R on Databricks you'll need
+by changing the `build-train-script` pipeline variable to either `diabetes_regression_build_train_pipeline_with_r.py`, or `diabetes_regression_build_train_pipeline_with_r_on_dbricks.py`. For pipeline training a model with R on Databricks you'll need
 to manually create a Databricks cluster and attach it to the ML Workspace as a
 compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables should be
 specified).
@@ -189,7 +189,7 @@ Wait until the pipeline finishes and verify that there is a new model in the **M
 
 ![trained model](./images/trained-model.png)
 
-To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\azdo-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
+To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
 
 ### Deploy the Model to Azure Kubernetes Service
 

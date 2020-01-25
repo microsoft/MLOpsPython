@@ -26,7 +26,12 @@ parser.add_argument(
 args = parser.parse_args()
 
 model = Model(ws, name=e.model_name, version=e.model_version)
-os.chdir("./code/scoring")
+sources_dir = e.sources_directory_train
+if (sources_dir is None):
+    sources_dir = 'diabetes_regression'
+path_to_scoring = os.path.join(".", sources_dir, "scoring")
+cwd = os.getcwd()
+os.chdir(path_to_scoring)
 
 image_config = ContainerImage.image_configuration(
     execution_script=e.score_script,
@@ -40,7 +45,7 @@ image = Image.create(
     name=e.image_name, models=[model], image_config=image_config, workspace=ws
 )
 
-os.chdir("../..")
+os.chdir(cwd)
 
 image.wait_for_creation(show_output=True)
 
