@@ -28,7 +28,7 @@ args = parser.parse_args()
 model = Model(ws, name=e.model_name, version=e.model_version)
 sources_dir = e.sources_directory_train
 if (sources_dir is None):
-    sources_dir = 'code'
+    sources_dir = 'diabetes_regression'
 path_to_scoring = os.path.join(".", sources_dir, "scoring")
 cwd = os.getcwd()
 os.chdir(path_to_scoring)

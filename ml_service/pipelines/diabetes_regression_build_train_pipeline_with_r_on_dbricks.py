@@ -1,11 +1,10 @@
-from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline
 from azureml.core import Workspace
-from azureml.core.runconfig import RunConfiguration, CondaDependencies
 import os
 import sys
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from attach_compute import get_compute
+from azureml.pipeline.steps import DatabricksStep
 from env_variables import Env
 
 
@@ -29,24 +28,17 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
-    run_config = RunConfiguration(conda_dependencies=CondaDependencies.create(
-        conda_packages=['numpy', 'pandas',
-                        'scikit-learn', 'tensorflow', 'keras'],
-        pip_packages=['azure', 'azureml-core',
-                      'azure-storage',
-                      'azure-storage-blob'])
-    )
-    run_config.environment.docker.enabled = True
-    run_config.environment.docker.base_image = "mcr.microsoft.com/mlops/python"
-
-    train_step = PythonScriptStep(
-        name="Train Model",
-        script_name="train_with_r.py",
+    train_step = DatabricksStep(
+        name="DBPythonInLocalMachine",
+        num_workers=1,
+        python_script_name="train_with_r_on_databricks.py",
+        source_directory="diabetes_regression/training/R",
+        run_name='DB_Python_R_demo',
+        existing_cluster_id=e.db_cluster_id,
         compute_target=aml_compute,
-        source_directory="code/training/R",
-        runconfig=run_config,
-        allow_reuse=False,
+        allow_reuse=False
     )
+
     print("Step Train created")
 
     steps = [train_step]
@@ -54,7 +46,7 @@ def main():
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
     published_pipeline = train_pipeline.publish(
-        name=e.pipeline_name + "_with_R",
+        name=e.pipeline_name + "_with_R_on_DB",
         description="Model training/retraining pipeline",
         version=e.build_id
     )

@@ -36,7 +36,7 @@ if (run.id.startswith('OfflineRun')):
     load_dotenv()
     sources_dir = os.environ.get("SOURCES_DIR_TRAIN")
     if (sources_dir is None):
-        sources_dir = 'code'
+        sources_dir = 'diabetes_regression'
     path_to_util = os.path.join(".", sources_dir, "util")
     sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
     from model_helper import get_model_by_tag
