@@ -35,6 +35,8 @@ variables:
   value: diabetes_regression
 - name: IMAGE_NAME
   value: 'diabetestrained'
+- name: RUN_EVALUATION
+  value: 'false'
   # Optional. Used by a training pipeline with R on Databricks
 - name: DB_CLUSTER_ID
   value: ''
@@ -42,3 +44,5 @@ variables:
   value: score.py
 - name: DATASET_NAME
   value: diabetes_ds
+- name: RUN_EVALUATION
+  value: 'false'
