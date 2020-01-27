@@ -44,5 +44,3 @@ variables:
   value: score.py
 - name: DATASET_NAME
   value: diabetes_ds
-- name: RUN_EVALUATION
-  value: 'false'
