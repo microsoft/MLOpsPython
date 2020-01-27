@@ -44,6 +44,7 @@ class Env(Singleton):
         self._datastore_name = os.environ.get("DATASTORE_NAME")
         self._datafile_name = os.environ.get("DATAFILE_NAME")
         self._dataset_name = os.environ.get("DATASET_NAME")
+        self._run_evaluation = os.environ.get("RUN_EVALUATION")
 
     @property
     def workspace_name(self):
@@ -160,3 +161,8 @@ class Env(Singleton):
     @property
     def dataset_name(self):
         return self._dataset_name
+
+    @property
+    def run_evaluation(self):
+        return self._run_evaluation
+
