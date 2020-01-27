@@ -99,7 +99,7 @@ if (builduri_base is not None):
     build_uri = builduri_base + build_id
     run.tag("BuildUri", value=build_uri)
 
-# Parameterize the metrices on which the models should be compared
+# Parameterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
 try:
     firstRegistration = False
