@@ -165,4 +165,3 @@ class Env(Singleton):
     @property
     def run_evaluation(self):
         return self._run_evaluation
-

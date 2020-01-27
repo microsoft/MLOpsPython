@@ -108,7 +108,6 @@ def main():
         allow_reuse=False,
     )
     print("Step Register created")
-    
     # Check run_evaluation flag to include or exclude evaluation step.
     if ((e.run_evaluation).lower() == 'true'):
         print("Include evaluation step before register step.")
