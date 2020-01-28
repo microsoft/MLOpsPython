@@ -104,7 +104,7 @@ builduri_base = os.environ.get("BUILDURI_BASE")
 if (builduri_base is not None):
     build_uri = builduri_base + build_id
     run.tag("BuildUri", value=build_uri)
-override_cancellation = args.override_cancellation
+allow_run_cancel = args.allow_run_cancel
 # Parameterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
 try:
