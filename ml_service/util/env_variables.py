@@ -45,8 +45,8 @@ class Env(Singleton):
         self._datafile_name = os.environ.get("DATAFILE_NAME")
         self._dataset_name = os.environ.get("DATASET_NAME")
         self._run_evaluation = os.environ.get("RUN_EVALUATION", "true")
-        self._override_cancellation = os.environ.get(
-            "OVERRIDE_CANCELLATION", "false")
+        self._allow_run_cancel = os.environ.get(
+            "ALLOW_RUN_CANCEL", "true")
 
     @property
     def workspace_name(self):
@@ -169,5 +169,5 @@ class Env(Singleton):
         return self._run_evaluation
 
     @property
-    def override_cancellation(self):
-        return self._override_cancellation
+    def allow_run_cancel(self):
+        return self._allow_run_cancel

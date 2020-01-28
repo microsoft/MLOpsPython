@@ -84,10 +84,10 @@ parser.add_argument(
     default="sklearn_regression_model.pkl",
 )
 parser.add_argument(
-    "--override_cancellation",
+    "--allow_run_cancel",
     type=str,
-    help="Set this to true to override run cancellation",
-    default="false",
+    help="Set this to false to avoid evaluation step from cancelling run",
+    default="true",
 )
 
 args = parser.parse_args()
@@ -130,7 +130,7 @@ try:
         if (production_model_mse is None or new_model_mse is None):
             print("Unable to find", metric_eval, "metrics, "
                   "exiting evaluation")
-            if((override_cancellation).lower() == 'false'):
+            if((allow_run_cancel).lower() == 'true'):
                 run.parent.cancel()
         else:
             print(
@@ -146,7 +146,7 @@ try:
         else:
             print("New trained model metric is less than or equal to "
                   "production model so skipping model registration.")
-            if((override_cancellation).lower() == 'false'):
+            if((allow_run_cancel).lower() == 'true'):
                 run.parent.cancel()
     else:
         print("This is the first model, "

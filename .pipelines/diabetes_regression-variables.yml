@@ -35,14 +35,15 @@ variables:
     value: diabetes_regression
   - name: IMAGE_NAME
     value: "diabetestrained"
-  - name: RUN_EVALUATION
-    value: "true"
-  - name: OVERRIDE_CANCELLATION
-    value: "false"
-  # Optional. Used by a training pipeline with R on Databricks
+    # Optional. Used by a training pipeline with R on Databricks
   - name: DB_CLUSTER_ID
     value: ""
   - name: SCORE_SCRIPT
     value: score.py
   - name: DATASET_NAME
     value: diabetes_ds
+  # You can set this variables at pipeline run. Check default values in ml_service\util\env_variables.py
+  # - name: RUN_EVALUATION
+  #   value: "true"
+  # - name: ALLOW_RUN_CANCEL
+  #   value: "true"
