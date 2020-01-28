@@ -35,9 +35,9 @@ variables:
     value: diabetes_regression
   - name: IMAGE_NAME
     value: "diabetestrained"
-  - name: RUN_EVALUATION__REMOVE
-    value: "false"
-  - name: OVERRIDE_CANCELLATION_REMOVE
+  - name: RUN_EVALUATION
+    value: "true"
+  - name: OVERRIDE_CANCELLATION
     value: "false"
   # Optional. Used by a training pipeline with R on Databricks
   - name: DB_CLUSTER_ID
