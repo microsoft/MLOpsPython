@@ -35,7 +35,7 @@ variables:
     value: diabetes_regression
   - name: IMAGE_NAME
     value: "diabetestrained"
-  - name: RUN_EVALUATION
+  - name: RUN_EVALUATION__REMOVE
     value: "false"
   - name: OVERRIDE_CANCELLATION
     value: "false"
