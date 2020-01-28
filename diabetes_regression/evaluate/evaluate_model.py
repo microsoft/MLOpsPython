@@ -83,6 +83,12 @@ parser.add_argument(
     help="Name of the Model",
     default="sklearn_regression_model.pkl",
 )
+parser.add_argument(
+    "--override_cancellation",
+    type=str,
+    help="Set this to true to override run cancellation",
+    default="false",
+)
 
 args = parser.parse_args()
 if (args.build_id is not None):
