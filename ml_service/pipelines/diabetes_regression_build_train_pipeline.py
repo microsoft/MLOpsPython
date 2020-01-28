@@ -110,15 +110,15 @@ def main():
     )
     print("Step Register created")
     # Check run_evaluation flag to include or exclude evaluation step.
-    if ((e.run_evaluation).lower() == 'true'):
+    if ((e.run_evaluation).lower() == 'false'):
+        print("Exclude evaluation step and directly run register step.")
+        register_step.run_after(train_step)
+        steps = [train_step, register_step]
+    else:
         print("Include evaluation step before register step.")
         evaluate_step.run_after(train_step)
         register_step.run_after(evaluate_step)
         steps = [train_step, evaluate_step, register_step]
-    else:
-        print("Exclude evaluation step and directly run register step.")
-        register_step.run_after(train_step)
-        steps = [train_step, register_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline._set_experiment_name
