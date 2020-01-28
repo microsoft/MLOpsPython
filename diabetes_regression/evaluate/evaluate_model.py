@@ -124,7 +124,7 @@ try:
         if (production_model_mse is None or new_model_mse is None):
             print("Unable to find", metric_eval, "metrics, "
                   "exiting evaluation")
-            if((override_cancellation).lower() == 'false'):
+            if((override_cancellation).lower() != 'true'):
                 run.parent.cancel()
         else:
             print(
@@ -140,7 +140,7 @@ try:
         else:
             print("New trained model metric is less than or equal to "
                   "production model so skipping model registration.")
-            if((override_cancellation).lower() == 'false'):
+            if((override_cancellation).lower() != 'true'):
                 run.parent.cancel()
     else:
         print("This is the first model, "
