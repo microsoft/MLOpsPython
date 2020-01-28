@@ -44,8 +44,9 @@ class Env(Singleton):
         self._datastore_name = os.environ.get("DATASTORE_NAME")
         self._datafile_name = os.environ.get("DATAFILE_NAME")
         self._dataset_name = os.environ.get("DATASET_NAME")
-        self._run_evaluation = os.environ.get("RUN_EVALUATION")
-        self._override_cancellation = os.environ.get("OVERRIDE_CANCELLATION")
+        self._run_evaluation = os.environ.get("RUN_EVALUATION", "true")
+        self._override_cancellation = os.environ.get(
+            "OVERRIDE_CANCELLATION", "false")
 
     @property
     def workspace_name(self):
