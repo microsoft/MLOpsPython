@@ -34,4 +34,4 @@ dependencies:
   - joblib==0.14.0
   - gunicorn==19.9.0 
   - flask==1.1.1
-  
+  - inference-schema[numpy-support]
