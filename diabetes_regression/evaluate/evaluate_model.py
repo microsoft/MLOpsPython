@@ -98,7 +98,7 @@ builduri_base = os.environ.get("BUILDURI_BASE")
 if (builduri_base is not None):
     build_uri = builduri_base + build_id
     run.tag("BuildUri", value=build_uri)
-
+override_cancellation = args.override_cancellation
 # Parameterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
 try:
@@ -124,7 +124,7 @@ try:
         if (production_model_mse is None or new_model_mse is None):
             print("Unable to find", metric_eval, "metrics, "
                   "exiting evaluation")
-            if((e.override_cancellation).lower() == 'false'):
+            if((override_cancellation).lower() == 'false'):
                 run.parent.cancel()
         else:
             print(
@@ -140,7 +140,7 @@ try:
         else:
             print("New trained model metric is less than or equal to "
                   "production model so skipping model registration.")
-            if((e.override_cancellation).lower() == 'false'):
+            if((override_cancellation).lower() == 'false'):
                 run.parent.cancel()
     else:
         print("This is the first model, "

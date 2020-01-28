@@ -89,6 +89,7 @@ def main():
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
+            "--override_cancellation", e.override_cancellation,
         ],
         runconfig=run_config,
         allow_reuse=False,
