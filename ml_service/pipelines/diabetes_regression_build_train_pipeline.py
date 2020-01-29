@@ -89,6 +89,7 @@ def main():
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
+            "--allow_run_cancel", e.allow_run_cancel,
         ],
         runconfig=run_config,
         allow_reuse=False,
@@ -108,10 +109,16 @@ def main():
         allow_reuse=False,
     )
     print("Step Register created")
-
-    evaluate_step.run_after(train_step)
-    register_step.run_after(evaluate_step)
-    steps = [train_step, evaluate_step, register_step]
+    # Check run_evaluation flag to include or exclude evaluation step.
+    if ((e.run_evaluation).lower() == 'true'):
+        print("Include evaluation step before register step.")
+        evaluate_step.run_after(train_step)
+        register_step.run_after(evaluate_step)
+        steps = [train_step, evaluate_step, register_step]
+    else:
+        print("Exclude evaluation step and directly run register step.")
+        register_step.run_after(train_step)
+        steps = [train_step, register_step]
 
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline._set_experiment_name
