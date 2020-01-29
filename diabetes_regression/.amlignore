@@ -1,0 +1,3 @@
+# We use yml files to configure deployment,
+# but we are not deploying them to compute
+*.yml
