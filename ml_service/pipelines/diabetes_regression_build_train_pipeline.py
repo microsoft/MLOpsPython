@@ -4,11 +4,8 @@ from azureml.pipeline.core import Pipeline
 from azureml.core import Workspace
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
 from azureml.core import Dataset, Datastore
-import os
-import sys
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from attach_compute import get_compute
-from env_variables import Env
+from ml_service.util.attach_compute import get_compute
+from ml_service.util.Env_variables import Env
 
 
 def main():
