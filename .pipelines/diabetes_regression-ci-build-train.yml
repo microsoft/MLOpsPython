@@ -4,14 +4,14 @@ trigger:
     include:
     - master
   paths:
-    exclude:
-    - docs/
-    - environment_setup/
-    - ml_service/util/create_scoring_image.*
-    - ml_service/util/smoke_test_scoring_service.py
+    include:
+    - diabetes_regression/
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py
 
 variables:
-- template: azdo-variables.yml
+- template: diabetes_regression-variables.yml
 - group: devopsforai-aml-vg
 
 
@@ -88,6 +88,7 @@ stages:
         PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)", "hyperparameter_alpha": "$(ALPHA)"}'
   - job: "Training_Run_Report"
     dependsOn: "Run_ML_Pipeline"
+    condition: always()
     displayName: "Determine if evaluation succeeded and new model is registered"
     pool:
         vmImage: 'ubuntu-latest'
@@ -115,10 +116,10 @@ stages:
         modelSourceType: manualSpec
         modelName: '$(MODEL_NAME)'
         modelVersion: $(MODEL_VERSION)
-        inferencePath: '$(Build.SourcesDirectory)/code/scoring/inference_config.yml'
+        inferencePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/inference_config.yml'
         deploymentTarget: ACI
         deploymentName: $(ACI_DEPLOYMENT_NAME)
-        deployConfig: '$(Build.SourcesDirectory)/code/scoring/deployment_config_aci.yml'
+        deployConfig: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/deployment_config_aci.yml'
         overwriteExistingDeployment: true
     - task: AzureCLI@1
       displayName: 'Smoke test'
@@ -150,11 +151,11 @@ stages:
         modelSourceType: manualSpec
         modelName: '$(MODEL_NAME)'
         modelVersion: $(MODEL_VERSION)
-        inferencePath: '$(Build.SourcesDirectory)/code/scoring/inference_config.yml'
+        inferencePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/inference_config.yml'
         deploymentTarget: AKS
         aksCluster: $(AKS_COMPUTE_NAME)
         deploymentName: $(AKS_DEPLOYMENT_NAME)
-        deployConfig: '$(Build.SourcesDirectory)/code/scoring/deployment_config_aks.yml'
+        deployConfig: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/deployment_config_aks.yml'
         overwriteExistingDeployment: true
     - task: AzureCLI@1
       displayName: 'Smoke test'
