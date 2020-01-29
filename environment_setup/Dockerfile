@@ -4,11 +4,16 @@ LABEL org.label-schema.vendor = "Microsoft" \
       org.label-schema.url = "https://hub.docker.com/r/microsoft/mlopspython" \
       org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
-       
+COPY diabetes_regression/training/training_dependencies.yml diabetes_regression/scoring/scoring_dependencies.yml environment_setup/ci_environment.yml /setup/
 
-COPY environment_setup/requirements.txt  /setup/
-	
-RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt && \ 
-    conda install -c r r-essentials
+RUN pip install conda-merge==0.1.5 && \
+    cd /setup && conda-merge training_dependencies.yml scoring_dependencies.yml ci_environment.yml > conda_merged.yml && \
+    echo "Generated conda environment definition:" && cat conda_merged.yml && \
+    conda env create -f conda_merged.yml
 
-CMD ["python"]
+# activate environment
+ENV PATH /usr/local/envs/ci/bin:$PATH
+RUN /bin/bash -c "source activate ci"
+
+# Install Azure CLI ML extension
+RUN az extension add -n azure-cli-ml

@@ -24,8 +24,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
-python --version
-pip install azure-cli==2.0.46
-pip install --upgrade azureml-sdk[cli]
-pip install -r requirements.txt
+set -eux
+pip install conda-merge==0.1.5
+conda-merge environment_setup/ci_environment.yml diabetes_regression/scoring/scoring_dependencies.yml diabetes_regression/training/training_dependencies.yml > /tmp/conda_merged.yml
+conda env create -f /tmp/conda_merged.yml
