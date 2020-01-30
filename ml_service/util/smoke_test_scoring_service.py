@@ -1,12 +1,9 @@
-import os
-import sys
 import argparse
 import requests
 import time
 from azureml.core import Workspace
 from azureml.core.webservice import AksWebservice, AciWebservice
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from env_variables import Env
+from ml_service.util.env_variables import Env
 import secrets
 
 
