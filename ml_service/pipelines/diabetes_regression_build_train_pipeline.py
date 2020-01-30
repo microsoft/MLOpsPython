@@ -5,7 +5,7 @@ from azureml.core import Workspace
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
 from azureml.core import Dataset, Datastore
 from ml_service.util.attach_compute import get_compute
-from ml_service.util.Env_variables import Env
+from ml_service.util.env_variables import Env
 
 
 def main():
