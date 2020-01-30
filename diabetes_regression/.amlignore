@@ -1,3 +1,7 @@
+# This file allows you to ignore some files/folders
+# when code is deploying to AML compute
+# The syntax of the file is the same as for .gitignore
+
 # We use yml files to configure deployment,
 # but we are not deploying them to compute
 *.yml
