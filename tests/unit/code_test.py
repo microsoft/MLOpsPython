@@ -19,7 +19,7 @@ def test_train_model():
     run = Mock(Run)
     reg = train_model(run, data, alpha=1.2)
 
-    run.log.assert_called_with("mse", 0.029843893480256872,
+    run.log.assert_called_with("mse", 0.029843893480257067,
                                description='Mean squared error metric')
 
     preds = reg.predict([[1], [2]])
