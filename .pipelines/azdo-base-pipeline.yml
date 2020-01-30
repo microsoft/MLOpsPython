@@ -17,4 +17,5 @@ steps:
   inputs:
     codeCoverageTool: Cobertura
     summaryFileLocation: 'coverage.xml'
+    reportDirectory: 'htmlcov'
     failIfCoverageEmpty: true
