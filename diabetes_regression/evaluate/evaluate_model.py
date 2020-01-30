@@ -24,7 +24,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 import os
-from azureml.core import Run, Workspace, Experiment
+from azureml.core import Run
 import argparse
 import traceback
 from util.model_helper import get_model_by_tag
@@ -33,7 +33,7 @@ run = Run.get_context()
 
 # if you would like to run this script on a local computer
 # the following code is a good starting point for you
-# use 
+# use
 # python -m evaluate.evaluate_model
 # in diabetes_regression folder context
 
@@ -67,7 +67,7 @@ run = Run.get_context()
 #     ws = aml_workspace
 #     exp = Experiment(ws, experiment_name)
 
-# comment the following three lines 
+# comment the following three lines
 # if you would like to use Offline mode
 exp = run.experiment
 ws = run.experiment.workspace

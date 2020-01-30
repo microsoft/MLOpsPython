@@ -1,5 +1,6 @@
 import argparse
-from azureml.core import Run, Experiment, Workspace
+import sys
+from azureml.core import Run
 from ml_service.util.env_variables import Env
 from diabetes_regression.util.model_helper import get_model_by_tag
 
@@ -10,7 +11,7 @@ def main():
 
 # if you would like to run this script on a local computer
 # the following code is a good starting point for you
-# use 
+# use
 # python -m ml_service.pipelines.diabetes_regression_verify_train_pipeline
 
     # if (run.id.startswith('OfflineRun')):
