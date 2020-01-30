@@ -86,6 +86,7 @@ stages:
         PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)", "hyperparameter_alpha": "$(ALPHA)"}'
   - job: "Training_Run_Report"
     dependsOn: "Run_ML_Pipeline"
+    condition: always()
     displayName: "Determine if evaluation succeeded and new model is registered"
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
