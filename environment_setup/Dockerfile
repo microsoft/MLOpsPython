@@ -12,8 +12,8 @@ RUN pip install conda-merge==0.1.5 && \
     conda env create -f conda_merged.yml
 
 # activate environment
-ENV PATH /usr/local/envs/ci/bin:$PATH
-RUN /bin/bash -c "source activate ci"
+ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
+RUN /bin/bash -c "source activate mlopspython_ci"
 
 # Install Azure CLI ML extension
 RUN az extension add -n azure-cli-ml
