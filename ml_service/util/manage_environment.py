@@ -4,7 +4,7 @@ from azureml.core import Workspace, Environment
 def get_environment(
     workspace: Workspace,
     environment_name: str,
-    create_new: bool
+    create_new: bool = False
 ):
     try:
         restored_environment = Environment.get(

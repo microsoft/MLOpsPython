@@ -1,7 +1,7 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline
-from azureml.core import Workspace
+from azureml.core import Workspace, Environment
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
 from azureml.core import Dataset, Datastore
 import os
@@ -9,6 +9,7 @@ import sys
 sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
 from attach_compute import get_compute
 from env_variables import Env
+from manage_environment import get_environment
 
 
 def main():
@@ -31,17 +32,12 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
-    run_config = RunConfiguration(conda_dependencies=CondaDependencies.create(
-        conda_packages=['numpy', 'pandas',
-                        'scikit-learn', 'tensorflow', 'keras'],
-        pip_packages=['azure', 'azureml-core',
-                      'azure-storage',
-                      'azure-storage-blob',
-                      'azureml-dataprep'])
-    )
-    run_config.environment.docker.enabled = True
-    config_envvar = {}
-    if (e.collection_uri is not None and e.teamproject_name is not None):
+    run_config = RunConfiguration()
+    run_config.environment = get_environment(
+        aml_workspace, "diabetes_regression")
+
+  config_envvar = {}
+   if (e.collection_uri is not None and e.teamproject_name is not None):
         builduri_base = e.collection_uri + e.teamproject_name
         builduri_base = builduri_base + "/_build/results?buildId="
         config_envvar["BUILDURI_BASE"] = builduri_base
