@@ -11,8 +11,9 @@ dependencies:
 - pip
 - pip:
 
-  # dependencies shared with diabetes_regression/scoring/scoring_dependencies.yml.
-  # Versions specification must match exactly, or the docker build will fail.
+  # dependencies shared with diabetes_regression/scoring/scoring_dependencies.yml
+  # and/or diabetes_regression/training/training_dependencies.yml.
+  # If versions are specified, they must match exactly, or the docker build will fail.
   - azureml-sdk==1.0.74
 
   # Additional pip dependencies for the CI environment.

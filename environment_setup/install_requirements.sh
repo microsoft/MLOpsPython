@@ -26,5 +26,5 @@
 
 set -eux
 pip install conda-merge==0.1.5
-conda-merge environment_setup/ci_environment.yml diabetes_regression/scoring/scoring_dependencies.yml diabetes_regression/training/training_dependencies.yml > /tmp/conda_merged.yml
+conda-merge diabetes_regression/training/training_dependencies.yml diabetes_regression/scoring/scoring_dependencies.yml environment_setup/ci_environment.yml > /tmp/conda_merged.yml
 conda env create -f /tmp/conda_merged.yml
