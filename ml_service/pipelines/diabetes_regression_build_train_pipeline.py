@@ -34,7 +34,7 @@ def main():
 
     run_config = RunConfiguration()
     run_config.environment = get_environment(
-        aml_workspace, "diabetes_regression")
+        aml_workspace, "diabetes_regression", True)
 
     config_envvar = {}
     if (e.collection_uri is not None and e.teamproject_name is not None):
