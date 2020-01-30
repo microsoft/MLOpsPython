@@ -1,0 +1,10 @@
+# To prevent unnecessary files from being included in
+# the snapshot, make an ignore file (.gitignore or .amlignore).
+# Place this file in the Snapshot directory and add the
+# filenames to ignore in it. The .amlignore file uses
+# the same syntax and patterns as the .gitignore file.
+# If both files exist, the .amlignore file takes precedence.
+
+# We use yml files to configure deployment,
+# but we are not deploying them to compute
+*.yml
