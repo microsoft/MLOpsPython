@@ -1,4 +1,4 @@
-## Model deployment to AKS cluster with Canary deployemnt
+## Model deployment to AKS cluster with Canary deployment
 
 [![Build Status](https://aidemos.visualstudio.com/MLOps/_apis/build/status/microsoft.MLOpsPython-Canary?branchName=master)](https://aidemos.visualstudio.com/MLOps/_build/latest?definitionId=133&branchName=master)
 
