@@ -11,13 +11,13 @@ RUN apt-get update && apt-get install -y \
     gcc
 
 # Install dotnet runtime used to generate code coverage report
-RUN curl -O https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb
-RUN dpkg -i packages-microsoft-prod.deb
-RUN apt-get update && apt-get install -y dotnet-runtime-3.1
+RUN curl -O https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && apt-get update && apt-get install -y dotnet-runtime-3.1
 
 # Packages for running R
 RUN conda install -c r r-essentials
 
 # Install Python modules
-COPY requirements.txt  /setup/
+COPY environment_setup/requirements.txt  /setup/
 RUN pip install --upgrade -r /setup/requirements.txt
