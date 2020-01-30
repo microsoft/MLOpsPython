@@ -60,8 +60,7 @@ if (run.id.startswith('OfflineRun')):
     ws = aml_workspace
     exp = Experiment(ws, experiment_name)
 else:
-    sys.path.append(os.path.abspath("./util"))  # NOQA: E402
-    from model_helper import get_model_by_tag
+    from util.model_helper import get_model_by_tag
     exp = run.experiment
     ws = run.experiment.workspace
     run_id = 'amlcompute'
