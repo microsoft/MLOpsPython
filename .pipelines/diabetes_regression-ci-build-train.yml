@@ -96,7 +96,7 @@ stages:
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - template: azdo-template-get-model-version.yml
+    - template: diabetes_regression-template-get-model-version.yml
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
   dependsOn: Trigger_AML_Pipeline
@@ -109,7 +109,7 @@ stages:
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - template: azdo-template-get-model-version.yml
+    - template: diabetes_regression-template-get-model-version.yml
     - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
       displayName: 'Azure ML Model Deploy'
       inputs:
@@ -144,7 +144,7 @@ stages:
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - template: azdo-template-get-model-version.yml
+    - template: diabetes_regression-template-get-model-version.yml
     - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
       displayName: 'Azure ML Model Deploy'
       inputs:
@@ -180,7 +180,7 @@ stages:
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
-    - template: azdo-template-get-model-version.yml
+    - template: diabetes_regression-template-get-model-version.yml
     - task: AzureCLI@1
       displayName: 'Create scoring image and set IMAGE_LOCATION variable'
       inputs:
