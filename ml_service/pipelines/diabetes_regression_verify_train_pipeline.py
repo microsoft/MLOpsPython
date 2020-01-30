@@ -1,5 +1,3 @@
-import os
-import sys
 import argparse
 from azureml.core import Run, Experiment, Workspace
 from ml_service.util.env_variables import Env
@@ -9,6 +7,36 @@ from diabetes_regression.util.model_helper import get_model_by_tag
 def main():
 
     run = Run.get_context()
+
+# if you would like to run this script on a local computer
+# the following code is a good starting point for you
+# use 
+# python -m ml_service.pipelines.diabetes_regression_verify_train_pipeline
+
+    # if (run.id.startswith('OfflineRun')):
+    #     from dotenv import load_dotenv
+    #     # For local development, set values in this section
+    #     load_dotenv()
+    #     sources_dir = os.environ.get("SOURCES_DIR_TRAIN")
+    #     if (sources_dir is None):
+    #         sources_dir = 'diabetes_regression'
+    #     path_to_util = os.path.join(".", sources_dir, "util")
+    #     sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
+    #     from model_helper import get_model_by_tag
+    #     workspace_name = os.environ.get("WORKSPACE_NAME")
+    #     experiment_name = os.environ.get("EXPERIMENT_NAME")
+    #     resource_group = os.environ.get("RESOURCE_GROUP")
+    #     subscription_id = os.environ.get("SUBSCRIPTION_ID")
+    #     build_id = os.environ.get('BUILD_BUILDID')
+    #     aml_workspace = Workspace.get(
+    #         name=workspace_name,
+    #         subscription_id=subscription_id,
+    #         resource_group=resource_group
+    #     )
+    #     ws = aml_workspace
+    #     exp = Experiment(ws, experiment_name)
+
+# comment this line if you are running offline
     exp = run.experiment
 
     e = Env()
