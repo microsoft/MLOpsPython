@@ -1,0 +1,49 @@
+variables:
+  # Azure ML Workspace Variables
+  - name: EXPERIMENT_NAME
+    value: mlopspython
+    # AML Compute Cluster Config
+  - name: AML_COMPUTE_CLUSTER_CPU_SKU
+    value: STANDARD_DS2_V2
+  - name: AML_COMPUTE_CLUSTER_NAME
+    value: train-cluster
+  - name: AML_CLUSTER_MIN_NODES
+    value: 0
+  - name: AML_CLUSTER_MAX_NODES
+    value: 4
+  - name: AML_CLUSTER_PRIORITY
+    value: lowpriority
+    # Training Config
+  - name: BUILD_TRAIN_SCRIPT
+    value: diabetes_regression_build_train_pipeline.py
+  - name: TRAIN_SCRIPT_PATH
+    value: training/train.py
+  - name: MODEL_NAME
+    value: sklearn_regression_model.pkl
+  - name: MODEL_VERSION
+    value: "1"
+    # AML Pipeline Config
+  - name: TRAINING_PIPELINE_NAME
+    value: "diabetes-Training-Pipeline"
+  - name: MODEL_PATH
+    value: ""
+  - name: EVALUATE_SCRIPT_PATH
+    value: evaluate/evaluate_model.py
+  - name: REGISTER_SCRIPT_PATH
+    value: register/register_model.py
+  - name: SOURCES_DIR_TRAIN
+    value: diabetes_regression
+  - name: IMAGE_NAME
+    value: "diabetestrained"
+    # Optional. Used by a training pipeline with R on Databricks
+  - name: DB_CLUSTER_ID
+    value: ""
+  - name: SCORE_SCRIPT
+    value: score.py
+  - name: DATASET_NAME
+    value: diabetes_ds
+  # These are the default values set in ml_service\util\env_variables.py. Uncomment and override if desired.
+  # - name: RUN_EVALUATION
+  #   value: "true"
+  # - name: ALLOW_RUN_CANCEL
+  #   value: "true"

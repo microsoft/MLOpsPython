@@ -1,8 +1,8 @@
 resources:
 - repo: self
 
-queue:
-  name: Hosted Ubuntu 1604
+pool: 
+  vmImage: 'ubuntu-latest'
 
 trigger:
   branches:
@@ -24,6 +24,8 @@ steps:
       command: buildAndPush
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageName)'
-      tags: 'latest'
+      tags: |
+       $(Build.BuildNumber)
+       latest
       buildContext: '$(Build.SourcesDirectory)' 
       dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'

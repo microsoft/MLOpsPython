@@ -1,0 +1,36 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - ml_service/util/create_scoring_image.py
+    - ml_service/util/Dockerfile
+    - diabetes_regression/scoring/
+    exclude:
+    - diabetes_regression/scoring/deployment_config_aci.yml
+    - diabetes_regression/scoring/deployment_config_aks.yml    
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+container: mcr.microsoft.com/mlops/python:latest
+
+variables:
+- group: devopsforai-aml-vg
+- name: 'SCORE_SCRIPT'
+  value: 'scoreB.py'
+
+steps:
+
+- task: AzureCLI@1
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e
+      export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+      python3 $(Build.SourcesDirectory)/ml_service/util/create_scoring_image.py   
+  displayName: 'Create Scoring Image'
+
