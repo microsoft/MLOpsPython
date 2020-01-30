@@ -11,7 +11,7 @@ def get_environment(
             workspace=workspace, name=environment_name)
         if create_new:
             new_env = Environment.from_conda_specification(name=environment_name,
-                                                           file_path="path-to-conda-specification-file")
+                                                           file_path="/../diabetes_regression/conda_dependencies.yml")
             restored_environment = new_env
             restored_environment.register(workspace)
         elif restored_environment is None:

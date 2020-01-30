@@ -36,8 +36,8 @@ def main():
     run_config.environment = get_environment(
         aml_workspace, "diabetes_regression")
 
-  config_envvar = {}
-   if (e.collection_uri is not None and e.teamproject_name is not None):
+    config_envvar = {}
+    if (e.collection_uri is not None and e.teamproject_name is not None):
         builduri_base = e.collection_uri + e.teamproject_name
         builduri_base = builduri_base + "/_build/results?buildId="
         config_envvar["BUILDURI_BASE"] = builduri_base
