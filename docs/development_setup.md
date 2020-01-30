@@ -22,7 +22,7 @@ source .venv/bin/activate
 Install the required Python modules in your virtual environment.
 
 ```
-pip install -r environment_setup/build-image/requirements.txt 
+pip install -r environment_setup/requirements.txt 
 ```
 
 ### Running local code
