@@ -47,10 +47,12 @@ def train_model(run, data, alpha):
         preds, data["test"]["y"]), description="Mean squared error metric")
     return reg
 
+
 def get_model_parameters():
     with open("train.json") as f:
-        data=json.load(f)
+        data = json.load(f)
     return data
+
 
 def main():
     print("Running train.py")
