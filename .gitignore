@@ -91,6 +91,7 @@ ENV/
 env.bak/
 venv.bak/
 *.vscode
+condaenv.*
 
 # Spyder project settings
 .spyderproject
