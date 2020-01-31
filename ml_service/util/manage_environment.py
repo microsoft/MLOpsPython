@@ -7,19 +7,19 @@ def get_environment(
     create_new: bool = False
 ):
     try:
+        environments = Environment.list(workspace=workspace)
+        restored_environment = None
+        for env in environments:
+            if env == environment_name:
+                restored_environment = env
 
-        if create_new:
+        if restored_environment is None or create_new:
             new_env = Environment.from_conda_specification(name=environment_name,  # NOQA: E501
                                                            file_path="MLOpsPython\diabetes_regression\conda_dependencies.yml")  # NOQA: E501
-            restored_env = new_env  # NOQA: E501
-            restored_env.register(workspace)
-        else:
-            restored_env = Environment.get(
-                workspace=workspace, name=environment_name)
+            restored_environment = new_env
+            restored_environment.register(workspace)
 
-        print(
-            "packages", restored_env.python.conda_dependencies.serialize_to_string())  # NOQA: E501
-        return restored_env
+        return restored_environment
     except Exception as e:
         print(e)
         print('An error occurred while creating an environment.')
