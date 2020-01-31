@@ -249,6 +249,7 @@ Make sure your webapp has the credentials to pull the image from the Azure Conta
 * You should edit the pipeline definition to remove unused stages. For example, if you are deploying to ACI and AKS, you should delete the unused `Deploy_Webapp` stage.
 * The sample pipeline generates a random value for a model hyperparameter (ridge regression [*alpha*](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)) to generate 'interesting' charts when testing the sample. In a real application you should use fixed hyperparameter values. You can [tune hyperparameter values using Azure ML](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-tune-hyperparameters), and manage their values in Azure DevOps Variable Groups.
 * You may wish to enable [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+* You can install additional Conda or pip packages by modifying the YAML environment configurations under the `diabetes_regression` directory. Make sure to use fixed version numbers for all packages to ensure reproducibility, and use the same versions across environments.
 * You can explore aspects of model observability in the solution, such as:
   * **Logging**: navigate to the Application Insights instance linked to the Azure ML Portal,
     then to the Logs (Analytics) pane. The following sample query correlates HTTP requests with custom logs
