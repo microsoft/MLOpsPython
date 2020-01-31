@@ -1,11 +1,9 @@
 import os
-import sys
 import argparse
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
 from azureml.core.model import Model
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from env_variables import Env
+from ml_service.util.env_variables import Env
 
 e = Env()
 
