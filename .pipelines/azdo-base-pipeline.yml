@@ -1,6 +1,6 @@
 steps:
 - script: |
-   tox
+    ./lint-and-test.sh
   displayName: 'Linting & unit tests'
 
 - task: PublishTestResults@2
