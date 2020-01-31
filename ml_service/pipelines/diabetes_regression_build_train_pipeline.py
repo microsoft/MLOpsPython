@@ -32,7 +32,7 @@ def main():
         print(aml_compute)
 
     # Create a reusable run configuration environment
-    conda_deps_file = "diabetes_regression/training/training_dependencies.yml"
+    conda_deps_file = "diabetes_regression/training_dependencies.yml"
     conda_deps = CondaDependencies(conda_deps_file)
     run_config = RunConfiguration(conda_dependencies=conda_deps)
     run_config.environment.docker.enabled = True
