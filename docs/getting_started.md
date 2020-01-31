@@ -171,7 +171,13 @@ Great, you now have the build pipeline set up which automatically triggers every
 
   **Note:** The build pipeline also supports building and publishing ML
 pipelines using R to train a model. This is enabled
-by changing the `build-train-script` pipeline variable to either `diabetes_regression_build_train_pipeline_with_r.py`, or `diabetes_regression_build_train_pipeline_with_r_on_dbricks.py`. For pipeline training a model with R on Databricks you'll need
+by changing the `build-train-script` pipeline variable to either of:
+* `diabetes_regression_build_train_pipeline_with_r.py` to train a model
+with R on Azure ML Compute. You will also need to add the
+`r-essentials` Conda packages into `diabetes_regression/scoring_dependencies.yml`
+and `diabetes_regression/training_dependencies.yml`. 
+* `diabetes_regression_build_train_pipeline_with_r_on_dbricks.py`
+to train a model with R on Databricks. You will need
 to manually create a Databricks cluster and attach it to the ML Workspace as a
 compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables should be
 specified).
@@ -243,6 +249,7 @@ Make sure your webapp has the credentials to pull the image from the Azure Conta
 * You should edit the pipeline definition to remove unused stages. For example, if you are deploying to ACI and AKS, you should delete the unused `Deploy_Webapp` stage.
 * The sample pipeline generates a random value for a model hyperparameter (ridge regression [*alpha*](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)) to generate 'interesting' charts when testing the sample. In a real application you should use fixed hyperparameter values. You can [tune hyperparameter values using Azure ML](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-tune-hyperparameters), and manage their values in Azure DevOps Variable Groups.
 * You may wish to enable [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+* You can install additional Conda or pip packages by modifying the YAML environment configurations under the `diabetes_regression` directory. Make sure to use fixed version numbers for all packages to ensure reproducibility, and use the same versions across environments.
 * You can explore aspects of model observability in the solution, such as:
   * **Logging**: navigate to the Application Insights instance linked to the Azure ML Portal,
     then to the Logs (Analytics) pane. The following sample query correlates HTTP requests with custom logs
