@@ -1,0 +1,18 @@
+name: diabetes_training
+
+dependencies:
+
+  # The python interpreter version.
+- python=3.7.5
+
+- numpy=1.18.1
+- pandas=1.0.0
+- scikit-learn=0.22.1
+#- r
+#- r-essentials
+#- tensorflow
+#- keras
+
+- pip=20.0.2
+- pip:
+  - azureml-core==1.0.79
