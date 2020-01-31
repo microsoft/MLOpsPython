@@ -12,8 +12,8 @@ RUN conda env create -f /setup/ci_dependencies.yml
 ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
 RUN /bin/bash -c "source activate mlopspython_ci"
 
-# Install Azure CLI ML extension.
-# This also serves as workaround for https://github.com/conda/conda/issues/8537 (conda env create doesn't fail
-# if pip installation fails, for example due to different version specs in the various environment files).
-# The `az` command is not available if pip has not installed azure-cli.
-RUN az extension add -n azure-cli-ml
+# Verify conda installation.
+# This serves as workaround for https://github.com/conda/conda/issues/8537 (conda env create doesn't fail
+# if pip installation fails, for example due to a wrong package version).
+# The `az` command is not available if pip has not run (and installed azure-cli).
+RUN az --version
