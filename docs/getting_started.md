@@ -80,10 +80,7 @@ There are more variables used in the project. They're defined in two places, one
 
 ### Local configuration
 
-In order to configure the project locally, create a copy of `.env.example` in the root directory and name it `.env`. Fill out all missing values and adjust the existing ones to suit your requirements. 
-
-For local development, you will also need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). The Azure CLI will be used to log you in interactively.
-Please be aware that the local environment also needs access to the Azure subscription so you have to have Contributor access on the Azure ML Workspace.
+For instructions on how to set up a local development environment, refer to the [Development environment setup instructions](development_setup.md).
 
 ### Azure DevOps configuration
 

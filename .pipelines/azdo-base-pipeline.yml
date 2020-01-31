@@ -1,26 +1,21 @@
-# this pipeline should be ignored for now
-parameters:
-  pipelineType: 'training'
-
 steps:
 - script: |
-   flake8 --output-file=$(Build.BinariesDirectory)/lint-testresults.xml --format junit-xml  
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Run code quality tests'
-  enabled: 'true'
-  
-- script: |
-   python -m pytest --junitxml=$(Build.BinariesDirectory)/unit-testresults.xml $(Build.SourcesDirectory)/tests/unit
-  displayName: 'Run unit tests'
-  enabled: 'true'
-  env:
-    SP_APP_SECRET: '$(SP_APP_SECRET)'
+    ./lint-and-test.sh
+  displayName: 'Linting & unit tests'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
-    testResultsFiles: '$(Build.BinariesDirectory)/*-testresults.xml'
+    testResultsFiles: '*-testresults.xml'
     testRunTitle: 'Linting & Unit tests'
     failTaskOnFailedTests: true
-  displayName: 'Publish linting and unit test results'
-  enabled: 'true'
+  displayName: 'Publish test results'
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish coverage report'
+  condition: succeededOrFailed()
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: 'coverage.xml'
+    reportDirectory: 'htmlcov'
+    failIfCoverageEmpty: true
