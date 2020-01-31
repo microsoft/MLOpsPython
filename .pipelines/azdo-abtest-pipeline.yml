@@ -40,7 +40,7 @@ stages:
         inlineScript: |
           set -e
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          python ml_service/util/create_scoring_image.py --output_image_location_file image_location.txt          
+          python -m ml_service.util.create_scoring_image --output_image_location_file image_location.txt          
       displayName: 'Create Scoring Image'
       name: 'buildscoringimage'
 
