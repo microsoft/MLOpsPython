@@ -54,13 +54,13 @@ def main():
         environment=environment,
     )
 
-    service_description=f'Scoring model version {e.model_version}'
+    service_description = f'Scoring model version {e.model_version}'
 
     if args.type == "AKS":
 
         deployment_config = AksWebservice.deploy_configuration(
             description=service_description,
-            tags = {"BuildId": e.build_id},
+            tags={"BuildId": e.build_id},
             compute_target_name=args.compute_target,
             autoscale_enabled=True,
             autoscale_min_replicas=1,
@@ -79,11 +79,10 @@ def main():
 
         deployment_config = AciWebservice.deploy_configuration(
             description=service_description,
-            tags = {"BuildId": e.build_id},
+            tags={"BuildId": e.build_id},
             cpu_cores=1,
             memory_gb=4,
         )
-
 
     model = Model(aml_workspace, name=e.model_name, version=e.model_version)
 
