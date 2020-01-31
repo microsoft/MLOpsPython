@@ -45,8 +45,8 @@ def main():
 
     # Create a reusable scoring environment
     environment = get_environment(
-       aml_workspace, "diabetes_scoring",
-       "diabetes_regression/scoring_dependencies.yml")
+        aml_workspace, "diabetes_scoring",
+        "diabetes_regression/scoring_dependencies.yml")
 
     inference_config = InferenceConfig(
         entry_script='score.py',
