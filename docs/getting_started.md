@@ -171,7 +171,13 @@ Great, you now have the build pipeline set up which automatically triggers every
 
   **Note:** The build pipeline also supports building and publishing ML
 pipelines using R to train a model. This is enabled
-by changing the `build-train-script` pipeline variable to either `diabetes_regression_build_train_pipeline_with_r.py`, or `diabetes_regression_build_train_pipeline_with_r_on_dbricks.py`. For pipeline training a model with R on Databricks you'll need
+by changing the `build-train-script` pipeline variable to either of:
+* `diabetes_regression_build_train_pipeline_with_r.py` to train a model
+with R on Azure ML Compute. You will also need to add the
+`r-essentials` Conda packages into `diabetes_regression/scoring_dependencies.yml`
+and `diabetes_regression/training_dependencies.yml`. 
+* `diabetes_regression_build_train_pipeline_with_r_on_dbricks.py`
+to train a model with R on Databricks. You will need
 to manually create a Databricks cluster and attach it to the ML Workspace as a
 compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables should be
 specified).

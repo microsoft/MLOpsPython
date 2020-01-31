@@ -38,7 +38,6 @@ def create_environment(
     environment_name: str,
     environment_file: str,
 ):
-    print("Creating a new environment " + environment_name)
 
     try:
         aml_env = Environment.from_conda_specification(
