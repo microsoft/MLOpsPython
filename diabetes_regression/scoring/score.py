@@ -79,7 +79,7 @@ def run(data, request_headers):
                request_headers.get("X-Ms-Request-Id", ""),
                request_headers.get("Traceparent", ""),
                len(result)
-           ))
+    ))
 
     return {"result": result.tolist()}
 
