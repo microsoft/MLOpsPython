@@ -4,16 +4,14 @@ pr:
     include:
     - master
 
-pool: 
+pool:
   vmImage: 'ubuntu-latest'
 
 container: mcr.microsoft.com/mlops/python:latest  
 
-
 variables:
 - template: diabetes_regression-variables.yml
 - group: devopsforai-aml-vg
-
 
 steps:
 - template: azdo-base-pipeline.yml

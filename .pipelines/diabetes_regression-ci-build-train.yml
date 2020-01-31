@@ -14,6 +14,8 @@ variables:
 - template: diabetes_regression-variables.yml
 - group: devopsforai-aml-vg
 
+pool:
+  vmImage: ubuntu-latest
 
 stages:
 - stage: 'Model_CI'
@@ -21,8 +23,6 @@ stages:
   jobs:
   - job: "Model_CI_Pipeline"
     displayName: "Model CI Pipeline"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -45,8 +45,6 @@ stages:
   - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
     displayName: "Get Pipeline ID for execution"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -92,8 +90,6 @@ stages:
     dependsOn: "Run_ML_Pipeline"
     condition: always()
     displayName: "Determine if evaluation succeeded and new model is registered"
-    pool:
-        vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -105,8 +101,6 @@ stages:
   jobs:
   - job: "Deploy_ACI"
     displayName: "Deploy to ACI"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -140,8 +134,6 @@ stages:
   jobs:
   - job: "Deploy_AKS"
     displayName: "Deploy to AKS"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -176,8 +168,6 @@ stages:
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Deploy to Webapp"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
