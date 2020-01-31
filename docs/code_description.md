@@ -2,9 +2,7 @@
 
 ### Environment Setup
 
-- `environment_setup/requirements.txt` : It consists of a list of python packages which are needed by the train.py to run successfully on host agent (locally).
-
-- `environment_setup/install_requirements.sh` : This script prepares the python environment i.e. install the Azure ML SDK and the packages specified in requirements.txt
+- `environment_setup/install_requirements.sh` : This script prepares a local conda environment i.e. install the Azure ML SDK and the packages specified in environment definitions.
 
 - `environment_setup/iac-*.yml, arm-templates` : Infrastructure as Code piplines to create and delete required resources along with corresponding arm-templates.
 
@@ -27,6 +25,12 @@
 - `ml_service/pipelines/diabetes_regression_verify_train_pipeline.py` : determines whether the evaluate_model.py step of the training pipeline registered a new model.
 - `ml_service/util` : contains common utility functions used to build and publish an ML training pipeline.
 
+### Environment Definitions
+
+- `diabetes_regression/training_dependencies.yml` : Conda environment definition for the training environment (Docker image in which train.py is run).
+- `diabetes_regression/scoring_dependencies.yml` : Conda environment definition for the scoring environment (Docker image in which score.py is run).
+- `diabetes_regression/ci_dependencies.yml` : Conda environment definition for the CI environment.
+
 ### Code
 
 - `diabetes_regression/training/train.py` : a training step of an ML training pipeline.
@@ -39,5 +43,4 @@
 
 ### Scoring
 - `diabetes_regression/scoring/score.py` : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.
-- `diabetes_regression/scoring/conda_dependencies.yml` : contains a list of dependencies required by score.py to be installed in a deployable Docker Image 
 - `diabetes_regression/scoring/inference_config.yml`, deployment_config_aci.yml, deployment_config_aks.yml : configuration files for the [AML Model Deploy](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.private-vss-services-azureml&ssr=false#overview) pipeline task for ACI and AKS deployment targets.
