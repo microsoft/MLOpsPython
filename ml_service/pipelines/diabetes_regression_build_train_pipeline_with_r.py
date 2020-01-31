@@ -4,6 +4,7 @@ from azureml.core import Workspace
 from azureml.core.runconfig import RunConfiguration, CondaDependencies
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
+from ml_service.util.manage_environment import get_environment
 
 
 def main():
@@ -26,11 +27,11 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
-    # Create a run configuration environment
-    conda_deps_file = "diabetes_regression/training_dependencies.yml"
-    conda_deps = CondaDependencies(conda_deps_file)
-    run_config = RunConfiguration(conda_dependencies=conda_deps)
-    run_config.environment.docker.enabled = True
+    # Create a reusable run configuration environment
+    run_config = RunConfiguration()
+    run_config.environment = get_environment(
+        aml_workspace, "diabetes_regression",
+        "diabetes_regression/training_dependencies.yml")
 
     train_step = PythonScriptStep(
         name="Train Model",
