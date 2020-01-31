@@ -8,7 +8,7 @@ from ml_service.util.manage_environment import get_environment
 
 
 def main():
-    parser = argparse.ArgumentParser("smoke_test_scoring_service.py")
+    parser = argparse.ArgumentParser("deploy_web_service.py")
 
     parser.add_argument(
         "--type",
@@ -26,10 +26,12 @@ def main():
     parser.add_argument(
         "--compute_target",
         type=str,
-        required=True,
         help="Name of the compute target. Only applicable if type = AKS"
     )
     args = parser.parse_args()
+
+    if args.type == "AKS" and args.compute_target is None:
+        raise ValueError("--compute_target is required")
 
     e = Env()
     # Get Azure machine learning workspace
@@ -57,8 +59,9 @@ def main():
     if args.type == "AKS":
 
         deployment_config = AksWebservice.deploy_configuration(
-            compute_target_name=args.compute_target,
             description=service_description,
+            tags = {"BuildId": e.build_id},
+            compute_target_name=args.compute_target,
             autoscale_enabled=True,
             autoscale_min_replicas=1,
             autoscale_max_replicas=3,
@@ -76,11 +79,11 @@ def main():
 
         deployment_config = AciWebservice.deploy_configuration(
             description=service_description,
+            tags = {"BuildId": e.build_id},
             cpu_cores=1,
             memory_gb=4,
         )
 
-    deployment_config.add_tags({"BuildId": e.build_id})
 
     model = Model(aml_workspace, name=e.model_name, version=e.model_version)
 
