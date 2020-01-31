@@ -28,9 +28,10 @@ steps:
   inputs:
     azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
     scriptLocation: inlineScript
+    workingDirectory: $(Build.SourcesDirectory)
     inlineScript: |
       set -e
       export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-      python3 $(Build.SourcesDirectory)/ml_service/util/create_scoring_image.py   
+      python3 -m ml_service.util.create_scoring_image   
   displayName: 'Create Scoring Image'
 

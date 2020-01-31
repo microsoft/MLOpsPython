@@ -1,11 +1,8 @@
 from azureml.pipeline.core import Pipeline
 from azureml.core import Workspace
-import os
-import sys
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from attach_compute import get_compute
+from ml_service.util.attach_compute import get_compute
 from azureml.pipeline.steps import DatabricksStep
-from env_variables import Env
+from ml_service.util.env_variables import Env
 
 
 def main():
