@@ -26,7 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 import numpy
 import joblib
 import os
-import glob
+from azureml.core.model import Model
 from inference_schema.schema_decorators \
     import input_schema, output_schema
 from inference_schema.parameter_types.numpy_parameter_type \
@@ -41,10 +41,9 @@ def init():
     # AZUREML_MODEL_DIR is an environment variable created during deployment.
     # It is the path to the model folder
     # (./azureml-models/$MODEL_NAME/$VERSION)
-    fset = [file for file in glob.glob(
-        "{0}/*.*".format(os.getenv("AZUREML_MODEL_DIR")), recursive=True)]
+    model_path=Model.get_model_path(os.getenv("AZUREML_MODEL_DIR").split('/')[1])
 
-    model = joblib.load(fset[0])
+    model = joblib.load(model_path)
 
 
 input_sample = numpy.array([
