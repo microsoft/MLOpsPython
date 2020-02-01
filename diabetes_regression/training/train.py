@@ -49,7 +49,7 @@ def train_model(run, data, alpha):
 
 
 def get_model_parameters():
-    with open("train.json") as f:
+    with open("../config.json") as f:
         data = json.load(f)
     return data
 
@@ -88,9 +88,10 @@ def main():
     print("Getting training parameters")
 
     pars = get_model_parameters()
-    alpha = pars.get("alpha")
-    if alpha is None:
-        alpha = 0.5
+    try:
+        alpha=pars["training"]["alpha"]
+    except KeyError:
+        alpha=0.5
 
     print("Parameter alpha: %s" % alpha)
 
