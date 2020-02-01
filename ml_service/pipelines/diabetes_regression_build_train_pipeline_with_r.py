@@ -26,15 +26,11 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
-    run_config = RunConfiguration(conda_dependencies=CondaDependencies.create(
-        conda_packages=['numpy', 'pandas',
-                        'scikit-learn', 'tensorflow', 'keras'],
-        pip_packages=['azure', 'azureml-core',
-                      'azure-storage',
-                      'azure-storage-blob'])
-    )
+    # Create a run configuration environment
+    conda_deps_file = "diabetes_regression/training_dependencies.yml"
+    conda_deps = CondaDependencies(conda_deps_file)
+    run_config = RunConfiguration(conda_dependencies=conda_deps)
     run_config.environment.docker.enabled = True
-    run_config.environment.docker.base_image = "mcr.microsoft.com/mlops/python"
 
     train_step = PythonScriptStep(
         name="Train Model",
