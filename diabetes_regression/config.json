@@ -2,5 +2,13 @@
     "training":
     {
         "alpha": 0.4
+    },
+    "evaluation":
+    {
+
+    },
+    "scoring":
+    {
+        
     }
 }

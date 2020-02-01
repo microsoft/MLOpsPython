@@ -32,7 +32,7 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
-import json
+from util.model_helper import get_model_parameters
 
 
 def train_model(run, data, alpha):
@@ -46,12 +46,6 @@ def train_model(run, data, alpha):
     run.parent.log("mse", mean_squared_error(
         preds, data["test"]["y"]), description="Mean squared error metric")
     return reg
-
-
-def get_model_parameters():
-    with open("../config.json") as f:
-        data = json.load(f)
-    return data
 
 
 def main():
