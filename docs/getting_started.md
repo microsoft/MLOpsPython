@@ -86,6 +86,8 @@ For instructions on how to set up a local development environment, refer to the 
 
 For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/diabetes_regression-variables.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
 
+**Note:** In `diabetes_regression` folder you can find `config.json` file that we would recommend to use in order to provide parameters for training, evaluation and scoring scripts. An example of a such parameter is a hyperparameter of a training algorithm: in our case it's the ridge regression [*alpha* hyperparameter](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html).
+
 Up until now you should have:
 
 * Forked (or cloned) the repo
@@ -120,7 +122,7 @@ Check out the newly created resources in the [Azure Portal](portal.azure.com):
 (Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](portal.azure.com).
 
 **Note:** The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. If you want to use your own dataset, you need to [create and register a datastore](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-access-data#azure-machine-learning-studio) in your ML workspace and upload the datafile (e.g. [diabetes.csv](./data/diabetes.csv)) to the corresponding blob container. You can also define a datastore in the ML Workspace with [az cli](https://docs.microsoft.com/en-us/cli/azure/ext/azure-cli-ml/ml/datastore?view=azure-cli-latest#ext-azure-cli-ml-az-ml-datastore-attach-blob). 
-You'll also need to configure DATASTORE_NAME and DATAFILE_NAME variables in ***devopsforai-aml-vg*** variable group. 
+You'll also need to configure DATASTORE_NAME and DATAFILE_NAME variables in ***devopsforai-aml-vg*** variable group.
 
 
 ## Create an Azure DevOps Azure ML Workspace Service Connection
@@ -187,7 +189,7 @@ specified).
 **Note:** If the model evaluation determines that the new model does not perform better than the previous one then the new model will not be registered and the pipeline will be cancelled.
 
 * The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). It then runs a *smoke test* to validate the deployment, i.e. sends a sample query to the scoring web service and verifies that it returns a response in the expected format.
- 
+
 Wait until the pipeline finishes and verify that there is a new model in the **ML Workspace**:
 
 ![trained model](./images/trained-model.png)
@@ -247,7 +249,6 @@ Make sure your webapp has the credentials to pull the image from the Azure Conta
 
 * The provided pipeline definition YAML file is a sample starting point, which you should tailor to your processes and environment.
 * You should edit the pipeline definition to remove unused stages. For example, if you are deploying to ACI and AKS, you should delete the unused `Deploy_Webapp` stage.
-* The sample pipeline generates a random value for a model hyperparameter (ridge regression [*alpha*](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)) to generate 'interesting' charts when testing the sample. In a real application you should use fixed hyperparameter values. You can [tune hyperparameter values using Azure ML](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-tune-hyperparameters), and manage their values in Azure DevOps Variable Groups.
 * You may wish to enable [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
 * You can install additional Conda or pip packages by modifying the YAML environment configurations under the `diabetes_regression` directory. Make sure to use fixed version numbers for all packages to ensure reproducibility, and use the same versions across environments.
 * You can explore aspects of model observability in the solution, such as:
