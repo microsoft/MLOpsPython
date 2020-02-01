@@ -44,8 +44,6 @@ def main():
         name="model_name", default_value=e.model_name)
     build_id_param = PipelineParameter(
         name="build_id", default_value=e.build_id)
-    hyperparameter_alpha_param = PipelineParameter(
-        name="hyperparameter_alpha", default_value=0.5)
 
     dataset_name = ""
     if (e.datastore_name is not None and e.datafile_name is not None):
@@ -66,7 +64,6 @@ def main():
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
-            "--alpha", hyperparameter_alpha_param,
             "--dataset_name", dataset_name,
         ],
         runconfig=run_config,
