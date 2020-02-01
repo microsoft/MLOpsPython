@@ -81,7 +81,7 @@ def main():
 
     print("Getting training parameters")
 
-    with open("../config.json") as f:
+    with open("config.json") as f:
         pars = json.load(f)
     try:
         alpha = pars["training"]["alpha"]
