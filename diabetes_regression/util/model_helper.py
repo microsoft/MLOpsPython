@@ -4,21 +4,6 @@ model_helper.py
 from azureml.core import Run
 from azureml.core import Workspace
 from azureml.core.model import Model as AMLModel
-import json
-
-
-def get_model_parameters():
-    """
-    Getting parameters from config.json
-    Parameters:
-    None
-
-    Return:
-    a dictionary from config.json
-    """
-    with open("../config.json") as f:
-        data = json.load(f)
-    return data
 
 
 def get_current_workspace() -> Workspace:

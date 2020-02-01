@@ -32,7 +32,7 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.externals import joblib
-from util.model_helper import get_model_parameters
+import json
 
 
 def train_model(run, data, alpha):
@@ -81,7 +81,8 @@ def main():
 
     print("Getting training parameters")
 
-    pars = get_model_parameters()
+    with open("../config.json") as f:
+        pars = json.load(f)
     try:
         alpha = pars["training"]["alpha"]
     except KeyError:
