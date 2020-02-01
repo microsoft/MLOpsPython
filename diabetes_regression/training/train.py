@@ -89,9 +89,9 @@ def main():
 
     pars = get_model_parameters()
     try:
-        alpha=pars["training"]["alpha"]
+        alpha = pars["training"]["alpha"]
     except KeyError:
-        alpha=0.5
+        alpha = 0.5
 
     print("Parameter alpha: %s" % alpha)
 
