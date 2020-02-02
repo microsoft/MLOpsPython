@@ -105,15 +105,26 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-template-get-model-version.yml
+    - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
+      displayName: 'Azure ML Model Deploy'
+      inputs:
+        azureSubscription: $(WORKSPACE_SVC_CONNECTION)
+        modelSourceType: manualSpec
+        modelName: '$(MODEL_NAME)'
+        modelVersion: $(MODEL_VERSION)
+        inferencePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/inference_config.yml'
+        deploymentTarget: ACI
+        deploymentName: $(ACI_DEPLOYMENT_NAME)
+        deployConfig: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/deployment_config_aci.yml'
+        overwriteExistingDeployment: true
     - task: AzureCLI@1
-      displayName: Azure ML Model Deploy and smoke test
+      displayName: 'Smoke test'
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
         inlineScript: |
           set -e # fail on error
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          python -m ml_service.pipelines.deploy_web_service --type ACI --service "$(ACI_DEPLOYMENT_NAME)"
           python -m ml_service.util.smoke_test_scoring_service --type ACI --service "$(ACI_DEPLOYMENT_NAME)"
 
 - stage: 'Deploy_AKS'
