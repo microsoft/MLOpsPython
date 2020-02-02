@@ -1,12 +1,11 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline
-from azureml.core import Workspace
+from azureml.core import Workspace, Environment
 from azureml.core.runconfig import RunConfiguration
 from azureml.core import Dataset, Datastore
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
-from ml_service.util.manage_environment import get_environment
 
 
 def main():
@@ -30,17 +29,15 @@ def main():
         print(aml_compute)
 
     # Create a reusable run configuration environment
-    run_config = RunConfiguration()
-    run_config.environment = get_environment(
-        aml_workspace, "diabetes_regression",
-        "diabetes_regression/training_dependencies.yml")
-
-    config_envvar = {}
+    environment = Environment.load_from_directory(e.sources_directory_train)
     if (e.collection_uri is not None and e.teamproject_name is not None):
         builduri_base = e.collection_uri + e.teamproject_name
         builduri_base = builduri_base + "/_build/results?buildId="
-        config_envvar["BUILDURI_BASE"] = builduri_base
-    run_config.environment.environment_variables = config_envvar
+        environment.environment_variables["BUILDURI_BASE"] = builduri_base
+    environment.register(aml_workspace)
+
+    run_config = RunConfiguration()
+    run_config.environment = environment
 
     model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)

@@ -23,13 +23,12 @@
 - `ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py` : builds and publishes an ML training pipeline. It uses R on Databricks Compute.
 - `ml_service/pipelines/run_train_pipeline.py` : invokes a published ML training pipeline (Python on ML Compute) via REST API.
 - `ml_service/pipelines/diabetes_regression_verify_train_pipeline.py` : determines whether the evaluate_model.py step of the training pipeline registered a new model.
-- `ml_service/pipelines/deploy_web_service.py` : deploys the model to ACI or AKS. Also contains the deployment configuration for the environments (e.g. CPU, memory, number of replicas in AKS).
 - `ml_service/util` : contains common utility functions used to build and publish an ML training pipeline.
 
 ### Environment Definitions
 
-- `diabetes_regression/training_dependencies.yml` : Conda environment definition for the training environment (Docker image in which train.py is run).
-- `diabetes_regression/scoring_dependencies.yml` : Conda environment definition for the scoring environment (Docker image in which score.py is run).
+- `diabetes_regression/azureml_environment.json` : Azure ML environment definition for the training environment, including base Docker image and a reference to `conda_dependencies.yml` Conda environment file.
+- `diabetes_regression/conda_dependencies.yml` : Conda environment definition for the environment used for both training and scoring (Docker image in which train.py and score.py are run).
 - `diabetes_regression/ci_dependencies.yml` : Conda environment definition for the CI environment.
 
 ### Code
@@ -44,3 +43,4 @@
 
 ### Scoring
 - `diabetes_regression/scoring/score.py` : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.
+- `diabetes_regression/scoring/inference_config.yml`, deployment_config_aci.yml, deployment_config_aks.yml : configuration files for the [AML Model Deploy](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.private-vss-services-azureml&ssr=false#overview) pipeline task for ACI and AKS deployment targets.

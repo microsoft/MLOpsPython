@@ -5,16 +5,19 @@ dependencies:
   # The python interpreter version.
 - python=3.7.5
 
-- r=3.6.0
-- r-essentials=3.6.0
+  # dependencies with versions aligned with conda_dependencies.yml.
 - numpy=1.18.1
 - pandas=1.0.0
 - scikit-learn=0.22.1
 
+  # dependencies for MLOps with R.
+- r=3.6.0
+- r-essentials=3.6.0
+
 - pip=20.0.2
 - pip:
 
-  # dependencies shared with other environment .yml files.
+  # dependencies with versions aligned with conda_dependencies.yml.
   - azureml-sdk==1.0.79
 
   # Additional pip dependencies for the CI environment.

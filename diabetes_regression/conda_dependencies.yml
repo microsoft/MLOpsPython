@@ -1,7 +1,7 @@
 # Details about the Conda environment file format:
 # https://conda.io/docs/using/envs.html#create-environment-file-by-hand
 
-name: diabetes_scoring
+name: diabetes_regression_sklearn
 
 dependencies:
 
@@ -15,9 +15,19 @@ dependencies:
 - numpy=1.18.1
 - pandas=1.0.0
 - scikit-learn=0.22.1
+#- r-essentials
+#- tensorflow
+#- keras
 
 - pip=20.0.2
 - pip:
+
+  # Dependencies for training environment.
+
+  - azureml-core==1.0.79
+
+  # Dependencies for scoring environment.
+
   # You must list azureml-defaults as a pip dependency
-  - azureml-defaults==1.0.85
+  - azureml-defaults==1.0.79
   - inference-schema[numpy-support]==1.0.1
