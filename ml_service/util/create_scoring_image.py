@@ -34,7 +34,7 @@ os.chdir(path_to_scoring)
 image_config = ContainerImage.image_configuration(
     execution_script=e.score_script,
     runtime="python",
-    conda_file="./diabetes_regression/scoring_dependencies.yml",
+    conda_file="scoring_dependencies.yml",
     description="Image with ridge regression model",
     tags={"area": "diabetes", "type": "regression"},
 )
