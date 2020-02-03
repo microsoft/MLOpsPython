@@ -29,6 +29,7 @@ def main():
         print(aml_compute)
 
     # Create a reusable run configuration environment
+    # Read definition from diabetes_regression/azureml_environment.json
     environment = Environment.load_from_directory(e.sources_directory_train)
     if (e.collection_uri is not None and e.teamproject_name is not None):
         builduri_base = e.collection_uri + e.teamproject_name
