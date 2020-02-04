@@ -5,7 +5,7 @@ name: diabetes_regression_sklearn
 
 dependencies:
   # The python interpreter version.
-  - python=3.8.1
+  - python=3.7.5
 
   # Required by azureml-defaults, installed separately through Conda to
   # get a prebuilt version and not require build tools for the install.
