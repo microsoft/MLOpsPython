@@ -1,24 +1,21 @@
-import os
-import sys
 import argparse
+import sys
+import os
 from azureml.core import Run, Experiment, Workspace
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from env_variables import Env
+from ml_service.util.env_variables import Env
+from diabetes_regression.util.model_helper import get_model_by_tag
 
 
 def main():
 
     run = Run.get_context()
+
     if (run.id.startswith('OfflineRun')):
         from dotenv import load_dotenv
-        # For local development, set values in this section
         load_dotenv()
         sources_dir = os.environ.get("SOURCES_DIR_TRAIN")
         if (sources_dir is None):
             sources_dir = 'diabetes_regression'
-        path_to_util = os.path.join(".", sources_dir, "util")
-        sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
-        from model_helper import get_model_by_tag
         workspace_name = os.environ.get("WORKSPACE_NAME")
         experiment_name = os.environ.get("EXPERIMENT_NAME")
         resource_group = os.environ.get("RESOURCE_GROUP")
@@ -32,9 +29,6 @@ def main():
         ws = aml_workspace
         exp = Experiment(ws, experiment_name)
     else:
-        sys.path.append(os.path.abspath("./util"))  # NOQA: E402
-        from model_helper import get_model_by_tag
-        ws = run.experiment.workspace
         exp = run.experiment
 
     e = Env()

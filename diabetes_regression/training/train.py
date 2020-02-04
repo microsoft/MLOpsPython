@@ -31,7 +31,8 @@ from sklearn.datasets import load_diabetes
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-from sklearn.externals import joblib
+import joblib
+import json
 
 
 def train_model(run, data, alpha):
@@ -62,13 +63,6 @@ def main():
         help="Name of the Model",
         default="sklearn_regression_model.pkl",
     )
-    parser.add_argument(
-        "--alpha",
-        type=float,
-        default=0.5,
-        help=("Ridge regression regularization strength hyperparameter; "
-              "must be a positive float.")
-    )
 
     parser.add_argument(
         "--dataset_name",
@@ -79,13 +73,22 @@ def main():
 
     print("Argument [build_id]: %s" % args.build_id)
     print("Argument [model_name]: %s" % args.model_name)
-    print("Argument [alpha]: %s" % args.alpha)
     print("Argument [dataset_name]: %s" % args.dataset_name)
 
     model_name = args.model_name
     build_id = args.build_id
-    alpha = args.alpha
     dataset_name = args.dataset_name
+
+    print("Getting training parameters")
+
+    with open("config.json") as f:
+        pars = json.load(f)
+    try:
+        alpha = pars["training"]["alpha"]
+    except KeyError:
+        alpha = 0.5
+
+    print("Parameter alpha: %s" % alpha)
 
     run = Run.get_context()
     ws = run.experiment.workspace

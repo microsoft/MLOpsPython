@@ -24,8 +24,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+set -eux
 
-python --version
-pip install azure-cli==2.0.46
-pip install --upgrade azureml-sdk[cli]
-pip install -r requirements.txt
+conda env create -f diabetes_regression/ci_dependencies.yml
+
+conda activate mlopspython_ci

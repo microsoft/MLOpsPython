@@ -1,12 +1,9 @@
-import os
-import sys
 import argparse
 import requests
 import time
 from azureml.core import Workspace
 from azureml.core.webservice import AksWebservice, AciWebservice
-sys.path.append(os.path.abspath("./ml_service/util"))  # NOQA: E402
-from env_variables import Env
+from ml_service.util.env_variables import Env
 import secrets
 
 
@@ -52,7 +49,7 @@ def call_web_app(url, headers):
             response.raise_for_status()
             return response.json()
         except requests.exceptions.HTTPError as e:
-            if i == retries-1:
+            if i == retries - 1:
                 raise e
             print(e)
             print("Retrying...")

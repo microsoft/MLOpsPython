@@ -26,6 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 import numpy
 import joblib
 import os
+from azureml.core.model import Model
 from inference_schema.schema_decorators \
     import input_schema, output_schema
 from inference_schema.parameter_types.numpy_parameter_type \
@@ -36,16 +37,13 @@ def init():
     # load the model from file into a global object
     global model
 
-    # AZUREML_MODEL_DIR is an environment variable created during service
-    # deployment. It contains the path to the folder containing the model.
-    path = os.environ['AZUREML_MODEL_DIR']
-    model_path = None
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            if '.pkl' in file:
-                model_path = os.path.join(path, file)
-    if model_path is None:
-        raise ValueError(".pkl model not found")
+    # we assume that we have just one model
+    # AZUREML_MODEL_DIR is an environment variable created during deployment.
+    # It is the path to the model folder
+    # (./azureml-models/$MODEL_NAME/$VERSION)
+    model_path = Model.get_model_path(
+        os.getenv("AZUREML_MODEL_DIR").split('/')[-2])
+
     model = joblib.load(model_path)
 
 
@@ -79,7 +77,7 @@ def run(data, request_headers):
                request_headers.get("X-Ms-Request-Id", ""),
                request_headers.get("Traceparent", ""),
                len(result)
-           ))
+    ))
 
     return {"result": result.tolist()}
 
