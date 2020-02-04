@@ -5,14 +5,15 @@ LABEL org.label-schema.vendor = "Microsoft" \
     org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
 COPY diabetes_regression/ci_dependencies.yml /setup/
-RUN conda update -n base -c defaults conda
-RUN conda install python=3.7.5
+#RUN conda update -n base -c defaults conda
+#RUN conda install python=3.7.5
 RUN conda env create -f /setup/ci_dependencies.yml
 
 # activate environment
-SHELL ["conda", "run", "-n", "mlopspython_ci", "/bin/bash", "-c"]
-# ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
-# RUN /bin/bash -c "source activate mlopspython_ci"
+#SHELL ["conda", "run", "-n", "mlopspython_ci", "/bin/bash", "-c"]
+# Alternate Way to activate Conda Env
+ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
+RUN /bin/bash -c "source activate mlopspython_ci"
 
 # Verify conda installation.
 # This serves as workaround for https://github.com/conda/conda/issues/8537 (conda env create doesn't fail
