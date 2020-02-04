@@ -67,7 +67,7 @@ be naming collisions with resources that require unique names like azure blob
 storage and registry DNS naming. Make sure to give a unique value to the
 BASE_NAME variable (e.g. MyUniqueML), so that the created resources will have
 unique names (e.g. MyUniqueMLamlcr, MyUniqueML-AML-KV, etc.). The length of
-the BASE_NAME value should not exceed 10 characters and should contain numbers and letters only. 
+the BASE_NAME value should not exceed 10 characters and it should contain numbers and letters only. 
 
 The **RESOURCE_GROUP** parameter is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
 
