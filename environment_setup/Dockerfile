@@ -10,6 +10,5 @@ COPY environment_setup/requirements.txt  /setup/
 	
 RUN apt-get update && apt-get install gcc -y && pip install --upgrade -r /setup/requirements.txt && \ 
     conda install -c r r-essentials
-RUN chmod -R 777 /usr/local/lib/python3.7    
 
 CMD ["python"]
