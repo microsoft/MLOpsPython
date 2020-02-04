@@ -107,7 +107,7 @@ In your Azure DevOps project, create a build pipeline from your forked repositor
 
 ![build connnect step](./images/build-connect.png)
 
-Select the **Existing Azure Pipelines YAML file** option and set the path to [/environment_setup/iac-create-environment.yml](../environment_setup/iac-remove-environment.yml):
+Select the **Existing Azure Pipelines YAML file** option and set the path to [/environment_setup/iac-create-environment.yml](../environment_setup/iac-create-environment.yml):
 
 ![configure step](./images/select-iac-pipeline.png)
 
