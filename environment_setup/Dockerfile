@@ -1,11 +1,11 @@
 FROM conda/miniconda3
 
 LABEL org.label-schema.vendor = "Microsoft" \
-      org.label-schema.url = "https://hub.docker.com/r/microsoft/mlopspython" \
-      org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
+    org.label-schema.url = "https://hub.docker.com/r/microsoft/mlopspython" \
+    org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
 COPY diabetes_regression/ci_dependencies.yml /setup/
-
+RUN conda env remove -n mlopspython_ci
 RUN conda env create -f /setup/ci_dependencies.yml
 
 # activate environment
