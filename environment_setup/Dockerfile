@@ -5,6 +5,7 @@ LABEL org.label-schema.vendor = "Microsoft" \
     org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
 COPY diabetes_regression/ci_dependencies.yml /setup/
+RUN conda update -n base -c defaults conda
 RUN conda install python=3.8.1
 RUN conda env create -f /setup/ci_dependencies.yml
 
