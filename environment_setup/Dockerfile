@@ -10,8 +10,9 @@ RUN conda install python=3.8.1
 RUN conda env create -f /setup/ci_dependencies.yml
 
 # activate environment
-ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
-RUN /bin/bash -c "source activate mlopspython_ci"
+SHELL ["conda", "run", "-n", "mlopspython_ci", "/bin/bash", "-c"]
+# ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
+# RUN /bin/bash -c "source activate mlopspython_ci"
 
 # Verify conda installation.
 # This serves as workaround for https://github.com/conda/conda/issues/8537 (conda env create doesn't fail
