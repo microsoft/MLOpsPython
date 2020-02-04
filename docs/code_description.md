@@ -27,8 +27,8 @@
 
 ### Environment Definitions
 
-- `diabetes_regression/training_dependencies.yml` : Conda environment definition for the training environment (Docker image in which train.py is run).
-- `diabetes_regression/scoring_dependencies.yml` : Conda environment definition for the scoring environment (Docker image in which score.py is run).
+- `diabetes_regression/azureml_environment.json` : Azure ML environment definition for the training environment, including base Docker image and a reference to `conda_dependencies.yml` Conda environment file.
+- `diabetes_regression/conda_dependencies.yml` : Conda environment definition for the environment used for both training and scoring (Docker image in which train.py and score.py are run).
 - `diabetes_regression/ci_dependencies.yml` : Conda environment definition for the CI environment.
 
 ### Code
