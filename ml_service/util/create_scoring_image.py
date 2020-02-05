@@ -27,14 +27,14 @@ model = Model(ws, name=e.model_name, version=e.model_version)
 sources_dir = e.sources_directory_train
 if (sources_dir is None):
     sources_dir = 'diabetes_regression'
-path_to_scoring = os.path.join(".", sources_dir, "scoring")
+path_to_scoring = os.path.join(".", sources_dir)
 cwd = os.getcwd()
 os.chdir(path_to_scoring)
 
 image_config = ContainerImage.image_configuration(
-    execution_script=e.score_script,
+    execution_script="scoring/" + e.score_script,
     runtime="python",
-    conda_file="./conda_dependencies.yml",
+    conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
     tags={"area": "diabetes", "type": "regression"},
 )
