@@ -115,11 +115,11 @@ Having done that, run the pipeline:
 
 ![iac run](./images/run-iac-pipeline.png)
 
-Check out the newly created resources in the [Azure Portal](https://ms.portal.azure.com):
+Check out the newly created resources in the [Azure Portal](https://portal.azure.com):
 
 ![created resources](./images/created-resources.png)
 
-(Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](https://ms.portal.azure.com).
+(Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](https://portal.azure.com).
 
 **Note:** The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. If you want to use your own dataset, you need to [create and register a datastore](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-access-data#azure-machine-learning-studio) in your ML workspace and upload the datafile (e.g. [diabetes.csv](./data/diabetes.csv)) to the corresponding blob container. You can also define a datastore in the ML Workspace with [az cli](https://docs.microsoft.com/en-us/cli/azure/ext/azure-cli-ml/ml/datastore?view=azure-cli-latest#ext-azure-cli-ml-az-ml-datastore-attach-blob). 
 You'll also need to configure DATASTORE_NAME and DATAFILE_NAME variables in ***devopsforai-aml-vg*** variable group.
@@ -162,7 +162,7 @@ Once the pipeline is finished, explore the execution result:
 
 ![build](./images/multi-stage-aci.png)
 
-and check out the published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://ms.portal.azure.com/):
+and check out the published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://portal.azure.com/):
 
 ![training pipeline](./images/training-pipeline.png)
 
