@@ -35,7 +35,7 @@ print(path_to_scoring)
 print(os.path.relpath("/scoring/score.py", os.getcwd()))
 print(os.path.relpath("/scoring/score.py", "."))
 image_config = ContainerImage.image_configuration(
-    execution_script=os.path.relpath("/scoring/score.py", os.getcwd()),
+    execution_script="./scoring/score.py",
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
