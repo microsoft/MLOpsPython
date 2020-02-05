@@ -32,7 +32,7 @@ cwd = os.getcwd()
 os.chdir(path_to_scoring)
 
 image_config = ContainerImage.image_configuration(
-    execution_script="scoring/" + e.score_script,
+    execution_script="/scoring/" + e.score_script,
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
