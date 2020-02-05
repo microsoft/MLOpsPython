@@ -22,4 +22,3 @@ RUN /bin/bash -c "source activate mlopspython_ci"
 RUN az --version
 
 ENTRYPOINT conda init bash
-ENTRYPOINT conda activate mlopspython_ci
