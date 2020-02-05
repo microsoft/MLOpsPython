@@ -3,6 +3,7 @@ import argparse
 from azureml.core import Workspace
 from azureml.core.image import ContainerImage, Image
 from azureml.core.model import Model
+import shutil
 from ml_service.util.env_variables import Env
 
 e = Env()
@@ -27,15 +28,15 @@ model = Model(ws, name=e.model_name, version=e.model_version)
 sources_dir = e.sources_directory_train
 if (sources_dir is None):
     sources_dir = 'diabetes_regression'
-path_to_scoring = os.path.join(".", sources_dir)
+path_to_scoring = os.path.join(".", sources_dir, "scoring")
 cwd = os.getcwd()
+print(os.path.join(".", sources_dir, "conda_dependencies.yml"))
+shutil.copy(os.path.join(".", sources_dir,
+                         "conda_dependencies.yml"), "path_to_scoring")
 os.chdir(path_to_scoring)
-print(os.getcwd())
-print(path_to_scoring)
-print(os.path.relpath("/scoring/score.py", os.getcwd()))
-print(os.path.relpath("/scoring/score.py", "."))
+
 image_config = ContainerImage.image_configuration(
-    execution_script="./scoring/score.py",
+    execution_script=e.score_script,
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
