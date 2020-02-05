@@ -30,6 +30,8 @@ if (sources_dir is None):
 path_to_scoring = os.path.join(".", sources_dir)
 cwd = os.getcwd()
 os.chdir(path_to_scoring)
+print(path_to_scoring)
+print(os.path.relpath("/scoring/score.py", path_to_scoring))
 
 image_config = ContainerImage.image_configuration(
     execution_script=os.path.relpath("/scoring/score.py", path_to_scoring),
