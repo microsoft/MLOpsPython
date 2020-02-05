@@ -29,12 +29,13 @@ if (sources_dir is None):
     sources_dir = 'diabetes_regression'
 path_to_scoring = os.path.join(".", sources_dir)
 cwd = os.getcwd()
-os.chdir(cwd)
+os.chdir(path_to_scoring)
 print(os.getcwd())
 print(path_to_scoring)
 print(os.path.relpath("/scoring/score.py", os.getcwd()))
+print(os.path.relpath("/scoring/score.py", "."))
 image_config = ContainerImage.image_configuration(
-    execution_script=os.path.relpath("/scoring/score.py", path_to_scoring),
+    execution_script=os.path.relpath("/scoring/score.py", os.getcwd()),
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
