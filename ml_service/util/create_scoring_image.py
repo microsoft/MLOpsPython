@@ -32,7 +32,7 @@ path_to_scoring = os.path.join(".", sources_dir, "scoring")
 cwd = os.getcwd()
 print(os.path.join(".", sources_dir, "conda_dependencies.yml"))
 shutil.copy(os.path.join(".", sources_dir,
-                         "conda_dependencies.yml"), "path_to_scoring")
+                         "conda_dependencies.yml"), path_to_scoring)
 os.chdir(path_to_scoring)
 
 image_config = ContainerImage.image_configuration(
