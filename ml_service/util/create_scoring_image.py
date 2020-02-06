@@ -30,7 +30,7 @@ if (sources_dir is None):
     sources_dir = 'diabetes_regression'
 path_to_scoring = os.path.join(".", sources_dir, "scoring")
 cwd = os.getcwd()
-# Copy conda_dependencies.yml into scoring as this method does not accept relative paths.
+# Copy conda_dependencies.yml into scoring as this method does not accept relative paths. # NOQA: E501
 shutil.copy(os.path.join(".", sources_dir,
                          "conda_dependencies.yml"), path_to_scoring)
 os.chdir(path_to_scoring)
