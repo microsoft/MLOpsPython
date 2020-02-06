@@ -4,30 +4,28 @@
 name: diabetes_regression_sklearn
 
 dependencies:
-
   # The python interpreter version.
-- python=3.7.5
+  - python=3.7.5
 
   # Required by azureml-defaults, installed separately through Conda to
   # get a prebuilt version and not require build tools for the install.
-- psutil=5.6 #latest
+  - psutil=5.6 #latest
 
-- numpy=1.18.1
-- pandas=1.0.0
-- scikit-learn=0.22.1
-#- r-essentials
-#- tensorflow
-#- keras
+  - numpy=1.18.1
+  - pandas=1.0.0
+  - scikit-learn=0.22.1
+  #- r-essentials
+  #- tensorflow
+  #- keras
 
-- pip=20.0.2
-- pip:
+  - pip=20.0.2
+  - pip:
+      # Dependencies for training environment.
 
-  # Dependencies for training environment.
+      - azureml-core==1.0.85
 
-  - azureml-core==1.0.79
+      # Dependencies for scoring environment.
 
-  # Dependencies for scoring environment.
-
-  # You must list azureml-defaults as a pip dependency
-  - azureml-defaults==1.0.79
-  - inference-schema[numpy-support]==1.0.1
+      # You must list azureml-defaults as a pip dependency
+      - azureml-defaults==1.0.85
+      - inference-schema[numpy-support]==1.0.1
