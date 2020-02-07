@@ -29,3 +29,4 @@ dependencies:
       # You must list azureml-defaults as a pip dependency
       - azureml-defaults==1.0.85
       - inference-schema[numpy-support]==1.0.1
+      - azureml-dataprep==1.1.38
