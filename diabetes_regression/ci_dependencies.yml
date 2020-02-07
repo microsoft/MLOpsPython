@@ -26,3 +26,5 @@ dependencies:
       - flake8_formatter_junit_xml==0.0.6
       - azure-cli==2.0.81
       - tox==3.14.3
+      # Uncomment for bootstrap.py
+      #- GitPython==3.0.5
