@@ -1,7 +1,17 @@
 steps:
-- script: |
-    ./lint-and-test.sh
-  displayName: 'Linting & unit tests'
+- task: PythonScript@0
+  inputs:
+    scriptSource: inline
+    script: set -eux
+            flake8 --output-file=lint-testresults.xml --format junit-xml
+  displayName: 'Run lint tests'
+
+- task: PythonScript@0
+  inputs:
+    scriptSource: inline
+    script: set -eux 
+            python -m pytest tests/unit --cov=diabetes_regression --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
+  displayName: 'Test with pytest'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
