@@ -92,7 +92,7 @@ class Helper:
 
 def main(args):
     # Run this script to create a template from mlopspython
-    #  python bootstrap.py --d [dirpath] --n test
+    #  python bootstrap.py --d [dirpath] --n [projectname]
     parser = argparse.ArgumentParser(description='New Template')
     parser.add_argument("--d", type=str,
                         help="Absolute path to new project direcory")
