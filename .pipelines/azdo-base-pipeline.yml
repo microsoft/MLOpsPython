@@ -1,17 +1,11 @@
 steps:
-- task: PythonScript@0
-  inputs:
-    scriptSource: inline
-    script: set -eux
-            flake8 --output-file=lint-testresults.xml --format junit-xml
+- script: |   
+   flake8 --output-file=lint-testresults.xml --format junit-xml
   displayName: 'Run lint tests'
 
-- task: PythonScript@0
-  inputs:
-    scriptSource: inline
-    script: set -eux 
-            python -m pytest tests/unit --cov=diabetes_regression --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
-  displayName: 'Test with pytest'
+- script: |   
+   python -m pytest tests/unit --cov=diabetes_regression --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
+  displayName: 'Run unit tests'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
