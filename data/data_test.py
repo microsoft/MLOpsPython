@@ -35,7 +35,7 @@ def get_absPath(filename):
     path = os.path.abspath(
         os.path.join(
             os.path.dirname(
-                __file__), os.path.pardir, os.path.pardir, "data", filename
+                __file__), os.path.pardir, "data", filename
         )
     )
     return path
