@@ -11,6 +11,7 @@ If you already have an Azure DevOps organization, create a [new project](https:/
 ## Clone or fork this repository
 Fork this repository within GitHub, or clone it into your Azure DevOps project.
 
+
 ## Create an ARM Service Connection to deploy resources
 
 This repository includes a YAML pipeline definition file for an Azure DevOps pipeline that will create the Azure ML workspace and associated resources through Azure Resource Manager.
@@ -48,14 +49,14 @@ Create a variable group named **``devopsforai-aml-vg``**. The YAML pipeline defi
 
 The variable group should contain the following required variables:
 
-| Variable Name               | Suggested Value                    |
-| --------------------------- | -----------------------------------|
-| BASE_NAME                   | [unique base name]                 |
-| LOCATION                    | centralus                          |
-| RESOURCE_GROUP              | mlops-RG                           |
-| WORKSPACE_NAME              | mlops-AML-WS                       |
-| WORKSPACE_SVC_CONNECTION    | aml-workspace-connection           | 
-| ACI_DEPLOYMENT_NAME         | diabetes-aci                       |
+| Variable Name            | Suggested Value          |
+| ------------------------ | ------------------------ |
+| BASE_NAME                | [unique base name]       |
+| LOCATION                 | centralus                |
+| RESOURCE_GROUP           | mlops-RG                 |
+| WORKSPACE_NAME           | mlops-AML-WS             |
+| WORKSPACE_SVC_CONNECTION | aml-workspace-connection |
+| ACI_DEPLOYMENT_NAME      | diabetes-aci             |
 
 **Note:** 
 
@@ -208,10 +209,10 @@ tutorial, but you can find set up information
 
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variables:
 
-| Variable Name               | Suggested Value                    |
-| --------------------------- | -----------------------------------|
-| AKS_COMPUTE_NAME            | aks                                |
-| AKS_DEPLOYMENT_NAME         | diabetes-aks                       |
+| Variable Name       | Suggested Value |
+| ------------------- | --------------- |
+| AKS_COMPUTE_NAME    | aks             |
+| AKS_DEPLOYMENT_NAME | diabetes-aks    |
 
 Set **AKS_COMPUTE_NAME** to the *Compute name* of the Inference Cluster referencing your AKS cluster in your Azure ML Workspace.
 
@@ -226,9 +227,9 @@ scoring service on Azure App Service](https://docs.microsoft.com/en-us/azure/mac
 
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variable:
 
-| Variable Name               | Suggested Value                    |
-| --------------------------- | -----------------------------------|
-| WEBAPP_DEPLOYMENT_NAME      | mlopswebapp                        |
+| Variable Name          | Suggested Value |
+| ---------------------- | --------------- |
+| WEBAPP_DEPLOYMENT_NAME | mlopswebapp     |
 
 Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. Delete the **ACI_DEPLOYMENT_NAME** variable.
 

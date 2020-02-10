@@ -104,7 +104,7 @@ def main(args):
         project_name = args.n
         helper = Helper(project_directory, project_name)
         helper.validateargs()
-        helper.clonerepo()
+        # helper.clonerepo()
         helper.cleandir()
         helper.replaceimport()
         helper.deletedir()
