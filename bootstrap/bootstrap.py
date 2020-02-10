@@ -86,8 +86,8 @@ class Helper:
                 "Not a valid directory. Please provide absolute directory path")  # NOQA: E501
         if (len(os.listdir(self._project_directory)) > 0):
             raise Exception("Directory not empty. PLease empty directory")
-        if(len(self._project_name) < 3 or len(self._project_name) > 8):
-            raise Exception("Project name should be 3 to 8 chars long")
+        if(len(self._project_name) < 3 or len(self._project_name) > 15):
+            raise Exception("Project name should be 3 to 15 chars long")
 
 
 def main(args):
@@ -97,7 +97,7 @@ def main(args):
     parser.add_argument("--d", type=str,
                         help="Absolute path to new project direcory")
     parser.add_argument(
-        "--n", type=str, help="Name of the project[3-8 chars] ")
+        "--n", type=str, help="Name of the project[3-15 chars] ")
     try:
         args = parser.parse_args()
         project_directory = args.d
