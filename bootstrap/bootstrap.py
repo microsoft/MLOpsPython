@@ -32,14 +32,14 @@ class Helper:
     def renamefiles(self):
         # Rename all files starting with diabetes_regression with project name
         strtoreplace = "diabetes_regression"
-        dirs = [".pipelines", "ml_service\pipelines"]
+        dirs = [".pipelines", r"ml_service\pipelines"]
         for dir in dirs:
             dirpath = os.path.join(self._project_directory, dir)
             for filename in os.listdir(dirpath):
                 if(filename.find(strtoreplace) != -1):
                     src = os.path.join(self._project_directory, dir, filename)
                     dst = os.path.join(self._project_directory,
-                                       dir, filename.replace(strtoreplace, self._project_name, 1))
+                                       dir, filename.replace(strtoreplace, self._project_name, 1))  # NOQA: E501
                     os.rename(src, dst)
 
     def renamedir(self):
@@ -55,12 +55,12 @@ class Helper:
         dirs = [".git", "docs", r"diabetes_regression\training\R"]
         for dir in dirs:
             os.system(
-                'rmdir /S /Q "{}"'.format(os.path.join(self._project_directory, dir)))
+                'rmdir /S /Q "{}"'.format(os.path.join(self._project_directory, dir)))  # NOQA: E501
 
     def replaceimport(self):
         # Replace imports with new project name
         dirs = [r"diabetes_regression\training\test_train.py",
-                r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py"]
+                r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py"]  # NOQA: E501
         for file in dirs:
             fin = open(os.path.join(self._project_directory, file), "rt")
             data = fin.read()
@@ -75,15 +75,15 @@ class Helper:
         # Clean up directories
         dirs = ["data", "experimentation"]
         for dir in dirs:
-            for root, dirs, files in os.walk(os.path.join(self._project_directory, dir)):
+            for root, dirs, files in os.walk(os.path.join(self._project_directory, dir)):  # NOQA: E501
                 for file in files:
                     os.remove(os.path.join(root, file))
 
     def validateargs(self):
         # Validate arguments
-        if (path.isdir(self._project_directory) is False):
+        if (os.path.isdir(self._project_directory) is False):
             raise Exception(
-                "Not a valid directory. Please provide absolute directory path")
+                "Not a valid directory. Please provide absolute directory path")  # NOQA: E501
         if (len(os.listdir(self._project_directory)) > 0):
             raise Exception("Directory not empty. PLease empty directory")
         if(len(self._project_name) < 3 or len(self._project_name) > 8):
