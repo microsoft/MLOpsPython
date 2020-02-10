@@ -22,7 +22,7 @@ High level directory structure for this repository:
 │   ├── pipelines         <- Python script that builds Azure Machine Learning pipelines.
 │   ├── util              <- Python script for various utility operations specific to Azure Machine Learning.
 ├── .env.example          <- Example .env file with environment for local development experience.  
-├── .gitignore            <- A gitignore file specifies intentionally untracked files that Git should ignore.  
+├── .gitignore            <- A gitignore file specifies intentionally un-tracked files that Git should ignore.  
 ├── LICENSE               <- License document for this project.
 ├── README.md             <- The top-level README for developers using this project.  
 ```
