@@ -59,7 +59,7 @@ class Helper:
 
     def replaceimport(self):
         # Replace imports with new project name
-        dirs = [r"tests\unit\code_test.py",
+        dirs = [r"diabetes_regression\training\test_train.py",
                 r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py"]
         for file in dirs:
             fin = open(os.path.join(self._project_directory, file), "rt")
