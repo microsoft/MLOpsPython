@@ -4,7 +4,7 @@ steps:
   displayName: 'Run lint tests'
 
 - script: |   
-   python -m pytest tests/unit --cov=diabetes_regression --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
+   python -m pytest . --cov=diabetes_regression --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
   displayName: 'Run unit tests'
 
 - task: PublishTestResults@2
