@@ -25,4 +25,3 @@ def test_train_model():
 
     preds = reg.predict([[1], [2]])
     np.testing.assert_equal(preds, [9.93939393939394, 9.03030303030303])
-    
