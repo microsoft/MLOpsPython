@@ -4,6 +4,7 @@ To use this existing project structure and scripts for your new ML project, you 
 
 To bootstrap from the existing MLOpsPython repository install and run bootstrap.py script as below
 >pip install GitPython==3.0.5
+>
 >python bootstrap.py --d [dirpath] --n [projectname]
 
 Where [dirpath] is the directory to download the repo and [projectname] is name of your ML project  
