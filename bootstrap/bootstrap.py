@@ -76,20 +76,20 @@ class Helper:
         dirs = [r".env.example",
                 r".pipelines\azdo-base-pipeline.yml",
                 r".pipelines\azdo-pr-build-train.yml",
-                r".pipelines\test-ci-build-train.yml",
-                r".pipelines\test-ci-image.yml",
-                r".pipelines\test-template-get-model-version.yml",
-                r".pipelines\test-variables.yml",
+                r".pipelines\diabetes_regression-ci-build-train.yml",
+                r".pipelines\diabetes_regression-ci-image.yml",
+                r".pipelines\diabetes_regression-template-get-model-version.yml",
+                r".pipelines\diabetes_regression-variables.yml",
                 r"environment_setup\Dockerfile",
                 r"environment_setup\install_requirements.sh",
-                r"ml_service\pipelines\test_build_train_pipeline_with_r_on_dbricks.py",
-                r"ml_service\pipelines\test_build_train_pipeline_with_r.py",
-                r"ml_service\pipelines\test_build_train_pipeline.py",
-                r"ml_service\pipelines\test_verify_train_pipeline.py",
+                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",
+                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r.py",
+                r"ml_service\pipelines\diabetes_regression_build_train_pipeline.py",
+                r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py",
                 r"ml_service\util\create_scoring_image.py",
-                r"test\azureml_environment.json",
-                r"test\conda_dependencies.yml",
-                r"test\evaluate\evaluate_model.py"]  # NOQA: E501
+                r"diabetes_regression\azureml_environment.json",
+                r"diabetes_regression\conda_dependencies.yml",
+                r"diabetes_regression\evaluate\evaluate_model.py"]  # NOQA: E501
 
         for file in dirs:
             fin = open(os.path.join(self._project_directory, file), "rt")
