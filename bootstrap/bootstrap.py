@@ -1,7 +1,7 @@
 import os
 import sys
 import argparse
-#from git import Repo
+# from git import Repo
 
 
 class Helper:
@@ -64,9 +64,37 @@ class Helper:
         for file in dirs:
             fin = open(os.path.join(self._project_directory, file), "rt")
             data = fin.read()
-            #newimport = "from " + self._project_name + "."
-            #data = data.replace("from diabetes_regression.", newimport)
-            data = data.replace("diabetes_regression.", self.project_name)
+            newimport = "from " + self._project_name + "."
+            data = data.replace("from diabetes_regression.", newimport)
+            fin.close()
+            fin = open(os.path.join(self._project_directory, file), "wt")
+            fin.write(data)
+            fin.close()
+
+    def replaceprojectinstances(self):
+        # Replace imports with new project name
+        dirs = [r".env.example",
+                r".pipelines\azdo-base-pipeline.yml",
+                r".pipelines\azdo-pr-build-train.yml",
+                r".pipelines\test-ci-build-train.yml",
+                r".pipelines\test-ci-image.yml",
+                r".pipelines\test-template-get-model-version.yml",
+                r".pipelines\test-variables.yml",
+                r"environment_setup\Dockerfile",
+                r"environment_setup\install_requirements.sh",
+                r"ml_service\pipelines\test_build_train_pipeline_with_r_on_dbricks.py",
+                r"ml_service\pipelines\test_build_train_pipeline_with_r.py",
+                r"ml_service\pipelines\test_build_train_pipeline.py",
+                r"ml_service\pipelines\test_verify_train_pipeline.py",
+                r"ml_service\util\create_scoring_image.py",
+                r"test\azureml_environment.json",
+                r"test\conda_dependencies.yml",
+                r"test\evaluate\evaluate_model.py"]  # NOQA: E501
+
+        for file in dirs:
+            fin = open(os.path.join(self._project_directory, file), "rt")
+            data = fin.read()
+            data = data.replace("diabetes_regression", self.project_name)
             fin.close()
             fin = open(os.path.join(self._project_directory, file), "wt")
             fin.write(data)
@@ -107,7 +135,8 @@ def main(args):
         helper.validateargs()
         # helper.clonerepo()
         helper.cleandir()
-        helper.replaceimport()
+        # helper.replaceimport()
+        helper.replaceprojectinstances)
         helper.deletedir()
         helper.renamefiles()
         helper.renamedir()
