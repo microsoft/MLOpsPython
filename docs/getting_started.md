@@ -9,8 +9,10 @@ following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/
 If you already have an Azure DevOps organization, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
 ## Clone or fork this repository
-Fork this repository within GitHub, or clone it into your Azure DevOps project.
 
+To initialize this repository with a custom project name refer [bootstraping doc.](../bootstrap/README.md\bootstrap\README.md)
+
+To learn existing repository simply fork this repository within GitHub, or clone it into your Azure DevOps project.
 
 ## Create an ARM Service Connection to deploy resources
 
@@ -58,7 +60,7 @@ The variable group should contain the following required variables:
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection |
 | ACI_DEPLOYMENT_NAME      | diabetes-aci             |
 
-**Note:** 
+**Note:**
 
 The **WORKSPACE_NAME** parameter is used for the Azure Machine Learning Workspace creation. You can provide an existing AML Workspace here if you have one.
 
@@ -68,7 +70,7 @@ be naming collisions with resources that require unique names like azure blob
 storage and registry DNS naming. Make sure to give a unique value to the
 BASE_NAME variable (e.g. MyUniqueML), so that the created resources will have
 unique names (e.g. MyUniqueMLamlcr, MyUniqueML-AML-KV, etc.). The length of
-the BASE_NAME value should not exceed 10 characters and it should contain numbers and letters only. 
+the BASE_NAME value should not exceed 10 characters and it should contain numbers and letters only.
 
 The **RESOURCE_GROUP** parameter is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
 
@@ -122,11 +124,11 @@ Check out the newly created resources in the [Azure Portal](https://portal.azure
 
 (Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](https://portal.azure.com).
 
-**Note:** The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. If you want to use your own dataset, you need to [create and register a datastore](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-access-data#azure-machine-learning-studio) in your ML workspace and upload the datafile (e.g. [diabetes.csv](./data/diabetes.csv)) to the corresponding blob container. You can also define a datastore in the ML Workspace with [az cli](https://docs.microsoft.com/en-us/cli/azure/ext/azure-cli-ml/ml/datastore?view=azure-cli-latest#ext-azure-cli-ml-az-ml-datastore-attach-blob). 
+**Note:** The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. If you want to use your own dataset, you need to [create and register a datastore](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-access-data#azure-machine-learning-studio) in your ML workspace and upload the datafile (e.g. [diabetes.csv](./data/diabetes.csv)) to the corresponding blob container. You can also define a datastore in the ML Workspace with [az cli](https://docs.microsoft.com/en-us/cli/azure/ext/azure-cli-ml/ml/datastore?view=azure-cli-latest#ext-azure-cli-ml-az-ml-datastore-attach-blob).
 You'll also need to configure DATASTORE_NAME and DATAFILE_NAME variables in ***devopsforai-aml-vg*** variable group.
 
-
 ## Create an Azure DevOps Azure ML Workspace Service Connection
+
 Install the **Azure Machine Learning** extension to your organization from the
 [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
 so that you can set up a service connection to your AML workspace.
@@ -202,7 +204,7 @@ The final stage is to deploy the model to the production environment running on
 [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service).
 
 **Note:** Creating a Kubernetes cluster on AKS is out of scope of this
-tutorial, but you can find set up information 
+tutorial, but you can find set up information
 [here](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal#create-an-aks-cluster).
 
 **Note:** If your target deployment environment is a K8s cluster and you want to implement Canary and/or A/B testing deployment strategies check out this [tutorial](./canary_ab_deployment.md).

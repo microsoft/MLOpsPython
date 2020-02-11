@@ -6,7 +6,7 @@ High level directory structure for this repository:
 
 ```bash
 ├── .pipelines            <- Azure DevOps YAML pipelines for CI, PR and model training and deployment.
-├── bootstrap             <- Python script to create a re-usbale code template to bootstrap.
+├── bootstrap             <- Python script to initialize this repository with a custom project name.
 ├── charts                <- Helm charts to deploy resources on Azure Kubernetes Service(AKS).
 ├── data                  <- Initial set of data to train and evaluate model.
 ├── diabetes_regression   <- The top-level folder for the ML project.
