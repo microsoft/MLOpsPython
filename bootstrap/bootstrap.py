@@ -7,8 +7,8 @@ import argparse
 class Helper:
 
     def __init__(self, project_directory, project_name):
-        self._project_directory = project_directory
-        self._project_name = project_name
+        self._project_directory = r"C:\Code\mlopsbyctest\MLOpsPython"
+        self._project_name = "test"
         self._git_repo = "https://github.com/microsoft/MLOpsPython.git"
 
     @property
@@ -57,21 +57,7 @@ class Helper:
             os.system(
                 'rmdir /S /Q "{}"'.format(os.path.join(self._project_directory, dir)))  # NOQA: E501
 
-    def replaceimport(self):
-        # Replace imports with new project name
-        dirs = [r"diabetes_regression\training\test_train.py",
-                r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py"]  # NOQA: E501
-        for file in dirs:
-            fin = open(os.path.join(self._project_directory, file), "rt")
-            data = fin.read()
-            newimport = "from " + self._project_name + "."
-            data = data.replace("from diabetes_regression.", newimport)
-            fin.close()
-            fin = open(os.path.join(self._project_directory, file), "wt")
-            fin.write(data)
-            fin.close()
-
-    def replaceprojectinstances(self):
+    def replaceprojectname(self):
         # Replace imports with new project name
         dirs = [r".env.example",
                 r".pipelines\azdo-base-pipeline.yml",
@@ -89,14 +75,17 @@ class Helper:
                 r"ml_service\util\create_scoring_image.py",
                 r"diabetes_regression\azureml_environment.json",
                 r"diabetes_regression\conda_dependencies.yml",
-                r"diabetes_regression\evaluate\evaluate_model.py"]  # NOQA: E501
+                r"diabetes_regression\evaluate\evaluate_model.py",
+                r"diabetes_regression\training\test_train.py"]  # NOQA: E501
 
         for file in dirs:
-            fin = open(os.path.join(self._project_directory, file), "rt")
+            fin = open(os.path.join(self._project_directory, file),
+                       "rt", encoding="utf8")
             data = fin.read()
             data = data.replace("diabetes_regression", self.project_name)
             fin.close()
-            fin = open(os.path.join(self._project_directory, file), "wt")
+            fin = open(os.path.join(self._project_directory, file),
+                       "wt", encoding="utf8")
             fin.write(data)
             fin.close()
 
@@ -120,8 +109,6 @@ class Helper:
 
 
 def main(args):
-    # Run this script to create a template from mlopspython
-    #  python bootstrap.py --d [dirpath] --n [projectname]
     parser = argparse.ArgumentParser(description='New Template')
     parser.add_argument("--d", type=str,
                         help="Absolute path to new project direcory")
@@ -135,8 +122,7 @@ def main(args):
         helper.validateargs()
         # helper.clonerepo()
         helper.cleandir()
-        # helper.replaceimport()
-        helper.replaceprojectinstances()
+        helper.replaceprojectname()
         helper.deletedir()
         helper.renamefiles()
         helper.renamedir()
