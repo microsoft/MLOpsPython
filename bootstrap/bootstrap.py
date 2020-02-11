@@ -136,7 +136,7 @@ def main(args):
         # helper.clonerepo()
         helper.cleandir()
         # helper.replaceimport()
-        helper.replaceprojectinstances)
+        helper.replaceprojectinstances()
         helper.deletedir()
         helper.renamefiles()
         helper.renamedir()
