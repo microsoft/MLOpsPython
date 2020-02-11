@@ -58,7 +58,7 @@ class Helper:
                 'rmdir /S /Q "{}"'.format(os.path.join(self._project_directory, dir)))  # NOQA: E501
 
     def replaceprojectname(self):
-        # Replace imports with new project name
+        # Replace instances of diabetes_regression within files
         dirs = [r".env.example",
                 r".pipelines\azdo-base-pipeline.yml",
                 r".pipelines\azdo-pr-build-train.yml",

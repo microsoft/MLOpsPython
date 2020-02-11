@@ -8,11 +8,12 @@ following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/
 
 If you already have an Azure DevOps organization, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
-## Clone or fork this repository
+## Decide best option to copy repository code
 
-To initialize this repository with a custom project name refer [bootstraping doc.](../bootstrap/README.md\bootstrap\README.md)
+* Fork this repository if there is a desire to contribute back to the repository else
+* Use this [code template](https://github.com/microsoft/MLOpsPython/generate) which copies the entire code base to your own GitHub location with the git commit history restarted. This can be used for learning and following the guide.
 
-To learn existing repository simply fork this repository within GitHub, or clone it into your Azure DevOps project.
+If the desire is to use this project for your own machine learning code, follow the [bootstrap instructions](https://github.com/microsoft/MLOpsPython/compare/..%5Cbootstrap%5CREADME.md?expand=1) after the code template is complete.
 
 ## Create an ARM Service Connection to deploy resources
 
