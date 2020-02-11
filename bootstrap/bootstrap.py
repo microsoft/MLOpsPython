@@ -23,11 +23,11 @@ class Helper:
     def git_repo(self):
         return self._git_repo
 
-    def clonerepo(self):
-        # Download MLOpsPython repo from git
-        Repo.clone_from(
-            self._git_repo, self._project_directory, branch="master", depth=1)
-        print(self._project_directory)
+    # def clonerepo(self):
+    #     # Download MLOpsPython repo from git
+    #     Repo.clone_from(
+    #         self._git_repo, self._project_directory, branch="master", depth=1)
+    #     print(self._project_directory)
 
     def renamefiles(self):
         # Rename all files starting with diabetes_regression with project name
@@ -64,14 +64,14 @@ class Helper:
                 r".pipelines\azdo-pr-build-train.yml",
                 r".pipelines\diabetes_regression-ci-build-train.yml",
                 r".pipelines\diabetes_regression-ci-image.yml",
-                r".pipelines\diabetes_regression-template-get-model-version.yml",
+                r".pipelines\diabetes_regression-template-get-model-version.yml",  # NOQA: E501
                 r".pipelines\diabetes_regression-variables.yml",
                 r"environment_setup\Dockerfile",
                 r"environment_setup\install_requirements.sh",
-                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",
-                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r.py",
-                r"ml_service\pipelines\diabetes_regression_build_train_pipeline.py",
-                r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py",
+                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",  # NOQA: E501
+                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r.py",  # NOQA: E501
+                r"ml_service\pipelines\diabetes_regression_build_train_pipeline.py",  # NOQA: E501
+                r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py",  # NOQA: E501
                 r"ml_service\util\create_scoring_image.py",
                 r"diabetes_regression\azureml_environment.json",
                 r"diabetes_regression\conda_dependencies.yml",
