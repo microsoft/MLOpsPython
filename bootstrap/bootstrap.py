@@ -26,7 +26,7 @@ class Helper:
     # def clonerepo(self):
     #     # Download MLOpsPython repo from git
     #     Repo.clone_from(
-    #         self._git_repo, self._project_directory, branch="master", depth=1)
+    #         self._git_repo, self._project_directory, branch="master", depth=1) # NOQA: E501
     #     print(self._project_directory)
 
     def renamefiles(self):
