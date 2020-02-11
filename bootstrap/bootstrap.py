@@ -7,8 +7,8 @@ import argparse
 class Helper:
 
     def __init__(self, project_directory, project_name):
-        self._project_directory = r"C:\Code\mlopsbyctest\MLOpsPython"
-        self._project_name = "test"
+        self._project_directory = project_directory
+        self._project_name = project_name
         self._git_repo = "https://github.com/microsoft/MLOpsPython.git"
 
     @property
