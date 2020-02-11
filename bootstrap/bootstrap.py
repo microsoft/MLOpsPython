@@ -52,7 +52,7 @@ class Helper:
 
     def deletedir(self):
         # Delete unwanted directories
-        dirs = [".git", "docs", r"diabetes_regression\training\R"]
+        dirs = ["docs", r"diabetes_regression\training\R"]
         for dir in dirs:
             os.system(
                 'rmdir /S /Q "{}"'.format(os.path.join(self._project_directory, dir)))  # NOQA: E501
@@ -84,8 +84,8 @@ class Helper:
         if (os.path.isdir(self._project_directory) is False):
             raise Exception(
                 "Not a valid directory. Please provide absolute directory path")  # NOQA: E501
-        if (len(os.listdir(self._project_directory)) > 0):
-            raise Exception("Directory not empty. PLease empty directory")
+        # if (len(os.listdir(self._project_directory)) > 0):
+        #     raise Exception("Directory not empty. PLease empty directory")
         if(len(self._project_name) < 3 or len(self._project_name) > 15):
             raise Exception("Project name should be 3 to 15 chars long")
 
