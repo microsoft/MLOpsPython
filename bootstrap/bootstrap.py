@@ -64,8 +64,9 @@ class Helper:
         for file in dirs:
             fin = open(os.path.join(self._project_directory, file), "rt")
             data = fin.read()
-            newimport = "from " + self._project_name + "."
-            data = data.replace("from diabetes_regression.", newimport)
+            #newimport = "from " + self._project_name + "."
+            #data = data.replace("from diabetes_regression.", newimport)
+            data = data.replace("diabetes_regression.", self.project_name)
             fin.close()
             fin = open(os.path.join(self._project_directory, file), "wt")
             fin.write(data)

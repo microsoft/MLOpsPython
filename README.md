@@ -24,10 +24,6 @@ This template contains code and pipeline definition for a machine learning proje
 - Active Azure subscription
 - At least contributor access to Azure subscription
 
-## Directory Structure
-
-To understand the high level directory structure for this repository, please go through [directory structure doc](directorystructure.md)
-
 ## Getting Started
 
 To deploy this solution in your subscription, follow the manual instructions in the [getting started](docs/getting_started.md) doc
