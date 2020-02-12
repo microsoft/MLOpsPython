@@ -95,6 +95,7 @@ def replaceprojectname(project_dir, project_name, rename_name):
             r"diabetes_regression\azureml_environment.json",
             r"diabetes_regression\conda_dependencies.yml",
             r"diabetes_regression\evaluate\evaluate_model.py",
+            r"diabetes_regression\register\register_model.py",
             r"diabetes_regression\training\test_train.py"]  # NOQA: E501
 
     for file in dirs:
