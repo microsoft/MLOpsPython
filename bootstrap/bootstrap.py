@@ -57,38 +57,6 @@ class Helper:
             os.system(
                 'rmdir /S /Q "{}"'.format(os.path.join(self._project_directory, dir)))  # NOQA: E501
 
-    def replaceprojectname(self):
-        # Replace instances of diabetes_regression within files
-        dirs = [r".env.example",
-                r".pipelines\azdo-base-pipeline.yml",
-                r".pipelines\azdo-pr-build-train.yml",
-                r".pipelines\diabetes_regression-ci-build-train.yml",
-                r".pipelines\diabetes_regression-ci-image.yml",
-                r".pipelines\diabetes_regression-template-get-model-version.yml",  # NOQA: E501
-                r".pipelines\diabetes_regression-variables.yml",
-                r"environment_setup\Dockerfile",
-                r"environment_setup\install_requirements.sh",
-                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",  # NOQA: E501
-                r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r.py",  # NOQA: E501
-                r"ml_service\pipelines\diabetes_regression_build_train_pipeline.py",  # NOQA: E501
-                r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py",  # NOQA: E501
-                r"ml_service\util\create_scoring_image.py",
-                r"diabetes_regression\azureml_environment.json",
-                r"diabetes_regression\conda_dependencies.yml",
-                r"diabetes_regression\evaluate\evaluate_model.py",
-                r"diabetes_regression\training\test_train.py"]  # NOQA: E501
-
-        for file in dirs:
-            fin = open(os.path.join(self._project_directory, file),
-                       "rt", encoding="utf8")
-            data = fin.read()
-            data = data.replace("diabetes_regression", self.project_name)
-            fin.close()
-            fin = open(os.path.join(self._project_directory, file),
-                       "wt", encoding="utf8")
-            fin.write(data)
-            fin.close()
-
     def cleandir(self):
         # Clean up directories
         dirs = ["data", "experimentation"]
@@ -108,6 +76,40 @@ class Helper:
             raise Exception("Project name should be 3 to 15 chars long")
 
 
+def replaceprojectname(project_dir, project_name, rename_name):
+    # Replace instances of rename_name within files with project_name
+    dirs = [r".env.example",
+            r".pipelines\azdo-base-pipeline.yml",
+            r".pipelines\azdo-pr-build-train.yml",
+            r".pipelines\diabetes_regression-ci-build-train.yml",
+            r".pipelines\diabetes_regression-ci-image.yml",
+            r".pipelines\diabetes_regression-template-get-model-version.yml",  # NOQA: E501
+            r".pipelines\diabetes_regression-variables.yml",
+            r"environment_setup\Dockerfile",
+            r"environment_setup\install_requirements.sh",
+            r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",  # NOQA: E501
+            r"ml_service\pipelines\diabetes_regression_build_train_pipeline_with_r.py",  # NOQA: E501
+            r"ml_service\pipelines\diabetes_regression_build_train_pipeline.py",  # NOQA: E501
+            r"ml_service\pipelines\diabetes_regression_verify_train_pipeline.py",  # NOQA: E501
+            r"ml_service\util\create_scoring_image.py",
+            r"diabetes_regression\azureml_environment.json",
+            r"diabetes_regression\conda_dependencies.yml",
+            r"diabetes_regression\evaluate\evaluate_model.py",
+            r"diabetes_regression\register\register_model.py",
+            r"diabetes_regression\training\test_train.py"]  # NOQA: E501
+
+    for file in dirs:
+        fin = open(os.path.join(project_dir, file),
+                   "rt", encoding="utf8")
+        data = fin.read()
+        data = data.replace(rename_name, project_name)
+        fin.close()
+        fin = open(os.path.join(project_dir, file),
+                   "wt", encoding="utf8")
+        fin.write(data)
+        fin.close()
+
+
 def main(args):
     parser = argparse.ArgumentParser(description='New Template')
     parser.add_argument("--d", type=str,
@@ -122,7 +124,9 @@ def main(args):
         helper.validateargs()
         # helper.clonerepo()
         helper.cleandir()
-        helper.replaceprojectname()
+        replaceprojectname(project_directory, project_name,
+                           "diabetes_regression")
+        replaceprojectname(project_directory, project_name, "diabetes")
         helper.deletedir()
         helper.renamefiles()
         helper.renamedir()
