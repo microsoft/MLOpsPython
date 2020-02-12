@@ -39,7 +39,7 @@ image_config = ContainerImage.image_configuration(
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
-    tags={"area": "diabetes", "type": "regression"},
+    tags={"area": "diabetes_regression"},
 )
 
 image = Image.create(
