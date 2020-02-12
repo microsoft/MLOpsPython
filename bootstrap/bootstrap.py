@@ -3,6 +3,7 @@ import sys
 import argparse
 # from git import Repo
 
+
 class Helper:
 
     def __init__(self, project_directory, project_name):
@@ -74,6 +75,7 @@ class Helper:
         if(len(self._project_name) < 3 or len(self._project_name) > 15):
             raise Exception("Project name should be 3 to 15 chars long")
 
+
 def replaceprojectname(project_dir, project_name, rename_name):
     # Replace instances of rename_name within files with project_name
     dirs = [r".env.example",
@@ -97,12 +99,12 @@ def replaceprojectname(project_dir, project_name, rename_name):
 
     for file in dirs:
         fin = open(os.path.join(project_dir, file),
-                    "rt", encoding="utf8")
+                   "rt", encoding="utf8")
         data = fin.read()
         data = data.replace(rename_name, project_name)
         fin.close()
         fin = open(os.path.join(project_dir, file),
-                    "wt", encoding="utf8")
+                   "wt", encoding="utf8")
         fin.write(data)
         fin.close()
 
@@ -121,10 +123,12 @@ def main(args):
         helper.validateargs()
         # helper.clonerepo()
         helper.cleandir()
-        replaceprojectname(project_directory,project_name,"diabetes_regression")
-        # helper.deletedir()
-        # helper.renamefiles()
-        # helper.renamedir()
+        replaceprojectname(project_directory, project_name,
+                           "diabetes_regression")
+        replaceprojectname(project_directory, project_name, "diabetes")
+        helper.deletedir()
+        helper.renamefiles()
+        helper.renamedir()
     except Exception as e:
         print(e)
     return 0
