@@ -18,7 +18,7 @@ def get_environment(
         if restored_environment is None or create_new:
             # Read definition from diabetes_regression/azureml_environment.json
             new_env = Environment.load_from_directory(e.sources_directory_train)  # NOQA: E501
-            stored_environment = new_env
+            restored_environment = new_env
             restored_environment.register(workspace)
 
         return restored_environment

@@ -1,7 +1,6 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline
-from azureml.core import Workspace, Environment
 from azureml.core.runconfig import RunConfiguration
 from azureml.core import Dataset, Datastore
 from ml_service.util.attach_compute import get_compute

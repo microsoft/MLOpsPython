@@ -93,11 +93,7 @@ parser.add_argument(
 parser.add_argument(
     "--allow_run_cancel",
     type=str,
-<< << << < HEAD
-    help="Set this to false to avoid evaluation step from cancelling run",
-== == == =
     help="Set this to false to avoid evaluation step from cancelling run after an unsuccessful evaluation",  # NOQA: E501
->>>>>> > 57ef170fca17cfffc95294a4518992c8e64342b6
     default="true",
 )
 
