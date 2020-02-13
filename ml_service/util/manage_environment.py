@@ -22,5 +22,4 @@ def get_environment(
         return restored_environment
     except Exception as e:
         print(e)
-        print('An error occurred while creating an environment.')
         exit(1)
