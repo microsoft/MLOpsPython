@@ -103,7 +103,6 @@ def replaceprojectname(project_dir, project_name, rename_name):
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_verify_train_pipeline.py",  # NOQA: E501
             r"ml_service/util/create_scoring_image.py",
-            r"diabetes_regression/azureml_environment.json",
             r"diabetes_regression/conda_dependencies.yml",
             r"diabetes_regression/evaluate/evaluate_model.py",
             r"diabetes_regression/register/register_model.py",
