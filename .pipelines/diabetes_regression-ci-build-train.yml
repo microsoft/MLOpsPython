@@ -14,6 +14,8 @@ variables:
 - template: diabetes_regression-variables.yml
 - group: devopsforai-aml-vg
 
+pool:
+  vmImage: ubuntu-latest
 
 stages:
 - stage: 'Model_CI'
@@ -21,8 +23,6 @@ stages:
   jobs:
   - job: "Model_CI_Pipeline"
     displayName: "Model CI Pipeline"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -45,8 +45,6 @@ stages:
   - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
     displayName: "Get Pipeline ID for execution"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -64,22 +62,12 @@ stages:
           echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINEID"
       name: 'getpipelineid'
       displayName: 'Get Pipeline ID'
-    - bash: |
-          # Generate a hyperparameter value as a random number between 0 and 1.
-          # A random value is used here to make the Azure ML dashboards "interesting" when testing
-          # the solution sample.
-          alpha=$(printf "0.%03d\n" $((($RANDOM*1000)/32767)))
-          echo "Alpha: $alpha"
-          echo "##vso[task.setvariable variable=ALPHA;isOutput=true]$alpha"
-      name: 'getalpha'
-      displayName: 'Generate random value for hyperparameter alpha'
   - job: "Run_ML_Pipeline"
     dependsOn: "Get_Pipeline_ID"
     displayName: "Trigger ML Training Pipeline"
     pool: server
     variables:
       AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
-      ALPHA: $[ dependencies.Get_Pipeline_ID.outputs['getalpha.ALPHA'] ]
     steps:
     - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
       displayName: 'Invoke ML pipeline'
@@ -87,13 +75,11 @@ stages:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         PipelineId: '$(AMLPIPELINE_ID)'
         ExperimentName: '$(EXPERIMENT_NAME)'
-        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)", "hyperparameter_alpha": "$(ALPHA)"}'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)"}'
   - job: "Training_Run_Report"
     dependsOn: "Run_ML_Pipeline"
     condition: always()
     displayName: "Determine if evaluation succeeded and new model is registered"
-    pool:
-        vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -105,8 +91,6 @@ stages:
   jobs:
   - job: "Deploy_ACI"
     displayName: "Deploy to ACI"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -140,8 +124,6 @@ stages:
   jobs:
   - job: "Deploy_AKS"
     displayName: "Deploy to AKS"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:
@@ -176,8 +158,6 @@ stages:
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Deploy to Webapp"
-    pool:
-      vmImage: 'ubuntu-latest'
     container: mcr.microsoft.com/mlops/python:latest
     timeoutInMinutes: 0
     steps:

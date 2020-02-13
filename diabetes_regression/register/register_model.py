@@ -119,7 +119,7 @@ def register_aml_model(
         if (build_id != 'none'):
             model_already_registered(model_name, exp, run_id)
             run = Run(experiment=exp, run_id=run_id)
-            tagsValue = {"area": "diabetes", "type": "regression",
+            tagsValue = {"area": "diabetes_regression",
                          "BuildId": build_id, "run_id": run_id,
                          "experiment_name": exp.name}
             if (build_uri is not None):
@@ -127,7 +127,7 @@ def register_aml_model(
         else:
             run = Run(experiment=exp, run_id=run_id)
             if (run is not None):
-                tagsValue = {"area": "diabetes", "type": "regression",
+                tagsValue = {"area": "diabetes_regression",
                              "run_id": run_id, "experiment_name": exp.name}
             else:
                 print("A model run for experiment", exp.name,

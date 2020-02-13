@@ -1,7 +1,7 @@
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline
-from azureml.core import Workspace
-from azureml.core.runconfig import RunConfiguration, CondaDependencies
+from azureml.core import Workspace, Environment
+from azureml.core.runconfig import RunConfiguration
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
 
@@ -26,15 +26,19 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
-    run_config = RunConfiguration(conda_dependencies=CondaDependencies.create(
-        conda_packages=['numpy', 'pandas',
-                        'scikit-learn', 'tensorflow', 'keras'],
-        pip_packages=['azure', 'azureml-core',
-                      'azure-storage',
-                      'azure-storage-blob'])
-    )
-    run_config.environment.docker.enabled = True
-    run_config.environment.docker.base_image = "mcr.microsoft.com/mlops/python"
+    # Create a reusable run configuration environment
+    # Read definition from diabetes_regression/azureml_environment.json
+    # Make sure to include `r-essentials'
+    #   in diabetes_regression/conda_dependencies.yml
+    environment = Environment.load_from_directory(e.sources_directory_train)
+    if (e.collection_uri is not None and e.teamproject_name is not None):
+        builduri_base = e.collection_uri + e.teamproject_name
+        builduri_base = builduri_base + "/_build/results?buildId="
+        environment.environment_variables["BUILDURI_BASE"] = builduri_base
+    environment.register(aml_workspace)
+
+    run_config = RunConfiguration()
+    run_config.environment = environment
 
     train_step = PythonScriptStep(
         name="Train Model",
@@ -51,7 +55,7 @@ def main():
     train_pipeline = Pipeline(workspace=aml_workspace, steps=steps)
     train_pipeline.validate()
     published_pipeline = train_pipeline.publish(
-        name=e.pipeline_name + "_with_R",
+        name=e.pipeline_name,
         description="Model training/retraining pipeline",
         version=e.build_id
     )

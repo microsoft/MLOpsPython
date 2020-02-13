@@ -2,7 +2,7 @@ from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline
 from azureml.core import Workspace, Environment
-from azureml.core.runconfig import RunConfiguration, CondaDependencies
+from azureml.core.runconfig import RunConfiguration
 from azureml.core import Dataset, Datastore
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
@@ -28,23 +28,22 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
-    run_config = RunConfiguration()
-    run_config.environment = get_environment(
-        aml_workspace, "diabetes_regression", False)
-
-    config_envvar = {}
+    # Create a reusable run configuration environment
+    # Read definition from diabetes_regression/azureml_environment.json
+    environment = Environment.load_from_directory(e.sources_directory_train)
     if (e.collection_uri is not None and e.teamproject_name is not None):
         builduri_base = e.collection_uri + e.teamproject_name
         builduri_base = builduri_base + "/_build/results?buildId="
-        config_envvar["BUILDURI_BASE"] = builduri_base
-    run_config.environment.environment_variables = config_envvar
+        environment.environment_variables["BUILDURI_BASE"] = builduri_base
+    environment.register(aml_workspace)
+
+    run_config = RunConfiguration()
+    run_config.environment = environment
 
     model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)
     build_id_param = PipelineParameter(
         name="build_id", default_value=e.build_id)
-    hyperparameter_alpha_param = PipelineParameter(
-        name="hyperparameter_alpha", default_value=0.5)
 
     dataset_name = ""
     if (e.datastore_name is not None and e.datafile_name is not None):
@@ -65,7 +64,6 @@ def main():
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
-            "--alpha", hyperparameter_alpha_param,
             "--dataset_name", dataset_name,
         ],
         runconfig=run_config,

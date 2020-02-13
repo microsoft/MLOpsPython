@@ -1,16 +1,43 @@
 ## Repo Details
 
+### Directory Structure
+
+High level directory structure for this repository:
+
+```bash
+├── .pipelines            <- Azure DevOps YAML pipelines for CI, PR and model training and deployment.
+├── bootstrap             <- Python script to initialize this repository with a custom project name.
+├── charts                <- Helm charts to deploy resources on Azure Kubernetes Service(AKS).
+├── data                  <- Initial set of data to train and evaluate model.
+├── diabetes_regression   <- The top-level folder for the ML project.
+│   ├── evaluate          <- Python script to evaluate trained ML model.
+│   ├── register          <- Python script to register trained ML model with Azure Machine Learning Service.
+│   ├── scoring           <- Python score.py to deploy trained ML model.
+│   ├── training          <- Python script to train ML model.
+│       ├── R             <- R script to train R based ML model.
+│   ├── util              <- Python script for various utility operations specific to this ML project.
+├── docs                  <- Extensive markdown documentation for entire project.
+├── environment_setup     <- The top-level folder for everything related to infrastructure.
+│   ├── arm-templates     <- Azure Resource Manager(ARM) templates to build infrastructure needed for this project.
+├── experimentation       <- Jupyter notebooks with ML experimentation code.
+├── ml_service            <- The top-level folder for all Azure Machine Learning resources.
+│   ├── pipelines         <- Python script that builds Azure Machine Learning pipelines.
+│   ├── util              <- Python script for various utility operations specific to Azure Machine Learning.
+├── .env.example          <- Example .env file with environment for local development experience.  
+├── .gitignore            <- A gitignore file specifies intentionally un-tracked files that Git should ignore.  
+├── LICENSE               <- License document for this project.
+├── README.md             <- The top-level README for developers using this project.  
+```
+
 ### Environment Setup
 
-- `environment_setup/requirements.txt` : It consists of a list of python packages which are needed by the train.py to run successfully on host agent (locally).
-
-- `environment_setup/install_requirements.sh` : This script prepares the python environment i.e. install the Azure ML SDK and the packages specified in requirements.txt
+- `environment_setup/install_requirements.sh` : This script prepares a local conda environment i.e. install the Azure ML SDK and the packages specified in environment definitions.
 
 - `environment_setup/iac-*.yml, arm-templates` : Infrastructure as Code piplines to create and delete required resources along with corresponding arm-templates.
 
 - `environment_setup/Dockerfile` : Dockerfile of a build agent containing Python 3.6 and all required packages.
 
-- `environment_setup/docker-image-pipeline.yml` : An AzDo pipeline for building and pushing [microsoft/mlopspython](https://hub.docker.com/_/microsoft-mlops-python) image. 
+- `environment_setup/docker-image-pipeline.yml` : An AzDo pipeline for building and pushing [microsoft/mlopspython](https://hub.docker.com/_/microsoft-mlops-python) image.
 
 ### Pipelines
 
@@ -27,17 +54,23 @@
 - `ml_service/pipelines/diabetes_regression_verify_train_pipeline.py` : determines whether the evaluate_model.py step of the training pipeline registered a new model.
 - `ml_service/util` : contains common utility functions used to build and publish an ML training pipeline.
 
+### Environment Definitions
+
+- `diabetes_regression/azureml_environment.json` : Azure ML environment definition for the training environment, including base Docker image and a reference to `conda_dependencies.yml` Conda environment file.
+- `diabetes_regression/conda_dependencies.yml` : Conda environment definition for the environment used for both training and scoring (Docker image in which train.py and score.py are run).
+- `diabetes_regression/ci_dependencies.yml` : Conda environment definition for the CI environment.
+
 ### Code
 
 - `diabetes_regression/training/train.py` : a training step of an ML training pipeline.
 - `diabetes_regression/evaluate/evaluate_model.py` : an evaluating step of an ML training pipeline which registers a new trained model if evaluation shows the new model is more performant than the previous one.
 - `diabetes_regression/evaluate/register_model.py` : (LEGACY) registers a new trained model if evaluation shows the new model is more performant than the previous one.
 - `diabetes_regression/training/R/r_train.r` : training a model with R basing on a sample dataset (weight_data.csv).
-- `diabetes_regression/training/R/train_with_r.py` : a python wrapper (ML Pipeline Step) invoking R training script on ML Compute 
+- `diabetes_regression/training/R/train_with_r.py` : a python wrapper (ML Pipeline Step) invoking R training script on ML Compute
 - `diabetes_regression/training/R/train_with_r_on_databricks.py` : a python wrapper (ML Pipeline Step) invoking R training script on Databricks Compute
 - `diabetes_regression/training/R/weight_data.csv` : a sample dataset used by R script (r_train.r) to train a model
 
 ### Scoring
+
 - `diabetes_regression/scoring/score.py` : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.
-- `diabetes_regression/scoring/conda_dependencies.yml` : contains a list of dependencies required by score.py to be installed in a deployable Docker Image 
 - `diabetes_regression/scoring/inference_config.yml`, deployment_config_aci.yml, deployment_config_aks.yml : configuration files for the [AML Model Deploy](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.private-vss-services-azureml&ssr=false#overview) pipeline task for ACI and AKS deployment targets.
