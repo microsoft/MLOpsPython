@@ -18,7 +18,7 @@ def get_environment(
 
         if restored_environment is None or create_new:
             # Read definition from diabetes_regression/azureml_environment.json
-            new_env = Environment.from_conda_specification(environment_name, os.path.normpath(e.sources_directory_train))  # NOQA: E501
+            new_env = Environment.from_conda_specification(environment_name, os.path.normpath(e.sources_directory_train, "conda_dependencies.yml"))  # NOQA: E501
             restored_environment = new_env
             restored_environment.register(workspace)
 
