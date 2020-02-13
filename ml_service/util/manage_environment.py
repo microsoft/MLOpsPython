@@ -1,4 +1,5 @@
 from azureml.core import Workspace, Environment
+from ml_service.util.env_variables import Env
 
 
 def get_environment(
@@ -7,6 +8,7 @@ def get_environment(
     create_new: bool = False
 ):
     try:
+        e = Env()
         environments = Environment.list(workspace=workspace)
         restored_environment = None
         for env in environments:
@@ -14,9 +16,9 @@ def get_environment(
                 restored_environment = env
 
         if restored_environment is None or create_new:
-            new_env = Environment.from_conda_specification(name=environment_name,  # NOQA: E501
-                                                           file_path="MLOpsPython\diabetes_regression\conda_dependencies.yml")  # NOQA: E501
-            restored_environment = new_env
+            # Read definition from diabetes_regression/azureml_environment.json
+            new_env = Environment.load_from_directory(e.sources_directory_train)  # NOQA: E501
+            stored_environment = new_env
             restored_environment.register(workspace)
 
         return restored_environment

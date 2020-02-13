@@ -4,6 +4,7 @@ from azureml.core import Workspace, Environment
 from azureml.core.runconfig import RunConfiguration
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
+from ml_service.util.manage_environment import get_environment
 
 
 def main():
@@ -26,16 +27,15 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
-    # Create a reusable run configuration environment
-    # Read definition from diabetes_regression/azureml_environment.json
+    # Create a reusable Azure ML environment
     # Make sure to include `r-essentials'
     #   in diabetes_regression/conda_dependencies.yml
-    environment = Environment.load_from_directory(e.sources_directory_train)
+    environment = get_environment(
+        aml_workspace, e.aml_env_name, create_new=False)  # NOQA: E501
     if (e.collection_uri is not None and e.teamproject_name is not None):
         builduri_base = e.collection_uri + e.teamproject_name
         builduri_base = builduri_base + "/_build/results?buildId="
         environment.environment_variables["BUILDURI_BASE"] = builduri_base
-    environment.register(aml_workspace)
 
     run_config = RunConfiguration()
     run_config.environment = environment
