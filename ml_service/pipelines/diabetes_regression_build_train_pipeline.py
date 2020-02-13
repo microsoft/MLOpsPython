@@ -1,6 +1,6 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
-from azureml.pipeline.core import Pipeline
+from azureml.pipeline.core import Pipeline, PipelineData
 from azureml.core import Workspace, Environment
 from azureml.core.runconfig import RunConfiguration
 from azureml.core import Dataset, Datastore
@@ -46,25 +46,42 @@ def main():
         name="build_id", default_value=e.build_id)
 
     dataset_name = ""
-    if (e.datastore_name is not None and e.datafile_name is not None):
+    # Allow an existing dataset to be specified
+    if e.dataset_name is not None:
         dataset_name = e.dataset_name
-        datastore = Datastore.get(aml_workspace, e.datastore_name)
-        data_path = [(datastore, e.datafile_name)]
-        dataset = Dataset.Tabular.from_delimited_files(path=data_path)
-        dataset.register(workspace=aml_workspace,
-                         name=e.dataset_name,
-                         description="dataset with training data",
-                         create_new_version=True)
+        # If a datastore and file are also provided, create a new dataset
+        if (e.datastore_name is not None and e.datafile_name is not None):
+            # There's an assumption that a datset consists of a single file
+            # A dataset can consist of multiple files in a folder hierarchy
+            datastore = Datastore.get(aml_workspace, e.datastore_name)
+            data_path = [(datastore, e.datafile_name)]
+            # There's an assumption the dataset is tabular(could be file-based)
+            dataset = Dataset.Tabular.from_delimited_files(path=data_path)
+            dataset.register(
+                workspace=aml_workspace,
+                name=e.dataset_name,
+                description="dataset with training data",
+                create_new_version=True)
+
+    # Get the dataset
+    dataset = Dataset.get_by_name(aml_workspace, dataset_name)
+
+    # Create a PipelineData to pass data between steps
+    pipeline_data = PipelineData(
+        'pipeline_data',
+        datastore=aml_workspace.get_default_datastore())
 
     train_step = PythonScriptStep(
         name="Train Model",
         script_name=e.train_script_path,
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
+        inputs=[dataset.as_named_input('training_data')],
+        outputs=[pipeline_data],
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
-            "--dataset_name", dataset_name,
+            "--step_output", pipeline_data
         ],
         runconfig=run_config,
         allow_reuse=False,
@@ -91,9 +108,11 @@ def main():
         script_name=e.register_script_path,
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
+        inputs=[pipeline_data],
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
+            "--step_input", pipeline_data,
         ],
         runconfig=run_config,
         allow_reuse=False,
