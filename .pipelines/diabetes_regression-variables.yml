@@ -43,7 +43,7 @@ variables:
   - name: DATASET_NAME
     value: diabetes_ds
   - name: AML_ENV_NAME
-    value: "diabetes_regression_sklearn"
+    value: "diabetes_regression_env"
   # These are the default values set in ml_service\util\env_variables.py. Uncomment and override if desired.
   # - name: RUN_EVALUATION
   #   value: "true"
