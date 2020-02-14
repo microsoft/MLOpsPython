@@ -150,16 +150,20 @@ def register_aml_model(
     build_uri=None
 ):
     try:
-        model_already_registered(model_name, exp, run_id)
-        tagsValue = {
-            "area": "diabetes_regression",
-            "BuildId": build_id,
-            "run_id": run_id,
-            "experiment_name": exp.name,
-            "mse": model_mse
-            }
-        if (build_uri is not None):
-            tagsValue["BuildUri"] = build_uri
+        if (build_id != 'none'):
+            model_already_registered(model_name, exp, run_id)
+            tagsValue = {
+                "area": "diabetes_regression",
+                "BuildId": build_id,
+                "run_id": run_id,
+                "experiment_name": exp.name,
+                "mse": model_mse
+                }
+            if (build_uri is not None):
+                tagsValue["BuildUri"] = build_uri
+        else:
+            tagsValue = {"area": "diabetes_regression",
+                         "run_id": run_id, "experiment_name": exp.name}
 
         model = AMLModel.register(
             workspace=exp.workspace,
