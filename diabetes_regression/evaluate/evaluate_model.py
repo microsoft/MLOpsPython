@@ -123,8 +123,9 @@ try:
         model_name, tag_name, exp.name, ws)
 
     if (model is not None):
-        production_model_mse = 10000
-        if (model.tags[metric_eval] is not None):
+        if (metric_eval not in model.tags):
+            production_model_mse = 10000
+        else:
             production_model_mse = float(model.tags[metric_eval])
         new_model_mse = float(run.parent.get_metrics().get(metric_eval))
         if (production_model_mse is None or new_model_mse is None):
