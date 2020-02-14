@@ -60,8 +60,6 @@ The variable group should contain the following required variables:
 | WORKSPACE_NAME           | mlops-AML-WS             |
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection |
 | ACI_DEPLOYMENT_NAME      | diabetes-aci             |
-| DATASET_NAME      | diabetes_training             |
-| MODEL_NAME      | diabetes_model.pkl             |
 
 **Note:**
 
@@ -79,9 +77,7 @@ The **RESOURCE_GROUP** parameter is used as the name for the resource group that
 
 The **WORKSPACE_SVC_CONNECTION** parameter is used to reference a service connection for the Azure ML workspace. You will create this after provisioning the workspace (we recommend using the IaC pipeline as described below), and installing the Azure ML extension in your Azure DevOps project.
 
-The **DATASET_NAME** parameter is used to reference the training dataset that you will register in your Azure ML workspace.
-
-The **MODEL_NAME** parameter is used to specify the name (and filename) of the model that you will train.
+Optionally, a **DATASET_NAME** parameter can be used to reference a training dataset that you have registered in your Azure ML workspace (more details below).
 
 Make sure to select the **Allow access to all pipelines** checkbox in the
 variable group configuration.
@@ -133,8 +129,7 @@ Check out the newly created resources in the [Azure Portal](https://portal.azure
 
 (Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](https://portal.azure.com).
 
-**Note:** The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. To use this, you need to create a **Dataset** in your workspace by uoloading the diabetes.csv file, naming the dataset to match the DATASET_NAME variable you created earlier in ***devopsforai-aml-vg*** variable group. You can upload the data file to the default datastore for simplicity, but best practice is to [create and register a datastore](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-access-data#azure-machine-learning-studio) in your ML workspace and upload the datafile to the corresponding blob container. You can also define a datastore in the ML Workspace with [az cli](https://docs.microsoft.com/en-us/cli/azure/ext/azure-cli-ml/ml/datastore?view=azure-cli-latest#ext-azure-cli-ml-az-ml-datastore-attach-blob).
-You can also configure DATASTORE_NAME and DATAFILE_NAME variables in ***devopsforai-aml-vg*** variable group to have the pipeline automatically upload the data file to your datastore and register a dataset.
+**Note:** The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. To use your own data, you need to [create a Dataset](https://docs.microsoft.com/azure/machine-learning/how-to-create-register-datasets) in your workspace and specify its name in a DATASET_NAME variable in the ***devopsforai-aml-vg*** variable group. You will also need to modify the test cases in the **ml_service/util/smoke_test_scoring_service.py** script to match the schema of the training features in your dataset.
 
 ## Create an Azure DevOps Azure ML Workspace Service Connection
 

@@ -26,7 +26,6 @@ POSSIBILITY OF SUCH DAMAGE.
 from azureml.core.run import Run
 import os
 import argparse
-from sklearn.datasets import load_diabetes
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
@@ -99,7 +98,9 @@ def main():
         X = df.values
         y = df.Y
     else:
-        X, y = load_diabetes(return_X_y=True)
+        e = ("No dataset provided")
+        print(e)
+        raise Exception(e)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=0)
@@ -110,10 +111,10 @@ def main():
 
     # Pass model file to next step
     os.makedirs(step_output_path, exist_ok=True)
-    output_path = os.path.join(step_output_path, model_name)
-    joblib.dump(value=reg, filename=output_path)
+    model_output_path = os.path.join(step_output_path, model_name)
+    joblib.dump(value=reg, filename=model_output_path)
 
-    # Also upload model file to run outputs
+    # Also upload model file to run outputs for history
     os.makedirs('outputs', exist_ok=True)
     output_path = os.path.join('outputs', model_name)
     joblib.dump(value=reg, filename=output_path)

@@ -64,11 +64,13 @@ def main():
         type=str,
         help="The Build ID of the build triggering this pipeline run",
     )
+
     parser.add_argument(
         "--run_id",
         type=str,
         help="Training run ID",
     )
+
     parser.add_argument(
         "--model_name",
         type=str,
@@ -95,6 +97,7 @@ def main():
     print("Loading model from " + model_path)
     model_file = os.path.join(model_path, model_name)
     model = joblib.load(model_file)
+    model_mse = run.parent.get_metrics()["mse"]
 
     if (model is not None):
         if (build_id is None):
@@ -108,6 +111,7 @@ def main():
                 register_aml_model(
                     model_file,
                     model_name,
+                    model_mse,
                     exp,
                     run_id,
                     build_id,
@@ -116,6 +120,7 @@ def main():
                 register_aml_model(
                     model_file,
                     model_name,
+                    model_mse,
                     exp,
                     run_id,
                     build_id)
@@ -138,6 +143,7 @@ def model_already_registered(model_name, exp, run_id):
 def register_aml_model(
     model_path,
     model_name,
+    model_mse,
     exp,
     run_id,
     build_id: str = 'none',
@@ -149,7 +155,9 @@ def register_aml_model(
             "area": "diabetes_regression",
             "BuildId": build_id,
             "run_id": run_id,
-            "experiment_name": exp.name}
+            "experiment_name": exp.name,
+            "mse": model_mse
+            }
         if (build_uri is not None):
             tagsValue["BuildUri"] = build_uri
 
