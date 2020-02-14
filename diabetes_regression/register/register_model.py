@@ -163,7 +163,9 @@ def register_aml_model(
                 tagsValue["BuildUri"] = build_uri
         else:
             tagsValue = {"area": "diabetes_regression",
-                         "run_id": run_id, "experiment_name": exp.name}
+                         "run_id": run_id,
+                         "experiment_name": exp.name,
+                         "mse": model_mse}
 
         model = AMLModel.register(
             workspace=exp.workspace,
