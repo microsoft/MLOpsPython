@@ -13,7 +13,10 @@ If you already have an Azure DevOps organization, create a [new project](https:/
 * Fork this repository if there is a desire to contribute back to the repository else
 * Use this [code template](https://github.com/microsoft/MLOpsPython/generate) which copies the entire code base to your own GitHub location with the git commit history restarted. This can be used for learning and following the guide.
 
-If the desire is to use this project for your machine learning code, follow the [bootstrap instructions](../bootstrap/README.md) after the code template is complete.
+This repository contains a template and demonstrates how it is applied for a sample ML project ***Diabetes*** that creates a linear regression model to predict the diabetes.
+
+If the desire is to adopt this template for your project and to use it with your machine learning code, it is recommended to go through this guide as it is first and then follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***Diabetes*** sample into your project starting point.
+
 
 ## Create an ARM Service Connection to deploy resources
 
