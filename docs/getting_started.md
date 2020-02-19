@@ -258,6 +258,8 @@ Make sure your webapp has the credentials to pull the image from the Azure Conta
 
 # Next steps
 
+* You may wish to follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case.
+* Use the [Convert ML experimental code to production code](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production#use-your-own-model-with-mlopspython-code-template) tutorial explaining how to bring your machine learning code on top of this template. 
 * The provided pipeline definition YAML file is a sample starting point, which you should tailor to your processes and environment.
 * You should edit the pipeline definition to remove unused stages. For example, if you are deploying to ACI and AKS, you should delete the unused `Deploy_Webapp` stage.
 * You may wish to enable [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
