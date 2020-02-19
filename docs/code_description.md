@@ -29,7 +29,7 @@ High level directory structure for this repository:
 ├── README.md             <- The top-level README for developers using this project.  
 ```
 
-The repository provides a template with folders structure suitable for maintaining multiple ML projects. There are common folders such as ***.pipelines***, ***environment_setup***, ***ml_service***, etc. and folders containing the code base for each ML project. This repository contains a single sample ML project in the ***diabetes_regression*** folder. This folder is going to be renamed to your project name by the [bootstrap procedure](../bootstrap/README.md).
+The repository provides a template with folders structure suitable for maintaining multiple ML projects. There are common folders such as ***.pipelines***, ***environment_setup***, ***ml_service*** and folders containing the code base for each ML project. This repository contains a single sample ML project in the ***diabetes_regression*** folder. This folder is going to be renamed to your project name by the [bootstrap procedure](../bootstrap/README.md).
 
 ### Environment Setup
 

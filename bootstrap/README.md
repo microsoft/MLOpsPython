@@ -8,6 +8,6 @@ To bootstrap from the existing MLOpsPython repository clone this repository, ens
 
 Where `[dirpath]` is the absolute path to the root of your directory where MLOps repo is cloned and `[projectname]` is the name of your ML project.
 
-The script renames folders, files and files content from the `diabetes` to your project name. However, if might need to rename manually variables defined in a variable group and there values. 
+The script renames folders, files and files' content from the `diabetes` to your project name. However, you might need to manually rename variables defined in a variable group and their values. 
 
 [This article](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production#use-your-own-model-with-mlopspython-code-template) will also assist to use this code template for your own ML project.
