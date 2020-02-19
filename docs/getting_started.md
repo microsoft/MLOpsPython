@@ -17,6 +17,7 @@ This repository contains a template and demonstrates how it is applied for a sam
 
 If the desire is to adopt this template for your project and to use it with your machine learning code, it is recommended to go through this guide as it is first to make sure everything is working on your environment, and then follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***Diabetes*** sample into your project starting point.
 
+
 ## Create a Variable Group for your Pipeline
 
 We make use of a variable group inside Azure DevOps to store variables and their
@@ -155,7 +156,7 @@ performs linting, unit testing and publishes a training pipeline.
 ### Set up the Pipeline
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
-pipeline referring to the [diabetes_regression-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml)
+pipeline referring to the [diabetes_regression-ci-build-train.yml](./.pipelines/azdo-ci-build-train.yml)
 pipeline definition in your forked repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
