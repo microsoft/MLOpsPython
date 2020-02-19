@@ -152,10 +152,9 @@ you can set up the pipeline necessary for deploying your ML model
 to production. The pipeline has a sequence of stages for:
 
 1. **Model Code Continuous Integration:** triggered on code change to master branch on GitHub,
-performs linting, unit testing, publishes a training pipeline, and runs the published training pipeline to train, evaluate, and register a model.
-1. **Train Model**: invokes the Azure ML service to trigger model training.
-1. **Release Deployment:** deploys a model to QA (ACI) and Prod (AKS)
-environments, or alternatively to Azure App Service.
+performs linting, unit testing and publishes a training pipeline.
+1. **Train Model**: invokes the Azure ML service to trigger the published training pipeline to train, evaluate, and register a model.
+1. **Release Deployment:** deploys a model to ACI, AKS and Azure App Service environments.
 
 ### Set up the Pipeline
 
