@@ -17,27 +17,6 @@ This repository contains a template and demonstrates how it is applied for a sam
 
 If the desire is to adopt this template for your project and to use it with your machine learning code, it is recommended to go through this guide as it is first to make sure everything is working on your environment, and then follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***Diabetes*** sample into your project starting point.
 
-
-## Create an ARM Service Connection to deploy resources
-
-This repository includes a YAML pipeline definition file for an Azure DevOps pipeline that will create the Azure ML workspace and associated resources through Azure Resource Manager.
-
-The pipeline requires an **Azure Resource Manager**
-[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
-Given this service connection, you will be able to run the IaC pipeline
-and have the required permissions to generate resources.
-
-![create service connection](./images/create-rm-service-connection.png)
-
-Use **``AzureResourceConnection``** as the connection name, since it is used
-in the IaC pipeline definition. Leave the **``Resource Group``** field empty.
-
-**Note:** Creating the ARM service connection scope requires 'Owner' or 'User Access Administrator' permissions on the subscription.
-You must also have sufficient permissions to register an application with
-your Azure AD tenant, or receive the ID and secret of a service principal
-from your Azure AD Administrator. That principal must have 'Contributor'
-permissions on the subscription.
-
 ## Create a Variable Group for your Pipeline
 
 We make use of a variable group inside Azure DevOps to store variables and their
@@ -61,6 +40,7 @@ The variable group should contain the following required variables:
 | LOCATION                 | centralus                |
 | RESOURCE_GROUP           | mlops-RG                 |
 | WORKSPACE_NAME           | mlops-AML-WS             |
+| AZURE_RM_SVC_CONNECTION  | azure-resource-connection|
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection |
 | ACI_DEPLOYMENT_NAME      | diabetes-aci             |
 
@@ -77,6 +57,19 @@ unique names (e.g. MyUniqueMLamlcr, MyUniqueML-AML-KV, etc.). The length of
 the BASE_NAME value should not exceed 10 characters and it should contain numbers and letters only.
 
 The **RESOURCE_GROUP** parameter is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
+
+The **AZURE_RM_SVC_CONNECTION** parameter is used by the [Azure DevOps pipeline]((../environment_setup/iac-create-environment.yml)) that creates the Azure ML workspace and associated resources through Azure Resource Manager. The pipeline requires an **Azure Resource Manager**
+[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
+
+![create service connection](./images/create-rm-service-connection.png)
+
+Leave the **``Resource Group``** field empty.
+
+**Note:** Creating the ARM service connection scope requires 'Owner' or 'User Access Administrator' permissions on the subscription.
+You must also have sufficient permissions to register an application with
+your Azure AD tenant, or receive the ID and secret of a service principal
+from your Azure AD Administrator. That principal must have 'Contributor'
+permissions on the subscription.
 
 The **WORKSPACE_SVC_CONNECTION** parameter is used to reference a service connection for the Azure ML workspace. You will create this after provisioning the workspace (we recommend using the IaC pipeline as described below), and installing the Azure ML extension in your Azure DevOps project.
 
