@@ -136,6 +136,8 @@ so that you can set up a service connection to your AML workspace.
 
 Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group above.
 
+![created resources](./images/ml-ws-svc-connection.png)
+
 **Note:** Creating service connection with Azure Machine Learning workspace scope requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
 You must also have sufficient permissions to register an application with
 your Azure AD tenant, or receive the ID and secret of a service principal
