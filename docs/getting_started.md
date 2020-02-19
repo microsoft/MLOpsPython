@@ -175,6 +175,7 @@ and check out the published training pipeline in the **mlops-AML-WS** workspace 
 
 Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master branch.
 
+
 * The first stage of the pipeline, **Model CI**, performs linting, unit testing, build and publishes an **ML Training Pipeline** in an **ML Workspace**.
 
   **Note:** The build pipeline also supports building and publishing ML
@@ -195,6 +196,8 @@ specified).
 **Note:** If the model evaluation determines that the new model does not perform better than the previous one then the new model will not be registered and the pipeline will be cancelled.
 
 * The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). It then runs a *smoke test* to validate the deployment, i.e. sends a sample query to the scoring web service and verifies that it returns a response in the expected format.
+
+The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The image of the container ***mcr.microsoft.com/mlops/python:latest*** is built with this [Dockerfile](./environment_setup/Dockerfile) and it has all necessary dependencies installed for the purposes of this repository. This image serves as an example of using a custom Docker image that provides a pre-baked environment. This environment is guaranteed to be the same on any building agent, VM or local machine. In your project you will want to build your own Docker image that only contains the dependencies and tools required for your case. This image will be more likely smaller and therefore faster, and it will be totally maintained by your team. 
 
 Wait until the pipeline finishes and verify that there is a new model in the **ML Workspace**:
 
