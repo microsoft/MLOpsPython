@@ -1,3 +1,4 @@
+# PR pipeline for running CI on PRs to master.
 trigger: none
 pr:
   branches:
