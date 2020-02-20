@@ -47,7 +47,7 @@ The repository provides a template with folders structure suitable for maintaini
 - `.pipelines/diabetes_regression-ci-build-train.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
 - `.pipelines/azdo-pr-build-train.yml` : a pipeline triggered when a **pull request** to the **master** branch is created. It performs linting, data integrity testing and unit testing only.
 - `.pipelines/diabetes_regression-ci-image.yml` : a pipeline building a scoring image for the diabetes regression model. 
-- `.pipelines/diabetes_regression-template-get-model-version.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci-build-train.yml` pipeline.
+- `.pipelines/diabetes_regression-template-get-model-version.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci-build-train.yml` pipeline. It finds out if a new model was registered and retrieves a version of the new model.
 - `.pipelines/azdo-abtest-pipeline.yml` : a pipeline demonstrating [Canary deployment strategy](./docs/canary_ab_deployment.md).
 - `.pipelines/azdo-helm-*.yml` : pipeline templates used by the `.pipelines/azdo-abtest-pipeline.yml` pipeline.
 
@@ -68,22 +68,22 @@ The repository provides a template with folders structure suitable for maintaini
 - `diabetes_regression/conda_dependencies.yml` : Conda environment definition for the environment used for both training and scoring (Docker image in which train.py and score.py are run).
 - `diabetes_regression/ci_dependencies.yml` : Conda environment definition for the CI environment.
 
-### Training
+### Training Step
 
 - `diabetes_regression/training/train.py` : a training step of an ML training pipeline.
 - `diabetes_regression/training/R/r_train.r` : training a model with R basing on a sample dataset (weight_data.csv).
 - `diabetes_regression/training/R/train_with_r.py` : a python wrapper (ML Pipeline Step) invoking R training script on ML Compute
 - `diabetes_regression/training/R/train_with_r_on_databricks.py` : a python wrapper (ML Pipeline Step) invoking R training script on Databricks Compute
 - `diabetes_regression/training/R/weight_data.csv` : a sample dataset used by R script (r_train.r) to train a model
-- `diabetes_regression/training/R/test_train.py` : a unit test on the training cide
+- `diabetes_regression/training/R/test_train.py` : a unit test for the training script(s)
 
-### Evaluating
+### Evaluation Step
 
 - `diabetes_regression/evaluate/evaluate_model.py` : an evaluating step of an ML training pipeline which registers a new trained model if evaluation shows the new model is more performant than the previous one.
 
-### Registering
+### Registering Step
 
-- `diabetes_regression/evaluate/register_model.py` : (LEGACY) registers a new trained model if evaluation shows the new model is more performant than the previous one.
+- `diabetes_regression/evaluate/register_model.py` : registers a new trained model if evaluation shows the new model is more performant than the previous one.
 
 ### Scoring
 
