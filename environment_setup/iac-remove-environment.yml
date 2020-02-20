@@ -11,7 +11,7 @@ variables:
 steps:
 - task: AzureResourceGroupDeployment@2
   inputs:
-    azureSubscription: 'AzureResourceConnection'
+    azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
     action: 'DeleteRG'
     resourceGroupName: '$(RESOURCE_GROUP)'
     location: $(LOCATION)
