@@ -95,8 +95,8 @@ def main():
     dataset = run.input_datasets['training_data']
     if (dataset):
         df = dataset.to_pandas_dataframe()
-        X = df.values
-        y = df.Y
+        X = df.drop('Y', axis=1).values
+        y = df['Y'].values
     else:
         e = ("No dataset provided")
         print(e)
