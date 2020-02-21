@@ -180,7 +180,8 @@ stages:
       inputs:
         azureSubscription: 'AzureResourceConnection'
         appName: '$(WEBAPP_DEPLOYMENT_NAME)'
-        containers: '$(IMAGE_LOCATION)'
+        resourceGroupName: '$(RESOURCE_GROUP)'
+        imageName: '$(IMAGE_LOCATION)'
     - task: AzureCLI@1
       displayName: 'Smoke test'
       inputs:
