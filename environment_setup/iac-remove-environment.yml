@@ -1,3 +1,4 @@
+# Pipeline that removes the resources created by the IaC Create Environment pipeline.
 pr: none
 trigger: none
 

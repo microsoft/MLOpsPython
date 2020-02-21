@@ -1,3 +1,4 @@
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
 pr: none
 trigger:
   branches:
@@ -84,6 +85,7 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-template-get-model-version.yml
+
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
   dependsOn: Trigger_AML_Pipeline
