@@ -1,3 +1,4 @@
+# Pipeline to run basic code quality tests as part of pull requests to the master branch.
 trigger: none
 pr:
   branches:

@@ -1,8 +1,10 @@
+# Pipeline template that defines common runtime environment variables.
 variables:
   # Azure ML Workspace Variables
   - name: EXPERIMENT_NAME
     value: mlopspython
-    # AML Compute Cluster Config
+
+  # AML Compute Cluster Config
   - name: AML_COMPUTE_CLUSTER_CPU_SKU
     value: STANDARD_DS2_V2
   - name: AML_COMPUTE_CLUSTER_NAME
@@ -13,6 +15,7 @@ variables:
     value: 4
   - name: AML_CLUSTER_PRIORITY
     value: lowpriority
+
     # Training Config
   - name: BUILD_TRAIN_SCRIPT
     value: diabetes_regression_build_train_pipeline.py
@@ -22,6 +25,7 @@ variables:
     value: sklearn_regression_model.pkl
   - name: MODEL_VERSION
     value: "1"
+
     # AML Pipeline Config
   - name: TRAINING_PIPELINE_NAME
     value: "diabetes-Training-Pipeline"
