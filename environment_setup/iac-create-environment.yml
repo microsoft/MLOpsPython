@@ -1,3 +1,4 @@
+# CI/PR Pipeline that deploys an ARM template to create or update the resources needed by the other pipelines.
 trigger:
   branches:
     include:

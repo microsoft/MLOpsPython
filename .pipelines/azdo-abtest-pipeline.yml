@@ -1,3 +1,4 @@
+# Pipeline for the canary deployment workflow.
 pr: none
 trigger:
   branches:
@@ -22,7 +23,6 @@ variables:
   value: 'model-green'
 - name: 'SCORE_SCRIPT'
   value: 'scoreA.py'
-
 
 stages:
 - stage: 'Building'
@@ -49,7 +49,6 @@ stages:
 
     - publish: $(System.DefaultWorkingDirectory)/charts
       artifact: allcharts
-
 
 - stage: 'Blue_Staging'
   jobs:

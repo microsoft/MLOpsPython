@@ -1,3 +1,4 @@
+# Pipeline template that attempts to get the latest model version and adds it to the environment for subsequent tasks to use.
 steps:
 - task: AzureCLI@1
   inputs:

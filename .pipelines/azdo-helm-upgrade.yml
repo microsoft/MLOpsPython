@@ -1,8 +1,9 @@
+# Pipeline template for deploying / upgrading using Helm.
 parameters:
   chartPath: ''
   releaseName: '' 
   overrideValues: ''
-    
+
 steps:
 - template: azdo-helm-install.yml
 - task: HelmDeploy@0

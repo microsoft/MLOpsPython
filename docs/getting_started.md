@@ -234,11 +234,13 @@ scoring service on Azure App Service](https://docs.microsoft.com/en-us/azure/mac
 
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add the following variable:
 
-| Variable Name          | Suggested Value |
-| ---------------------- | --------------- |
-| WEBAPP_DEPLOYMENT_NAME | mlopswebapp     |
+| Variable Name          | Suggested Value        |
+| ---------------------- | ---------------------- |
+| WEBAPP_DEPLOYMENT_NAME | _name of your web app_ |
 
-Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. Delete the **ACI_DEPLOYMENT_NAME** variable.
+Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. This app must exist before you can deploy the model to it. 
+
+Delete the **ACI_DEPLOYMENT_NAME** variable.
 
 The pipeline uses the [Create Image Script](../ml_service/util/create_scoring_image.py)
 to create a scoring image. The image
