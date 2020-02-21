@@ -1,4 +1,4 @@
-# CI pipeline that builds, trains, tests, and deploys the diabetes model.
+# Continuous Integration (CI) pipeline that builds, trains, tests, and deploys the diabetes_regression model.
 pr: none
 trigger:
   branches:
