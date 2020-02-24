@@ -181,7 +181,7 @@ stages:
       name: WebAppDeploy
       displayName: 'Azure Web App on Container Deploy'
       inputs:
-        azureSubscription: 'AzureResourceConnection'
+        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
         appName: '$(WEBAPP_DEPLOYMENT_NAME)'
         resourceGroupName: '$(RESOURCE_GROUP)'
         imageName: '$(IMAGE_LOCATION)'
