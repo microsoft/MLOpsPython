@@ -72,6 +72,7 @@ stages:
   - job: "Run_ML_Pipeline"
     dependsOn: "Get_Pipeline_ID"
     displayName: "Trigger ML Training Pipeline"
+    timeoutInMinutes: 0
     pool: server
     variables:
       AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
@@ -186,7 +187,7 @@ stages:
       name: WebAppDeploy
       displayName: 'Azure Web App on Container Deploy'
       inputs:
-        azureSubscription: 'AzureResourceConnection'
+        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
         appName: '$(WEBAPP_DEPLOYMENT_NAME)'
         resourceGroupName: '$(RESOURCE_GROUP)'
         imageName: '$(IMAGE_LOCATION)'
