@@ -3,7 +3,7 @@
 resources:
   containers:
   - container: mlops
-    image: mcr.microsoft.com/mlops/python/$(Build.BuildId):latest
+    image: mcr.microsoft.com/mlops/python/$(Build.SourceBranch):latest
 
 pr: none
 trigger:
