@@ -75,9 +75,11 @@ Run the pipeline and ensure your container has been used.
 
 Especially when working in a team, it's possible for environment changes across branches to interfere with one another.
 
-For example, if the master branch is using scikit-learn and you create a branch to use Tensorflow instead, and you remove scikit-learn from the 
+For example, if the master branch is using scikit-learn and you create a branch to use Tensorflow instead, and you
+decide to remove scikit-learn from the 
 [ci_dependencies.yml](../diabetes_regression/ci_dependencies.yml) Conda environment definition
-and runs the [docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml) Docker image, the master branch will stop building.
+and run the [docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml) Docker image,
+then the master branch will stop building.
 
 You could leave scikit-learn in addition to Tensorflow in the environment, but that is not ideal, as you would have to take an extra step to remove scikit-learn after merging your branch to master.
 
