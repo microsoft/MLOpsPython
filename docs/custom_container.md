@@ -40,13 +40,13 @@ typically come with prebuilt binaries that make installation more reliable.
 
 In your [Azure DevOps](https://dev.azure.com) project create a new build
 pipeline referring to the
-[docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml)
+[./environment_setup/docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml)
 pipeline definition in your forked repository.
 
 Create a pipeline variable named `agentImageName` and give it an appropriate
 value to name your image with, e.g. `mlops/diabetes_regression`.
 
-Run the pipeline.
+Save and run the pipeline.
 
 ## Modify the model pipeline
 
