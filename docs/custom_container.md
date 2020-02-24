@@ -24,8 +24,7 @@ Create a service connection to your Azure Container Registry:
 - As *Connection type*, select *Docker Registry*
 - As *Registry type*, select *Azure Container Registry*
 - As *Azure container registry*, select your Container registry instance.
-
-As *Service connection name*, enter `acrconnection`.
+- As *Service connection name*, enter `acrconnection`.
 
 ## Update the environment definition
 
