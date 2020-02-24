@@ -1,4 +1,10 @@
 # Pipeline for the canary deployment workflow.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
 pr: none
 trigger:
   branches:
@@ -31,7 +37,7 @@ stages:
     timeoutInMinutes: 0
     pool:
       vmImage: 'ubuntu-latest'
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     steps:
     - task: AzureCLI@1
       inputs:
