@@ -3,8 +3,7 @@
 resources:
   containers:
   - container: mlops
-    image: mcr.microsoft.com/mlops/python/$(Build.SourceBranch):latest
-    endpoint: acrconnection
+    image: mcr.microsoft.com/mlops/python/$(Build.SourceBranchName):latest
 
 pr: none
 trigger:
