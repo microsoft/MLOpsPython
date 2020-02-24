@@ -38,7 +38,3 @@ BUILD_BUILDID is a variable used to uniquely identify the ML pipeline between th
 set to the current build number. In a local environment, we can use a command such as
 `uuidgen` so set a different random identifier on each run, ensuring there are 
 no collisions.
-
-### Local testing
-
-Before committing, run `tox` to execute linter and unit test checks.

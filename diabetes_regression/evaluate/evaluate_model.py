@@ -90,6 +90,7 @@ parser.add_argument(
     help="Name of the Model",
     default="sklearn_regression_model.pkl",
 )
+
 parser.add_argument(
     "--allow_run_cancel",
     type=str,
@@ -122,18 +123,10 @@ try:
         model_name, tag_name, exp.name, ws)
 
     if (model is not None):
-
-        production_model_run_id = model.run_id
-
-        # Get the run history for both production model and
-        # newly trained model and compare mse
-        production_model_run = Run(exp, run_id=production_model_run_id)
-        new_model_run = run.parent
-        print("Production model run is", production_model_run)
-
-        production_model_mse = \
-            production_model_run.get_metrics().get(metric_eval)
-        new_model_mse = new_model_run.get_metrics().get(metric_eval)
+        production_model_mse = 10000
+        if (metric_eval in model.tags):
+            production_model_mse = float(model.tags[metric_eval])
+        new_model_mse = float(run.parent.get_metrics().get(metric_eval))
         if (production_model_mse is None or new_model_mse is None):
             print("Unable to find", metric_eval, "metrics, "
                   "exiting evaluation")
@@ -151,7 +144,7 @@ try:
             print("New trained model performs better, "
                   "thus it should be registered")
         else:
-            print("New trained model metric is less than or equal to "
+            print("New trained model metric is worse than or equal to "
                   "production model so skipping model registration.")
             if((allow_run_cancel).lower() == 'true'):
                 run.parent.cancel()

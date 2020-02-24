@@ -16,6 +16,8 @@ Having the Istio installed, figure out the Istio gateway endpoint on your K8s cl
 GATEWAY_IP=$(kubectl get svc istio-ingressgateway -n istio-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 ```
 
+You don't need to create any Istio resources (e.g. Gateway or VirtualService) at this point. It will be handled by the AzDo pipeline that builds and deploys a scoring image.
+
 #### 2. Set up variables
 
 There are some extra variables that you need to setup in ***devopsforai-aml-vg*** variable group (see [getting started](./getting_started.md)):
@@ -35,7 +37,7 @@ The result of the pipeline will be a registered Docker image in the ACR reposito
 
 ![scoring image](./images/scoring_image.png)
 
-The pipeline will also deploy the scoring image to the Kubernetes cluster. 
+The pipeline creates Istio Gateway and VirtualService and deploys the scoring image to the Kubernetes cluster. 
 
 ```bash
 kubectl get deployments --namespace abtesting

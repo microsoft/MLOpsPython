@@ -1,3 +1,4 @@
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
 pr: none
 trigger:
   branches:
@@ -62,22 +63,12 @@ stages:
           echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINEID"
       name: 'getpipelineid'
       displayName: 'Get Pipeline ID'
-    - bash: |
-          # Generate a hyperparameter value as a random number between 0 and 1.
-          # A random value is used here to make the Azure ML dashboards "interesting" when testing
-          # the solution sample.
-          alpha=$(printf "0.%03d\n" $((($RANDOM*1000)/32767)))
-          echo "Alpha: $alpha"
-          echo "##vso[task.setvariable variable=ALPHA;isOutput=true]$alpha"
-      name: 'getalpha'
-      displayName: 'Generate random value for hyperparameter alpha'
   - job: "Run_ML_Pipeline"
     dependsOn: "Get_Pipeline_ID"
     displayName: "Trigger ML Training Pipeline"
     pool: server
     variables:
       AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
-      ALPHA: $[ dependencies.Get_Pipeline_ID.outputs['getalpha.ALPHA'] ]
     steps:
     - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
       displayName: 'Invoke ML pipeline'
@@ -85,7 +76,7 @@ stages:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         PipelineId: '$(AMLPIPELINE_ID)'
         ExperimentName: '$(EXPERIMENT_NAME)'
-        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)", "hyperparameter_alpha": "$(ALPHA)"}'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)"}'
   - job: "Training_Run_Report"
     dependsOn: "Run_ML_Pipeline"
     condition: always()
@@ -94,6 +85,7 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-template-get-model-version.yml
+
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
   dependsOn: Trigger_AML_Pipeline
@@ -190,7 +182,8 @@ stages:
       inputs:
         azureSubscription: 'AzureResourceConnection'
         appName: '$(WEBAPP_DEPLOYMENT_NAME)'
-        containers: '$(IMAGE_LOCATION)'
+        resourceGroupName: '$(RESOURCE_GROUP)'
+        imageName: '$(IMAGE_LOCATION)'
     - task: AzureCLI@1
       displayName: 'Smoke test'
       inputs:

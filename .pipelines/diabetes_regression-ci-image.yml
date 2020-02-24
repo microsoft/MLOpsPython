@@ -1,3 +1,4 @@
+# Builds the container image that is used by other pipelines for scoring.
 pr: none
 trigger:
   branches:
@@ -10,7 +11,7 @@ trigger:
     - diabetes_regression/scoring/
     exclude:
     - diabetes_regression/scoring/deployment_config_aci.yml
-    - diabetes_regression/scoring/deployment_config_aks.yml    
+    - diabetes_regression/scoring/deployment_config_aks.yml
 
 pool: 
   vmImage: 'ubuntu-latest'
@@ -23,7 +24,6 @@ variables:
   value: 'scoreB.py'
 
 steps:
-
 - task: AzureCLI@1
   inputs:
     azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
@@ -32,6 +32,6 @@ steps:
     inlineScript: |
       set -e
       export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-      python3 -m ml_service.util.create_scoring_image   
+      python3 -m ml_service.util.create_scoring_image
   displayName: 'Create Scoring Image'
 

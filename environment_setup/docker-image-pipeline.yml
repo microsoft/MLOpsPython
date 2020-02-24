@@ -1,3 +1,4 @@
+# Pipeline that builds and pushes the microsoft/mlopspython image.
 resources:
 - repo: self
 

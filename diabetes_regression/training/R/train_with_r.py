@@ -1,3 +1,3 @@
-import os
+import subprocess
 
-os.system("Rscript r_train.r && ls -ltr model.rds")
+subprocess.check_call(["bash", "-c", "Rscript r_train.r && ls -ltr model.rds"])
