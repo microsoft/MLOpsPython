@@ -73,12 +73,12 @@ Run the pipeline and ensure your container has been used.
 
 ## Dealing with branch concurrency
 
-Especially when working in a team, it's possible that multiple team members
+Especially when working in a team, it's possible for environment changes across branches to interfere with one another.
 
-For example, if the master branch is using scikit-learn and Alice creates a branch to use Tensorflow instead, and she removes scikit-learn from the 
+For example, if the master branch is using scikit-learn and you create a branch to use Tensorflow instead, and you remove scikit-learn from the 
 [ci_dependencies.yml](../diabetes_regression/ci_dependencies.yml) Conda environment definition
 and runs the [docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml) Docker image, the master branch will stop building.
 
-Alice could leave scikit-learn in addition to Tensorflow in the environment, but that is not ideal, as she would have to take an extra step to remove scikit-learn after merging her branch to master.
+You could leave scikit-learn in addition to Tensorflow in the environment, but that is not ideal, as you would have to take an extra step to remove scikit-learn after merging your branch to master.
 
-A better approach would be for Alice to use a distinct name for her environment, such as mlops/diabetes_regression_tensorflow.
+A better approach would be to use a distinct name for your modified environment, such as `mlops/diabetes_regression/tensorflow`.
