@@ -23,8 +23,8 @@ provision a separate instance.
 Create a service connection to your Azure Container Registry:
 - As *Connection type*, select *Docker Registry*
 - As *Registry type*, select *Azure Container Registry*
-- As *Azure container registry*, select your Container registry instance.
-- As *Service connection name*, enter `acrconnection`.
+- As *Azure container registry*, select your Container registry instance
+- As *Service connection name*, enter `acrconnection`
 
 ## Update the environment definition
 
@@ -40,7 +40,7 @@ typically come with prebuilt binaries that make installation more reliable.
 
 In your [Azure DevOps](https://dev.azure.com) project create a new build
 pipeline referring to the
-[./environment_setup/docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml)
+[../environment_setup/docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml)
 pipeline definition in your forked repository.
 
 Create a pipeline variable named `agentImageName` and give it an appropriate
@@ -77,7 +77,7 @@ Especially when working in a team, it's possible for environment changes across 
 
 For example, if the master branch is using scikit-learn and you create a branch to use Tensorflow instead, and you remove scikit-learn from the 
 [ci_dependencies.yml](../diabetes_regression/ci_dependencies.yml) Conda environment definition
-and runs the [docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml) Docker image, the master branch will stop building.
+and runs the [docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml) Docker image, the master branch will stop building.
 
 You could leave scikit-learn in addition to Tensorflow in the environment, but that is not ideal, as you would have to take an extra step to remove scikit-learn after merging your branch to master.
 
