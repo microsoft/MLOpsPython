@@ -51,3 +51,8 @@ variables:
   #   value: "true"
   # - name: ALLOW_RUN_CANCEL
   #   value: "true"
+
+  # For debugging deployment issues. Specify a build id with the MODEL_BUILD_ID pipeline variable at queue time
+  # to skip training and deploy a model registered by a previous build.
+  - name: modelbuildid
+    value: $[coalesce(variables['MODEL_BUILD_ID'], variables['Build.BuildId'])]

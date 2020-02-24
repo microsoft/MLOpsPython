@@ -21,6 +21,7 @@ pool:
 stages:
 - stage: 'Model_CI'
   displayName: 'Model CI'
+  condition: not(variables['MODEL_BUILD_ID'])
   jobs:
   - job: "Model_CI_Pipeline"
     displayName: "Model CI Pipeline"
@@ -42,6 +43,7 @@ stages:
 
 - stage: 'Trigger_AML_Pipeline'
   displayName: 'Train model'
+  condition: not(variables['MODEL_BUILD_ID'])
   jobs:
   - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
@@ -90,7 +92,7 @@ stages:
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
   dependsOn: Trigger_AML_Pipeline
-  condition: and(succeeded(), variables['ACI_DEPLOYMENT_NAME'])
+  condition: and(not(failed('Trigger_AML_Pipeline')), variables['ACI_DEPLOYMENT_NAME'])
   jobs:
   - job: "Deploy_ACI"
     displayName: "Deploy to ACI"
@@ -157,7 +159,7 @@ stages:
 - stage: 'Deploy_Webapp'
   displayName: 'Deploy to Webapp'
   dependsOn: Trigger_AML_Pipeline
-  condition: and(succeeded(), variables['WEBAPP_DEPLOYMENT_NAME'])
+  condition: and(not(failed('Trigger_AML_Pipeline')), variables['WEBAPP_DEPLOYMENT_NAME'])
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Deploy to Webapp"
