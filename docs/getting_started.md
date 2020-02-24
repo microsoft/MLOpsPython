@@ -158,7 +158,7 @@ performs linting, unit testing and publishes a training pipeline.
 ### Set up the Pipeline
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
-pipeline referring to the [diabetes_regression-ci-build-train.yml](../.pipelines/azdo-ci-build-train.yml)
+pipeline referring to the [diabetes_regression-ci-build-train.yml](../.pipelines/diabetes_regression-ci-build-train.yml)
 pipeline definition in your forked repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
