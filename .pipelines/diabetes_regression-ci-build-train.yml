@@ -92,7 +92,7 @@ stages:
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
   dependsOn: Trigger_AML_Pipeline
-  condition: and(not(failed('Trigger_AML_Pipeline')), variables['ACI_DEPLOYMENT_NAME'])
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['ACI_DEPLOYMENT_NAME'])
   jobs:
   - job: "Deploy_ACI"
     displayName: "Deploy to ACI"
@@ -159,7 +159,7 @@ stages:
 - stage: 'Deploy_Webapp'
   displayName: 'Deploy to Webapp'
   dependsOn: Trigger_AML_Pipeline
-  condition: and(not(failed('Trigger_AML_Pipeline')), variables['WEBAPP_DEPLOYMENT_NAME'])
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['WEBAPP_DEPLOYMENT_NAME'])
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Deploy to Webapp"
