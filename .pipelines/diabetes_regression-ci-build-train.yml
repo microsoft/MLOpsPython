@@ -43,7 +43,7 @@ stages:
 
 - stage: 'Trigger_AML_Pipeline'
   displayName: 'Train model'
-  condition: not(variables['MODEL_BUILD_ID'])
+  condition: and(succeeded(), not(variables['MODEL_BUILD_ID']))
   jobs:
   - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
