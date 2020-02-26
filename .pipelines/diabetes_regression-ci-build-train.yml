@@ -1,4 +1,10 @@
 # Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
 pr: none
 trigger:
   branches:
@@ -25,7 +31,7 @@ stages:
   jobs:
   - job: "Model_CI_Pipeline"
     displayName: "Model CI Pipeline"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
     - template: azdo-base-pipeline.yml
@@ -48,7 +54,7 @@ stages:
   - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
     displayName: "Get Pipeline ID for execution"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
     - task: AzureCLI@1
@@ -84,7 +90,7 @@ stages:
     dependsOn: "Run_ML_Pipeline"
     condition: always()
     displayName: "Determine if evaluation succeeded and new model is registered"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-template-get-model-version.yml
@@ -96,7 +102,7 @@ stages:
   jobs:
   - job: "Deploy_ACI"
     displayName: "Deploy to ACI"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-template-get-model-version.yml
@@ -129,7 +135,7 @@ stages:
   jobs:
   - job: "Deploy_AKS"
     displayName: "Deploy to AKS"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-template-get-model-version.yml
@@ -163,7 +169,7 @@ stages:
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Deploy to Webapp"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-template-get-model-version.yml
