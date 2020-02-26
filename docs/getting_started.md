@@ -17,7 +17,6 @@ This repository contains a template and demonstrates how to apply it to a sample
 
 If the desire is to adopt this template for your project and to use it with your machine learning code, it is recommended to go through this guide as it is first. This ensures everything is working on your environment. After the sample is working, follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***diabetes_regression*** sample into your project starting point.
 
-
 ## Create a Variable Group for your Pipeline
 
 We make use of a variable group inside Azure DevOps to store variables and their
@@ -173,7 +172,6 @@ and check out the published training pipeline in the **mlops-AML-WS** workspace 
 
 Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master branch.
 
-
 * The first stage of the pipeline, **Model CI**, performs linting, unit testing, build and publishes an **ML Training Pipeline** in an **ML Workspace**.
 
   **Note:** The build pipeline also supports building and publishing ML
@@ -187,7 +185,7 @@ with R on Azure ML Compute. You will also need to uncomment (i.e. include) the
 to train a model with R on Databricks. You will need
 to manually create a Databricks cluster and attach it to the ML Workspace as a
 compute (Values DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables should be
-specified). Example ML pipelines using R have a single step to train a model. They don't demonstrate how to evaluate and register a model. The evaluation and registering techniques are shown only in the Python implementation. 
+specified). Example ML pipelines using R have a single step to train a model. They don't demonstrate how to evaluate and register a model. The evaluation and registering techniques are shown only in the Python implementation.
 
 * The second stage of the pipeline, **Train model**, triggers the run of the ML Training Pipeline. The training pipeline will train, evaluate, and register a new model. The actual computation is performed in an [Azure Machine Learning Compute cluster](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute). In Azure DevOps, this stage runs an agentless job that waits for the completion of the Azure ML job, allowing the pipeline to wait for training completion for hours or even days without using agent resources.
 
@@ -195,13 +193,15 @@ specified). Example ML pipelines using R have a single step to train a model. Th
 
 * The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). It then runs a *smoke test* to validate the deployment, i.e. sends a sample query to the scoring web service and verifies that it returns a response in the expected format.
 
-The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The image of the container ***mcr.microsoft.com/mlops/python:latest*** is built with this [Dockerfile](../environment_setup/Dockerfile) and it has all necessary dependencies installed for the purposes of this repository. This image serves as an example of using a custom Docker image that provides a pre-baked environment. This environment is guaranteed to be the same on any building agent, VM or local machine. In your project you will want to build your own Docker image that only contains the dependencies and tools required for your use case. This image will be more likely smaller and therefore faster, and it will be totally maintained by your team. 
+The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The image of the container ***mcr.microsoft.com/mlops/python:latest*** is built with this [Dockerfile](../environment_setup/Dockerfile) and it has all necessary dependencies installed for the purposes of this repository. This image serves as an example of using a custom Docker image that provides a pre-baked environment. This environment is guaranteed to be the same on any building agent, VM or local machine. In your project you will want to build your own Docker image that only contains the dependencies and tools required for your use case. This image will be more likely smaller and therefore faster, and it will be totally maintained by your team.
 
 Wait until the pipeline finishes and verify that there is a new model in the **ML Workspace**:
 
 ![trained model](./images/trained-model.png)
 
 To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
+
+To skip model training and registration, and deploy a model successfully registered by a previous build (for testing changes to the score file or inference configuration), add the variable `MODEL_BUILD_ID` when the pipeline is queued, and set the value to the id of the previous build.
 
 ### Deploy the Model to Azure Kubernetes Service
 
@@ -238,7 +238,7 @@ In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the va
 | ---------------------- | ---------------------- |
 | WEBAPP_DEPLOYMENT_NAME | _name of your web app_ |
 
-Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. This app must exist before you can deploy the model to it. 
+Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. This app must exist before you can deploy the model to it.
 
 Delete the **ACI_DEPLOYMENT_NAME** variable.
 
@@ -254,10 +254,10 @@ Make sure your webapp has the credentials to pull the image from the Azure Conta
 
 ![build](./images/multi-stage-webapp.png)
 
-# Next steps
+## Next steps
 
 * You may wish to follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case.
-* Use the [Convert ML experimental code to production code](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production#use-your-own-model-with-mlopspython-code-template) tutorial which explains how to bring your machine learning code on top of this template. 
+* Use the [Convert ML experimental code to production code](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production#use-your-own-model-with-mlopspython-code-template) tutorial which explains how to bring your machine learning code on top of this template.
 * The provided pipeline definition YAML file is a sample starting point, which you should tailor to your processes and environment.
 * You should edit the pipeline definition to remove unused stages. For example, if you are deploying to ACI and AKS, you should delete the unused `Deploy_Webapp` stage.
 * You may wish to enable [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
