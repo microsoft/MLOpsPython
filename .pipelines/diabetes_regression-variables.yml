@@ -1,8 +1,32 @@
 # Pipeline template that defines common runtime environment variables.
 variables:
-  # Azure ML Workspace Variables
+
+  # Source Config
+    # The directory containing the scripts for training, evaluating, and registering the model
+  - name: SOURCES_DIR_TRAIN
+    value: diabetes_regression
+    # The path to the model training script under SOURCES_DIR_TRAIN
+  - name: TRAIN_SCRIPT_PATH
+    value: training/train.py
+    # The path to the model evaluation script under SOURCES_DIR_TRAIN
+  - name: EVALUATE_SCRIPT_PATH
+    value: evaluate/evaluate_model.py
+    # The path to the model registration script under SOURCES_DIR_TRAIN
+  - name: REGISTER_SCRIPT_PATH
+    value: register/register_model.py
+    # The path to the model scoring script relative to SOURCES_DIR_TRAIN
+  - name: SCORE_SCRIPT
+    value: scoring/score.py
+
+  # Azure ML Variables
   - name: EXPERIMENT_NAME
     value: mlopspython
+  - name: DATASET_NAME
+    value: diabetes_ds
+  - name: TRAINING_PIPELINE_NAME
+    value: "diabetes-Training-Pipeline"
+  - name: MODEL_NAME
+    value: diabetes_regression_model.pkl
 
   # AML Compute Cluster Config
   - name: AML_COMPUTE_CLUSTER_CPU_SKU
@@ -16,43 +40,23 @@ variables:
   - name: AML_CLUSTER_PRIORITY
     value: lowpriority
 
-    # Training Config
-  - name: BUILD_TRAIN_SCRIPT
-    value: diabetes_regression_build_train_pipeline.py
-  - name: TRAIN_SCRIPT_PATH
-    value: training/train.py
-  - name: MODEL_NAME
-    value: sklearn_regression_model.pkl
-  - name: MODEL_VERSION
-    value: "1"
-
-    # AML Pipeline Config
-  - name: TRAINING_PIPELINE_NAME
-    value: "diabetes-Training-Pipeline"
-  - name: MODEL_PATH
-    value: ""
-  - name: EVALUATE_SCRIPT_PATH
-    value: evaluate/evaluate_model.py
-  - name: REGISTER_SCRIPT_PATH
-    value: register/register_model.py
-  - name: SOURCES_DIR_TRAIN
-    value: diabetes_regression
+  # The name for the (docker/webapp) scoring image
   - name: IMAGE_NAME
     value: "diabetestrained"
+ 
     # Optional. Used by a training pipeline with R on Databricks
   - name: DB_CLUSTER_ID
     value: ""
-  - name: SCORE_SCRIPT
-    value: score.py
-  - name: DATASET_NAME
-    value: diabetes_ds
+
   # These are the default values set in ml_service\util\env_variables.py. Uncomment and override if desired.
+    # Set to false to disable the evaluation step in the ML pipeline and register the newly trained model unconditionally.
   # - name: RUN_EVALUATION
   #   value: "true"
+    # Set to false to register the model regardless of the outcome of the evaluation step in the ML pipeline.
   # - name: ALLOW_RUN_CANCEL
   #   value: "true"
 
-  # For debugging deployment issues. Specify a build id with the MODEL_BUILD_ID pipeline variable at queue time
-  # to skip training and deploy a model registered by a previous build.
+    # For debugging deployment issues. Specify a build id with the MODEL_BUILD_ID pipeline variable at queue time
+    # to skip training and deploy a model registered by a previous build.
   - name: modelbuildid
     value: $[coalesce(variables['MODEL_BUILD_ID'], variables['Build.BuildId'])]

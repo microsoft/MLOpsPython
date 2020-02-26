@@ -6,7 +6,7 @@ If your target deployment environment is a K8s cluster and you want to implement
 
 **Note:** It is assumed that you have an AKS instance and configured ***kubectl*** to communicate with the cluster.
 
-#### 1. Install Istio on a K8s cluster. 
+#### 1. Install Istio on a K8s cluster.
 
 This guidance uses [Istio](https://istio.io) service mesh implememtation to control traffic routing between model versions. The instruction on installing Istio is available [here](https://docs.microsoft.com/en-us/azure/aks/servicemesh-istio-install?pivots=client-operating-system-linux).
 
@@ -28,7 +28,6 @@ There are some extra variables that you need to setup in ***devopsforai-aml-vg**
 | K8S_AB_NAMESPACE            | Namespace in a K8s cluster to deploy the model       |
 | IMAGE_REPO_NAME             | Image reposiory name (e.g. mlopspyciamlcr.azurecr.io)|
 
-
 #### 3. Configure a pipeline to build and deploy a scoring Image
 
 Import and run the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) multistage deployment pipeline.
@@ -37,7 +36,7 @@ The result of the pipeline will be a registered Docker image in the ACR reposito
 
 ![scoring image](./images/scoring_image.png)
 
-The pipeline creates Istio Gateway and VirtualService and deploys the scoring image to the Kubernetes cluster. 
+The pipeline creates Istio Gateway and VirtualService and deploys the scoring image to the Kubernetes cluster.
 
 ```bash
 kubectl get deployments --namespace abtesting
@@ -45,9 +44,9 @@ NAME          READY   UP-TO-DATE   AVAILABLE   AGE
 model-green   1/1     1            1           19h
 ```
 
-#### 4. Build a new Scoring Image.
+#### 4. Build a new Scoring Image
 
-Change value of the ***SCORE_SCRIPT*** variable in the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) to point to ***scoreA.py*** and merge it to the master branch.
+Change value of the ***SCORE_SCRIPT*** variable in the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) to point to ***scoring/scoreA.py*** and merge it to the master branch.
 
 **Note:** ***scoreA.py*** and ***scoreB.py*** files used in this tutorial are just mockups returning either "New Model A" or "New Model B" respectively. They are used to demonstrate the concept of testing two scoring images with different models or scoring code. In real life you would implement a scoring file similar to [score.py](./../code/scoring/score.py) (see [getting started](./getting_started.md)).
 
@@ -60,7 +59,6 @@ It will automatically trigger the pipeline and deploy a new scoring image with t
 | Blue_100            |0            |100         |All traffic (100%) is routed to the blue image.|
 | Blue_Green          |0            |100         |Old green image is removed. The new blue image is copied as green.<br>Blue and Green images are equal.<br>All traffic (100%) is routed to the blue image.|
 | Green_100           |100          |0           |All traffic (100%) is routed to the green image.<br>The blue image is removed
-
 
 **Note:** The pipeline performs the rollout without any pausing. You may want to configure [Approvals and Checks](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops&tabs=check-pass) for the stages on your environment for better experience of the model testing. The environment ***abtestenv*** will be added automatically to your AzDo project after the first pipeline run.
 

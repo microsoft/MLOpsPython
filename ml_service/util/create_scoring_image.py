@@ -28,14 +28,16 @@ model = Model(ws, name=e.model_name, version=e.model_version)
 sources_dir = e.sources_directory_train
 if (sources_dir is None):
     sources_dir = 'diabetes_regression'
-path_to_scoring = os.path.join(".", sources_dir, "scoring")
+score_script = os.path.join(".", sources_dir, e.score_script)
+score_file = os.path.basename(score_script)
+path_to_scoring = os.path.dirname(score_script)
 cwd = os.getcwd()
 # Copy conda_dependencies.yml into scoring as this method does not accept relative paths. # NOQA: E501
 shutil.copy(os.path.join(".", sources_dir,
                          "conda_dependencies.yml"), path_to_scoring)
 os.chdir(path_to_scoring)
 image_config = ContainerImage.image_configuration(
-    execution_script=e.score_script,
+    execution_script=score_file,
     runtime="python",
     conda_file="conda_dependencies.yml",
     description="Image with ridge regression model",
