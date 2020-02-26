@@ -157,7 +157,7 @@ performs linting, unit testing and publishes a training pipeline.
 ### Set up the Pipeline
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
-pipeline referring to the [diabetes_regression-ci-build-train.yml](./.pipelines/azdo-ci-build-train.yml)
+pipeline referring to the [diabetes_regression-ci-build-train.yml](../.pipelines/diabetes_regression-ci-build-train.yml)
 pipeline definition in your forked repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
@@ -193,7 +193,7 @@ specified). Example ML pipelines using R have a single step to train a model. Th
 
 * The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). It then runs a *smoke test* to validate the deployment, i.e. sends a sample query to the scoring web service and verifies that it returns a response in the expected format.
 
-The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The image of the container ***mcr.microsoft.com/mlops/python:latest*** is built with this [Dockerfile](./environment_setup/Dockerfile) and it has all necessary dependencies installed for the purposes of this repository. This image serves as an example of using a custom Docker image that provides a pre-baked environment. This environment is guaranteed to be the same on any building agent, VM or local machine. In your project you will want to build your own Docker image that only contains the dependencies and tools required for your use case. This image will be more likely smaller and therefore faster, and it will be totally maintained by your team.
+The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The image of the container ***mcr.microsoft.com/mlops/python:latest*** is built with this [Dockerfile](../environment_setup/Dockerfile) and it has all necessary dependencies installed for the purposes of this repository. This image serves as an example of using a custom Docker image that provides a pre-baked environment. This environment is guaranteed to be the same on any building agent, VM or local machine. In your project you will want to build your own Docker image that only contains the dependencies and tools required for your use case. This image will be more likely smaller and therefore faster, and it will be totally maintained by your team.
 
 Wait until the pipeline finishes and verify that there is a new model in the **ML Workspace**:
 
@@ -261,6 +261,7 @@ Make sure your webapp has the credentials to pull the image from the Azure Conta
 * The provided pipeline definition YAML file is a sample starting point, which you should tailor to your processes and environment.
 * You should edit the pipeline definition to remove unused stages. For example, if you are deploying to ACI and AKS, you should delete the unused `Deploy_Webapp` stage.
 * You may wish to enable [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+* You may want to use [Azure DevOps self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your ML pipeline execution. The Docker container image for the ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
 * You can install additional Conda or pip packages by modifying the YAML environment configurations under the `diabetes_regression` directory. Make sure to use fixed version numbers for all packages to ensure reproducibility, and use the same versions across environments.
 * You can explore aspects of model observability in the solution, such as:
   * **Logging**: navigate to the Application Insights instance linked to the Azure ML Portal,

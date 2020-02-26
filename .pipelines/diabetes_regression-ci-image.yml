@@ -1,4 +1,10 @@
 # Builds the container image that is used by other pipelines for scoring.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
 pr: none
 trigger:
   branches:
@@ -16,7 +22,7 @@ trigger:
 pool: 
   vmImage: 'ubuntu-latest'
 
-container: mcr.microsoft.com/mlops/python:latest
+container: mlops
 
 variables:
 - group: devopsforai-aml-vg
