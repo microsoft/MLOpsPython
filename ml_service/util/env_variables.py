@@ -38,7 +38,6 @@ class Env(Singleton):
         self._image_name = os.environ.get('IMAGE_NAME')
         self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
         self._score_script = os.environ.get("SCORE_SCRIPT")
-        self._collection_uri = os.environ.get("SYSTEM_COLLECTIONURI")
         self._teamproject_name = os.environ.get("SYSTEM_TEAMPROJECT")
         self._dataset_name = os.environ.get("DATASET_NAME")
         self._run_evaluation = os.environ.get("RUN_EVALUATION", "true")
@@ -136,10 +135,6 @@ class Env(Singleton):
     @property
     def score_script(self):
         return self._score_script
-
-    @property
-    def collection_uri(self):
-        return self._collection_uri
 
     @property
     def teamproject_name(self):

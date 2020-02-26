@@ -34,10 +34,6 @@ def main():
     # Create a reusable run configuration environment
     # Read definition from diabetes_regression/azureml_environment.json
     environment = Environment.load_from_directory(e.sources_directory_train)
-    if (e.collection_uri is not None and e.teamproject_name is not None):
-        builduri_base = e.collection_uri + e.teamproject_name
-        builduri_base = builduri_base + "/_build/results?buildId="
-        environment.environment_variables["BUILDURI_BASE"] = builduri_base
     environment.register(aml_workspace)
 
     run_config = RunConfiguration()
@@ -45,8 +41,6 @@ def main():
 
     model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)
-    build_id_param = PipelineParameter(
-        name="build_id", default_value=e.build_id)
 
     # Get dataset name
     dataset_name = e.dataset_name
@@ -98,7 +92,6 @@ def main():
         inputs=[dataset.as_named_input('training_data')],
         outputs=[pipeline_data],
         arguments=[
-            "--build_id", build_id_param,
             "--model_name", model_name_param,
             "--step_output", pipeline_data
         ],
@@ -113,7 +106,6 @@ def main():
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
         arguments=[
-            "--build_id", build_id_param,
             "--model_name", model_name_param,
             "--allow_run_cancel", e.allow_run_cancel,
         ],
@@ -129,7 +121,6 @@ def main():
         source_directory=e.sources_directory_train,
         inputs=[pipeline_data],
         arguments=[
-            "--build_id", build_id_param,
             "--model_name", model_name_param,
             "--step_input", pipeline_data,
         ],

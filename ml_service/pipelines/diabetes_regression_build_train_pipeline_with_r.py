@@ -31,10 +31,6 @@ def main():
     # Make sure to include `r-essentials'
     #   in diabetes_regression/conda_dependencies.yml
     environment = Environment.load_from_directory(e.sources_directory_train)
-    if (e.collection_uri is not None and e.teamproject_name is not None):
-        builduri_base = e.collection_uri + e.teamproject_name
-        builduri_base = builduri_base + "/_build/results?buildId="
-        environment.environment_variables["BUILDURI_BASE"] = builduri_base
     environment.register(aml_workspace)
 
     run_config = RunConfiguration()
