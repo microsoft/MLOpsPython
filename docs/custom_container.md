@@ -57,7 +57,7 @@ run from that image.
 
 ## Modify the model pipeline
 
-Modify the model pipeline file [diabetes_regression-ci-build-train.yml](../.pipelines/diabetes_regression-ci-build-train.yml) by replacing this section:
+Modify the model pipeline file [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml) by replacing this section:
 
 ```
 resources:
@@ -94,6 +94,6 @@ A better approach would be to use a distinct name for your modified environment,
 By changing the name of the image in your branch in both the container build pipeline
 [environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
 and the model pipeline file
-[diabetes_regression-ci-build-train.yml](../.pipelines/diabetes_regression-ci-build-train.yml),
+[diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml),
 and running both pipelines in sequence on your branch,
 you avoid any branch conflicts, and the name does not have to be changed after merging to master.

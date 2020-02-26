@@ -43,13 +43,13 @@ The repository provides a template with folders structure suitable for maintaini
 
 ### Pipelines
 
-- `.pipelines/azdo-base-pipeline.yml` : a pipeline template used by ci-build-train pipeline and pr-build-train pipelines. It contains steps performing linting, data and unit testing.  
-- `.pipelines/diabetes_regression-ci-build-train.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
-- `.pipelines/azdo-pr-build-train.yml` : a pipeline triggered when a **pull request** to the **master** branch is created. It performs linting, data integrity testing and unit testing only.
+- `.pipelines/code-quality-template.yml` : a pipeline template used by ci-build-train pipeline and pr-build-train pipelines. It contains steps performing linting, data and unit testing.  
+- `.pipelines/diabetes_regression-ci.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
+- `.pipelines/pr.yml` : a pipeline triggered when a **pull request** to the **master** branch is created. It performs linting, data integrity testing and unit testing only.
 - `.pipelines/diabetes_regression-ci-image.yml` : a pipeline building a scoring image for the diabetes regression model. 
-- `.pipelines/diabetes_regression-template-get-model-version.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci-build-train.yml` pipeline. It finds out if a new model was registered and retrieves a version of the new model.
-- `.pipelines/azdo-abtest-pipeline.yml` : a pipeline demonstrating [Canary deployment strategy](./docs/canary_ab_deployment.md).
-- `.pipelines/azdo-helm-*.yml` : pipeline templates used by the `.pipelines/azdo-abtest-pipeline.yml` pipeline.
+- `.pipelines/diabetes_regression-get-model-version-template.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci.yml` pipeline. It finds out if a new model was registered and retrieves a version of the new model.
+- `.pipelines/abtest.yml` : a pipeline demonstrating [Canary deployment strategy](./docs/canary_ab_deployment.md).
+- `.pipelines/helm-*.yml` : pipeline templates used by the `.pipelines/abtest.yml` pipeline.
 
 
 
