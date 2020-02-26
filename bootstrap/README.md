@@ -2,7 +2,7 @@
 
 To use this existing project structure and scripts for your new ML project, you can quickly get started from the existing repository, bootstrap and create a template that works for your ML project. Bootstrapping will prepare a similar directory structure for your project which includes renaming files and folders, deleting and cleaning up some directories and fixing imports and absolute path based on your project name. This will enable reusing various resources like pre-built pipelines and scripts for your new project. 
 
-## Generating a project structure
+## Generating the project structure
 
 To bootstrap from the existing MLOpsPython repository clone this repository, ensure Python is installed locally, and run bootstrap.py script as below
 
