@@ -30,7 +30,7 @@ There are some extra variables that you need to setup in ***devopsforai-aml-vg**
 
 #### 3. Configure a pipeline to build and deploy a scoring Image
 
-Import and run the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) multistage deployment pipeline.
+Import and run the [abtest.yml](./.pipelines/abtest.yml) multistage deployment pipeline.
 
 The result of the pipeline will be a registered Docker image in the ACR repository attached to the AML Service:
 
@@ -46,7 +46,7 @@ model-green   1/1     1            1           19h
 
 #### 4. Build a new Scoring Image
 
-Change value of the ***SCORE_SCRIPT*** variable in the [azdo-abtest-pipeline.yml](./.pipelines/azdo-abtest-pipeline.yml) to point to ***scoring/scoreA.py*** and merge it to the master branch.
+Change value of the ***SCORE_SCRIPT*** variable in the [abtest.yml](./.pipelines/abtest.yml) to point to ***scoring/scoreA.py*** and merge it to the master branch.
 
 **Note:** ***scoreA.py*** and ***scoreB.py*** files used in this tutorial are just mockups returning either "New Model A" or "New Model B" respectively. They are used to demonstrate the concept of testing two scoring images with different models or scoring code. In real life you would implement a scoring file similar to [score.py](./../code/scoring/score.py) (see [getting started](./getting_started.md)).
 

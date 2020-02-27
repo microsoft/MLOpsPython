@@ -5,7 +5,7 @@ parameters:
   overrideValues: ''
 
 steps:
-- template: azdo-helm-install.yml
+- template: helm-install-template.yml
 - task: HelmDeploy@0
   displayName: 'helm upgrade'
   inputs:

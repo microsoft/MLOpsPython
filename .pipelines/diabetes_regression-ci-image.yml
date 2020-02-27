@@ -1,4 +1,4 @@
-# Builds the container image that is used by other pipelines for scoring.
+# Pipeline for building the container image that is used by other pipelines for scoring.
 
 resources:
   containers:

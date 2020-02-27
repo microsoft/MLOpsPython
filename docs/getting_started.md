@@ -58,7 +58,7 @@ the BASE_NAME value should not exceed 10 characters and it should contain number
 
 The **RESOURCE_GROUP** parameter is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
 
-The **AZURE_RM_SVC_CONNECTION** parameter is used by the [Azure DevOps pipeline]((../environment_setup/iac-create-environment.yml)) that creates the Azure ML workspace and associated resources through Azure Resource Manager. The pipeline requires an **Azure Resource Manager**
+The **AZURE_RM_SVC_CONNECTION** parameter is used by the [Azure DevOps pipeline]((../environment_setup/iac-create-environment-pipeline.yml)) that creates the Azure ML workspace and associated resources through Azure Resource Manager. The pipeline requires an **Azure Resource Manager**
 [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
 
 ![create service connection](./images/create-rm-service-connection.png)
@@ -88,7 +88,7 @@ For instructions on how to set up a local development environment, refer to the 
 
 ### Azure DevOps configuration
 
-For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/diabetes_regression-variables.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
+For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/diabetes_regression-variables-template.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
 
 **Note:** In `diabetes_regression` folder you can find `config.json` file that we would recommend to use in order to provide parameters for training, evaluation and scoring scripts. An example of a such parameter is a hyperparameter of a training algorithm: in our case it's the ridge regression [*alpha* hyperparameter](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We don't provide any special serializers for this config file. So, it's up to you which template to support there.
 
@@ -102,7 +102,7 @@ Up until now you should have:
 
 The easiest way to create all required resources (Resource Group, ML Workspace,
 Container Registry, Storage Account, etc.) is to leverage an
-"Infrastructure as Code" [pipeline in this repository](../environment_setup/iac-create-environment.yml). This **IaC** pipeline takes care of setting up
+"Infrastructure as Code" [pipeline in this repository](../environment_setup/iac-create-environment-pipeline.yml). This **IaC** pipeline takes care of setting up
 all required resources based on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json).
 
 ### Create a Build IaC Pipeline
@@ -111,7 +111,7 @@ In your Azure DevOps project, create a build pipeline from your forked repositor
 
 ![build connnect step](./images/build-connect.png)
 
-Select the **Existing Azure Pipelines YAML file** option and set the path to [/environment_setup/iac-create-environment.yml](../environment_setup/iac-create-environment.yml):
+Select the **Existing Azure Pipelines YAML file** option and set the path to [/environment_setup/iac-create-environment-pipeline.yml](../environment_setup/iac-create-environment-pipeline.yml):
 
 ![configure step](./images/select-iac-pipeline.png)
 
@@ -123,7 +123,7 @@ Check out the newly created resources in the [Azure Portal](https://portal.azure
 
 ![created resources](./images/created-resources.png)
 
-(Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment.yml](../environment_setup/iac-remove-environment.yml) definition or you can just delete the resource group in the [Azure Portal](https://portal.azure.com).
+(Optional) To remove the resources created for this project you can use the [/environment_setup/iac-remove-environment-pipeline.yml](../environment_setup/iac-remove-environment-pipeline.yml) definition or you can just delete the resource group in the [Azure Portal](https://portal.azure.com).
 
 **Note:** The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. To use your own data, you need to [create a Dataset](https://docs.microsoft.com/azure/machine-learning/how-to-create-register-datasets) in your workspace and specify its name in a DATASET_NAME variable in the ***devopsforai-aml-vg*** variable group. You will also need to modify the test cases in the **ml_service/util/smoke_test_scoring_service.py** script to match the schema of the training features in your dataset.
 
@@ -157,7 +157,7 @@ performs linting, unit testing and publishes a training pipeline.
 ### Set up the Pipeline
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
-pipeline referring to the [diabetes_regression-ci-build-train.yml](../.pipelines/diabetes_regression-ci-build-train.yml)
+pipeline referring to the [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml)
 pipeline definition in your forked repository:
 
 ![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
@@ -199,7 +199,7 @@ Wait until the pipeline finishes and verify that there is a new model in the **M
 
 ![trained model](./images/trained-model.png)
 
-To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci-build-train.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
+To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci.yml` pipeline to `false`.  This can also be overridden at runtime execution of the pipeline.
 
 To skip model training and registration, and deploy a model successfully registered by a previous build (for testing changes to the score file or inference configuration), add the variable `MODEL_BUILD_ID` when the pipeline is queued, and set the value to the id of the previous build.
 
