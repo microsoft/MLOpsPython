@@ -102,7 +102,7 @@ def main():
 
     if (model is not None):
         if (build_id is None):
-            register_aml_model(model_file, model_name, exp, run_id)
+            register_aml_model(model_file, model_name, model_mse, exp, run_id)
         elif (build_uri is None):
             register_aml_model(
                 model_file,
