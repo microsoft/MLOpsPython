@@ -14,7 +14,7 @@
 # This directive is stored in a comment to preserve the Conda file structure.
 # [AzureMlVersion] = 2
 
-name: test_aml_env
+name: diabetes_regression__training_env
 dependencies:
   # The python interpreter version.
   # Currently Azure ML Workbench only supports 3.5.2 and later.
