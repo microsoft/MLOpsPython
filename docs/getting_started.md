@@ -1,28 +1,27 @@
-# Getting Started with this Repo
+# Getting Started with MLOpsPython
+
+This repository contains a template and demonstrates how to apply it to a sample ML project ***diabetes_regression*** that creates a linear regression model to predict diabetes.
+
+If the desire is to adopt this template for your project and to use it with your machine learning code, it is recommended to go through this guide as it is first. This ensures everything is working on your environment. After the sample is working, follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***diabetes_regression*** sample into your project starting point.
 
 ## Create an Azure DevOps organization
 
-We use Azure DevOps for running our multi-stage pipeline with build(CI), ML training and scoring service release
+We use Azure DevOps for running our multi-stage pipeline with build (CI), ML training and scoring service release
 (CD) stages. If you don't already have an Azure DevOps organization, create one by following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
 If you already have an Azure DevOps organization, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
 ## Decide best option to copy repository code
 
-* Fork this repository if there is a desire to contribute back to the repository else
+* Fork this repository if there is a desire to contribute back to the repository, otherwise
 * Use this [code template](https://github.com/microsoft/MLOpsPython/generate) which copies the entire code base to your own GitHub location with the git commit history restarted. This can be used for learning and following the guide.
-
-This repository contains a template and demonstrates how to apply it to a sample ML project ***diabetes_regression*** that creates a linear regression model to predict the diabetes.
-
-If the desire is to adopt this template for your project and to use it with your machine learning code, it is recommended to go through this guide as it is first. This ensures everything is working on your environment. After the sample is working, follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***diabetes_regression*** sample into your project starting point.
 
 ## Create a Variable Group for your Pipeline
 
-We make use of a variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines or pipeline stages. You can either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to learn more about how to create a variable group and
-[link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline.
-Click on **Library** in the **Pipelines** section as indicated below:
+We make use of a variable group inside Azure DevOps to store variables and their values that we want to make available across multiple pipelines or pipeline stages. You can either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Please refer to the documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) to learn more about how to create a variable group and [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline.
+Navigate to **Library** in the **Pipelines** section as indicated below:
 
-![library_variable groups](./images/library_variable_groups.png)
+![Library Variable Groups](./images/library_variable_groups.png)
 
 Create a variable group named **``devopsforai-aml-vg``**. The YAML pipeline definitions in this repository refer to this variable group by name.
 
@@ -38,7 +37,7 @@ The variable group should contain the following required variables:
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection |
 | ACI_DEPLOYMENT_NAME      | diabetes-aci             |
 
-**Note:**
+**Variable Descriptions:**
 
 The **WORKSPACE_NAME** parameter is used for the Azure Machine Learning Workspace creation. You can provide an existing AML Workspace here if you have one.
 
@@ -46,10 +45,9 @@ The **BASE_NAME** parameter is used throughout the solution for naming Azure res
 
 The **RESOURCE_GROUP** parameter is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
 
-The **AZURE_RM_SVC_CONNECTION** parameter is used by the [Azure DevOps pipeline]((../environment_setup/iac-create-environment-pipeline.yml)) that creates the Azure ML workspace and associated resources through Azure Resource Manager. The pipeline requires an **Azure Resource Manager**
-[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
+The **AZURE_RM_SVC_CONNECTION** parameter is used by the [Azure DevOps pipeline]((../environment_setup/iac-create-environment-pipeline.yml)) that creates the Azure ML workspace and associated resources through Azure Resource Manager. The pipeline requires an **Azure Resource Manager** [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
 
-![create service connection](./images/create-rm-service-connection.png)
+![Create service connection](./images/create-rm-service-connection.png)
 
 Leave the **``Resource Group``** field empty.
 
@@ -60,11 +58,11 @@ The **WORKSPACE_SVC_CONNECTION** parameter is used to reference a service connec
 
 Optionally, a **DATASET_NAME** parameter can be used to reference a training dataset that you have registered in your Azure ML workspace (more details below).
 
-Make sure to select the **Allow access to all pipelines** checkbox in thevariable group configuration.
+Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
 ## More variable options
 
-There are more variables used in the project. They're defined in two places, one for local execution and one for using Azure DevOps Pipelines.
+There are more variables used in the project. They're defined in two places: one for local execution and one for using Azure DevOps Pipelines.
 
 ### Local configuration
 
@@ -74,9 +72,9 @@ For instructions on how to set up a local development environment, refer to the 
 
 For using Azure DevOps Pipelines all other variables are stored in the file `.pipelines/diabetes_regression-variables-template.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
 
-**Note:** In `diabetes_regression` folder you can find `config.json` file that we would recommend to use in order to provide parameters for training, evaluation and scoring scripts. An example of a such parameter is a hyperparameter of a training algorithm: in our case it's the ridge regression [*alpha* hyperparameter](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We don't provide any special serializers for this config file. So, it's up to you which template to support there.
+**Note:** In the `diabetes_regression` folder you can find the `config.json` file that we recommend to use in order to provide parameters for training, evaluation and scoring scripts. An example of a such parameter is a hyperparameter of a training algorithm; in our case it's the ridge regression [*alpha* hyperparameter](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We don't provide any special serializers for this config file, so it's up to you which template to support there.
 
-Up until now you should have:
+At this point you should have:
 
 * Forked (or cloned) the repo
 * Configured an Azure DevOps project with a service connection to Azure Resource Manager
@@ -84,21 +82,21 @@ Up until now you should have:
 
 ## Create Resources with Azure Pipelines
 
-The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an "Infrastructure as Code" [pipeline in this repository](../environment_setup/iac-create-environment-pipeline.yml). This **IaC** pipeline takes care of setting up all required resources based on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json).
+The easiest way to create all required resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage an **Infrastructure as Code (IaC)** [pipeline in this repository](../environment_setup/iac-create-environment-pipeline.yml). This **IaC** pipeline takes care of setting up all required resources based on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json).
 
 ### Create a Build IaC Pipeline
 
 In your Azure DevOps project, create a build pipeline from your forked repository:
 
-![build connnect step](./images/build-connect.png)
+![Build connnect step](./images/build-connect.png)
 
 Select the **Existing Azure Pipelines YAML file** option and set the path to [/environment_setup/iac-create-environment-pipeline.yml](../environment_setup/iac-create-environment-pipeline.yml):
 
-![configure step](./images/select-iac-pipeline.png)
+![Configure step](./images/select-iac-pipeline.png)
 
 Having done that, run the pipeline:
 
-![iac run](./images/run-iac-pipeline.png)
+![IaC run](./images/run-iac-pipeline.png)
 
 Check out the newly created resources in the [Azure Portal](https://portal.azure.com):
 
@@ -110,7 +108,7 @@ Check out the newly created resources in the [Azure Portal](https://portal.azure
 
 ## Create an Azure DevOps Azure ML Workspace Service Connection
 
-Install the **Azure Machine Learning** extension to your organization from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml), so that you can set up a service connection to your AML workspace.
+Install the **Azure Machine Learning** extension to your organization from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml). We use this to set up a service connection to your AML workspace.
 
 Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. The connection name specified here needs to be used for the value of the `WORKSPACE_SVC_CONNECTION` set in the variable group above.
 
