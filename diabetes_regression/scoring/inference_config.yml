@@ -7,4 +7,3 @@ sourceDirectory:
 enableGpu: False
 baseImage:
 baseImageRegistry:
-environment: diabetes_regression
