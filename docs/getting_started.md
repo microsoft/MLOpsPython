@@ -1,7 +1,7 @@
 
 # Getting Started with MLOpsPython <!-- omit in toc -->
 
-This guide shows how to get MLOpsPython working with a sample ML project ***diabetes_regression*** that creates a linear regression model to predict diabetes. You can adapt this example to use with your own project.
+This guide shows how to get MLOpsPython working with a sample ML project ***diabetes_regression***. The project creates a linear regression model to predict diabetes. You can adapt this example to use with your own project.
 
 We recommend working through this guide completely to ensure everything is working in your environment. After the sample is working, follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***diabetes_regression*** sample into a starting point for your project.
 
@@ -16,7 +16,7 @@ We recommend working through this guide completely to ensure everything is worki
 - [Set up Build, Release Trigger, and Release Multi-Stage Pipeline](#set-up-build-release-trigger-and-release-multi-stage-pipeline)
   - [Set up the Pipeline](#set-up-the-pipeline)
 - [Further Exploration](#further-exploration)
-  - [(Optional) Deploy the Model to Azure Kubernetes Service](#optional-deploy-the-model-to-azure-kubernetes-service)
+  - [Deploy the Model to Azure Kubernetes Service](#deploy-the-model-to-azure-kubernetes-service)
   - [Deploy the Model to Azure App Service (Azure Web App for containers)](#deploy-the-model-to-azure-app-service-azure-web-app-for-containers)
   - [Example pipelines using R](#example-pipelines-using-r)
   - [Observability and Monitoring](#observability-and-monitoring)
@@ -65,7 +65,7 @@ Make sure you select the **Allow access to all pipelines** checkbox in the varia
 
 **WORKSPACE_NAME** is used for creating the Azure Machine Learning Workspace. You can provide an existing AML Workspace here if you've got one.
 
-**BASE_NAME** is used as a prefix for naming Azure resources. When using a shared subscription, we want to avoid naming collisions resources that require unique names, for example, Azure Blob Storage and registry DNS names. Make sure to set BASE_NAME to a unique name so that created resources will have unique names (for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, etc.). The length of the BASE_NAME value should not exceed 10 characters and must contain numbers and letters only.
+**BASE_NAME** is used as a prefix for naming Azure resources. When sharing an Azure subscription, the prefix allows us to avoid naming collisions for resources that require unique names, for example, Azure Blob Storage and Registry DNS names. Make sure to set BASE_NAME to a unique name so that created resources will have unique names (for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, and so on.) The length of the BASE_NAME value should not exceed 10 characters and must contain numbers and letters only.
 
 **RESOURCE_GROUP** is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
 
@@ -125,7 +125,7 @@ Now that you've provisioned all the required Azure resources and service connect
 
 1. **Model Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a training pipeline.
 1. **Train Model**: invokes the Azure ML service to trigger the published training pipeline to train, evaluate, and register a model.
-1. **Release Deployment:** deploys a model to ACI, AKS, and Azure App Service environments.
+2. **Release Deployment:** deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments.  For simplicity, we're going to initially focus on ACI. See [Further Exploration](#further-exploration) for other deployment types.
 
 ### Set up the Pipeline
 
@@ -146,11 +146,11 @@ Great, you now have the build pipeline set up which automatically triggers every
 
 * The first stage of the pipeline, **Model CI**, does linting, unit testing, code coverage, building, and publishes an **ML Training Pipeline** in an **ML Workspace**.
 
-* The second stage of the pipeline, **Train model**, triggers the run of the ML Training Pipeline. The training pipeline will train, evaluate, and register a new model. The actual computation happens on an [Azure Machine Learning Compute cluster](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute). In Azure DevOps, the stage runs an agentless job that waits for the completion of the Azure ML job, allowing the pipeline to wait for training completion for hours or even days without using agent resources.
+* The second stage of the pipeline, **Train model**, triggers the run of the ML Training Pipeline. The training pipeline will train, evaluate, and register a new model. The actual computation happens on an [Azure Machine Learning Compute cluster](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute). In Azure DevOps, the stage runs an agentless job that waits for the completion of the Azure ML job. This allows the pipeline to wait for training completion for hours or even days without using agent resources.
 
 If  model evaluation determines that the new model does not perform better than the previous one, the new model will not be registered and the pipeline will be canceled.
 
-* The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). After deployment, it runs a *smoke test* for validation by sending a sample query to the scoring web service and verifying that it returns an expected response.
+* The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). After deployment, it runs a *smoke test* for validation by sending a sample query to the scoring web service and verifies that it returns an expected response.
 
 The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The image of the container ***mcr.microsoft.com/mlops/python:latest*** is built with this [Dockerfile](../environment_setup/Dockerfile) and it has all necessary dependencies installed for the purposes of this repository. This image is an example of a custom Docker image with a pre-baked environment. The environment is guaranteed to be the same on any building agent, VM, or local machine. In your project, you'll want to build your own Docker image that only contains the dependencies and tools required for your use case. Your image will probably be smaller and faster, and it will be maintained by your team.
 
@@ -164,14 +164,17 @@ To skip model training and registration, and deploy a model successfully registe
 
 ## Further Exploration
 
-### (Optional) Deploy the Model to Azure Kubernetes Service
+You should now have a working pipeline that can get you started with MLOpsPython. Below are some additional features offered that might suit your scenario.
+
+### Deploy the Model to Azure Kubernetes Service
+
+MLOpsPython also can deploy to [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service).
 
 Creating a Kubernetes cluster on AKS is out of scope of this tutorial, but you can find set up information [here](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal#create-an-aks-cluster).
 
 **Note:** If your target deployment environment is a K8s cluster and you want to implement Canary and/or A/B testing deployment strategies, check out this [tutorial](./canary_ab_deployment.md).
 
-The final stage is to deploy the model to the production environment running on
-[Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service).
+We'll keep the ACI deployment active because it is a lightweight way to validate changes before deploying to AKS.
 
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add these variables:
 
@@ -188,7 +191,7 @@ After successfully deploying to Azure Container Instances, the next stage will d
 
 ### Deploy the Model to Azure App Service (Azure Web App for containers)
 
-If you want to deploy your scoring service as an [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service), you'll need to do the following.
+If you want to deploy your scoring service as an [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) instead of ACI and AKS, follow these additional steps.
 
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`) and add a variable:
 
@@ -244,11 +247,8 @@ To remove the resources created for this project, you can use the [/environment_
 
 ## Next Steps: Integrating your project
 
-* The provided pipeline definition YAML files are a sample starting point, which you should tailor to your processes and environment.
-* Follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case.
-* Use the [Convert ML experimental code to production code](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production#use-your-own-model-with-mlopspython-code-template) tutorial that explains how to bring your machine learning code on top of this template.
+* Follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case. This guide includes information on bringing your own code to this template.
 * You may want to use [Azure DevOps self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your ML pipeline execution. The Docker container image for the ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
-* You can install additional Conda or pip packages by modifying the YAML environment configurations under the `diabetes_regression` directory. Make sure to use fixed version numbers for all packages to ensure reproducibility, and use the same versions across environments.
 * Edit the pipeline definition to remove unused stages. For example, if you're deploying to ACI and AKS only, delete the unused `Deploy_Webapp` stage.
 * Consider enabling [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
 
