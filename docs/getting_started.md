@@ -9,8 +9,9 @@ If you intend to adopt this template for your project and to use it existing mac
 - [Get the code](#get-the-code)
 - [Create a Variable Group for your Pipeline](#create-a-variable-group-for-your-pipeline)
 - [Provisioning resources using Azure Pipelines](#provisioning-resources-using-azure-pipelines)
+  - [Create an Azure Devops Service Connection for the Azure Resource Manager](#create-an-azure-devops-service-connection-for-the-azure-resource-manager)
   - [Create the IaC Pipeline](#create-the-iac-pipeline)
-- [Create an Azure DevOps Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection)
+- [Create an Azure DevOps Service Connection for the Azure ML Workspace](#create-an-azure-devops-service-connection-for-the-azure-ml-workspace)
 - [Set up Build, Release Trigger, and Release Multi-Stage Pipeline](#set-up-build-release-trigger-and-release-multi-stage-pipeline)
   - [Set up the Pipeline](#set-up-the-pipeline)
 - [Futher Exploration](#futher-exploration)
@@ -27,7 +28,7 @@ If you intend to adopt this template for your project and to use it existing mac
 
 ## Setting up Azure DevOps
 
-We will use Azure DevOps for running the multi-stage pipeline with build (CI), ML training and scoring service release (CD) stages. If you don't already have an Azure DevOps organization, create one by following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
+We will use Azure DevOps for running the multi-stage pipeline with build (CI), ML training, and scoring service release (CD) stages. If you don't already have an Azure DevOps organization, create one by following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
 If you already have an Azure DevOps organization, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
@@ -46,15 +47,15 @@ Create a variable group named **``devopsforai-aml-vg``**. The YAML pipeline defi
 
 The variable group should contain the following required variables:
 
-| Variable Name            | Suggested Value           |
-| ------------------------ | ------------------------- |
-| BASE_NAME                | [unique base name]        |
-| LOCATION                 | centralus                 |
-| RESOURCE_GROUP           | mlops-RG                  |
-| WORKSPACE_NAME           | mlops-AML-WS              |
-| AZURE_RM_SVC_CONNECTION  | azure-resource-connection |
-| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  |
-| ACI_DEPLOYMENT_NAME      | diabetes-aci              |
+| Variable Name            | Suggested Value           | Short description                                                                                                            |
+| ------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| BASE_NAME                | [unique base name]        | Naming prefix                                                                                                                |
+| LOCATION                 | centralus                 | Azure location                                                                                                               |
+| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group                                                                                                         |
+| WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                      |
+| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Mananger Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
+| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                  |
+| ACI_DEPLOYMENT_NAME      | diabetes-aci              | Azure Container Interface                                                                                                    |
 
 **Variable Descriptions:**
 
@@ -64,7 +65,19 @@ The **BASE_NAME** parameter is used throughout the solution for naming Azure res
 
 The **RESOURCE_GROUP** parameter is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing AML Workspace, set this value to the corresponding resource group name.
 
-The **AZURE_RM_SVC_CONNECTION** parameter is used by the [Azure DevOps pipeline]((../environment_setup/iac-create-environment-pipeline.yml)) that creates the Azure ML workspace and associated resources through Azure Resource Manager. The pipeline requires an **Azure Resource Manager** [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
+The **AZURE_RM_SVC_CONNECTION** parameter is used by the [Azure DevOps pipeline]((../environment_setup/iac-create-environment-pipeline.yml)) that creates the Azure ML workspace and associated resources through Azure Resource Manager. We'll create this in a [step below](#create-an-azure-devops-service-connection-for-the-azure-resource-manager).
+
+The **WORKSPACE_SVC_CONNECTION** parameter is used to reference a [service connection for the Azure ML workspace](#create-an-azure-devops-azure-ml-workspace-service-connection). You will create this after [provisioning the workspace](#provisioning-resources-using-azure-pipelines) in a [step below](#create-an-azure-devops-service-connection-for-the-azure-ml-workspace).
+
+Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
+
+## Provisioning resources using Azure Pipelines
+
+The easiest way to create all required Azure resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage the **Infrastructure as Code (IaC)** [pipeline in this repository](../environment_setup/iac-create-environment-pipeline.yml). This **IaC** pipeline takes care of setting up all required resources based on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json).
+
+### Create an Azure Devops Service Connection for the Azure Resource Manager
+
+The [IaC provisioning pipeline]((../environment_setup/iac-create-environment-pipeline.yml)) requires an **Azure Resource Manager** [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
 
 ![Create service connection](./images/create-rm-service-connection.png)
 
@@ -72,16 +85,6 @@ Leave the **``Resource Group``** field empty.
 
 **Note:** Creating the ARM service connection scope requires 'Owner' or 'User Access Administrator' permissions on the subscription.
 You must also have sufficient permissions to register an application with your Azure AD tenant, or receive the ID and secret of a service principal from your Azure AD Administrator. That principal must have 'Contributor' permissions on the subscription.
-
-The **WORKSPACE_SVC_CONNECTION** parameter is used to reference a service connection for the Azure ML workspace. You will create this after provisioning the workspace (we recommend using the IaC pipeline as described below), and installing the Azure ML extension in your Azure DevOps project.
-
-Optionally, a **DATASET_NAME** parameter can be used to reference a training dataset that you have registered in your Azure ML workspace (more details below).
-
-Make sure to select the **Allow access to all pipelines** checkbox in the variable group configuration.
-
-## Provisioning resources using Azure Pipelines
-
-The easiest way to create all required Azure resources (Resource Group, ML Workspace, Container Registry, Storage Account, etc.) is to leverage the **Infrastructure as Code (IaC)** [pipeline in this repository](../environment_setup/iac-create-environment-pipeline.yml). This **IaC** pipeline takes care of setting up all required resources based on these [ARM templates](../environment_setup/arm-templates/cloud-environment.json).
 
 ### Create the IaC Pipeline
 
@@ -101,7 +104,7 @@ Check that the newly created resources appear in the [Azure Portal](https://port
 
 ![Created resources](./images/created-resources.png)
 
-## Create an Azure DevOps Azure ML Workspace Service Connection
+## Create an Azure DevOps Service Connection for the Azure ML Workspace
 
 At this point you should have a Azure ML Workspace created. Similar to the Azure Resource Manager service connection, we need to create an additional one for the workspace.
 
