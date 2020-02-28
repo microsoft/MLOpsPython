@@ -1,3 +1,10 @@
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
 pr: none
 trigger:
   branches:
@@ -11,7 +18,7 @@ trigger:
     - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py
 
 variables:
-- template: diabetes_regression-variables.yml
+- template: diabetes_regression-variables-template.yml
 - group: devopsforai-aml-vg
 
 pool:
@@ -20,13 +27,14 @@ pool:
 stages:
 - stage: 'Model_CI'
   displayName: 'Model CI'
+  condition: not(variables['MODEL_BUILD_ID'])
   jobs:
   - job: "Model_CI_Pipeline"
     displayName: "Model CI Pipeline"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: azdo-base-pipeline.yml
+    - template: code-quality-template.yml
     - task: AzureCLI@1
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
@@ -41,11 +49,12 @@ stages:
 
 - stage: 'Trigger_AML_Pipeline'
   displayName: 'Train model'
+  condition: and(succeeded(), not(variables['MODEL_BUILD_ID']))
   jobs:
   - job: "Get_Pipeline_ID"
     condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
     displayName: "Get Pipeline ID for execution"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
     - task: AzureCLI@1
@@ -65,6 +74,7 @@ stages:
   - job: "Run_ML_Pipeline"
     dependsOn: "Get_Pipeline_ID"
     displayName: "Trigger ML Training Pipeline"
+    timeoutInMinutes: 0
     pool: server
     variables:
       AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
@@ -80,21 +90,22 @@ stages:
     dependsOn: "Run_ML_Pipeline"
     condition: always()
     displayName: "Determine if evaluation succeeded and new model is registered"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
+
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
   dependsOn: Trigger_AML_Pipeline
-  condition: and(succeeded(), variables['ACI_DEPLOYMENT_NAME'])
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['ACI_DEPLOYMENT_NAME'])
   jobs:
   - job: "Deploy_ACI"
     displayName: "Deploy to ACI"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
     - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
       displayName: 'Azure ML Model Deploy'
       inputs:
@@ -124,10 +135,10 @@ stages:
   jobs:
   - job: "Deploy_AKS"
     displayName: "Deploy to AKS"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
     - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
       displayName: 'Azure ML Model Deploy'
       inputs:
@@ -154,14 +165,14 @@ stages:
 - stage: 'Deploy_Webapp'
   displayName: 'Deploy to Webapp'
   dependsOn: Trigger_AML_Pipeline
-  condition: and(succeeded(), variables['WEBAPP_DEPLOYMENT_NAME'])
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['WEBAPP_DEPLOYMENT_NAME'])
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Deploy to Webapp"
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
     - task: AzureCLI@1
       displayName: 'Create scoring image and set IMAGE_LOCATION variable'
       inputs:
@@ -178,9 +189,10 @@ stages:
       name: WebAppDeploy
       displayName: 'Azure Web App on Container Deploy'
       inputs:
-        azureSubscription: 'AzureResourceConnection'
+        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
         appName: '$(WEBAPP_DEPLOYMENT_NAME)'
-        containers: '$(IMAGE_LOCATION)'
+        resourceGroupName: '$(RESOURCE_GROUP)'
+        imageName: '$(IMAGE_LOCATION)'
     - task: AzureCLI@1
       displayName: 'Smoke test'
       inputs:

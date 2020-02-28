@@ -1,12 +1,14 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
-from azureml.pipeline.core import Pipeline
-from azureml.core import Workspace
+from azureml.pipeline.core import Pipeline, PipelineData
+from azureml.core import Workspace, Environment
 from azureml.core.runconfig import RunConfiguration
-from azureml.core import Dataset, Datastore
+from azureml.core import Dataset
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
-from ml_service.util.manage_environment import get_environment
+from sklearn.datasets import load_diabetes
+import pandas as pd
+import os
 
 
 def main():
@@ -44,26 +46,59 @@ def main():
     build_id_param = PipelineParameter(
         name="build_id", default_value=e.build_id)
 
-    dataset_name = ""
-    if (e.datastore_name is not None and e.datafile_name is not None):
-        dataset_name = e.dataset_name
-        datastore = Datastore.get(aml_workspace, e.datastore_name)
-        data_path = [(datastore, e.datafile_name)]
-        dataset = Dataset.Tabular.from_delimited_files(path=data_path)
-        dataset.register(workspace=aml_workspace,
-                         name=e.dataset_name,
-                         description="dataset with training data",
-                         create_new_version=True)
+    # Get dataset name
+    dataset_name = e.dataset_name
+
+    # Check to see if dataset exists
+    if (dataset_name not in aml_workspace.datasets):
+        # Create dataset from diabetes sample data
+        sample_data = load_diabetes()
+        df = pd.DataFrame(
+            data=sample_data.data,
+            columns=sample_data.feature_names)
+        df['Y'] = sample_data.target
+        file_name = 'diabetes.csv'
+        df.to_csv(file_name, index=False)
+
+        # Upload file to default datastore in workspace
+        default_ds = aml_workspace.get_default_datastore()
+        target_path = 'training-data/'
+        default_ds.upload_files(
+            files=[file_name],
+            target_path=target_path,
+            overwrite=True,
+            show_progress=False)
+
+        # Register dataset
+        path_on_datastore = os.path.join(target_path, file_name)
+        dataset = Dataset.Tabular.from_delimited_files(
+            path=(default_ds, path_on_datastore))
+        dataset = dataset.register(
+            workspace=aml_workspace,
+            name=dataset_name,
+            description='diabetes training data',
+            tags={'format': 'CSV'},
+            create_new_version=True)
+
+    # Get the dataset
+    dataset = Dataset.get_by_name(aml_workspace, dataset_name)
+
+    # Create a PipelineData to pass data between steps
+    pipeline_data = PipelineData(
+        'pipeline_data',
+        datastore=aml_workspace.get_default_datastore())
 
     train_step = PythonScriptStep(
         name="Train Model",
         script_name=e.train_script_path,
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
+        inputs=[dataset.as_named_input('training_data')],
+        outputs=[pipeline_data],
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
-            "--dataset_name", dataset_name,
+            "--step_output", pipeline_data
         ],
         runconfig=run_config,
         allow_reuse=False,
@@ -90,9 +125,11 @@ def main():
         script_name=e.register_script_path,
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
+        inputs=[pipeline_data],
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
+            "--step_input", pipeline_data,
         ],
         runconfig=run_config,
         allow_reuse=False,

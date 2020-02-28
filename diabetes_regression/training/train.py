@@ -24,10 +24,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 from azureml.core.run import Run
-from azureml.core import Dataset
 import os
 import argparse
-from sklearn.datasets import load_diabetes
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
@@ -65,19 +63,20 @@ def main():
     )
 
     parser.add_argument(
-        "--dataset_name",
+        "--step_output",
         type=str,
-        help=("Dataset with the training data")
+        help=("output for passing data to next step")
     )
+
     args = parser.parse_args()
 
     print("Argument [build_id]: %s" % args.build_id)
     print("Argument [model_name]: %s" % args.model_name)
-    print("Argument [dataset_name]: %s" % args.dataset_name)
+    print("Argument [step_output]: %s" % args.step_output)
 
     model_name = args.model_name
     build_id = args.build_id
-    dataset_name = args.dataset_name
+    step_output_path = args.step_output
 
     print("Getting training parameters")
 
@@ -91,15 +90,17 @@ def main():
     print("Parameter alpha: %s" % alpha)
 
     run = Run.get_context()
-    ws = run.experiment.workspace
 
-    if (dataset_name):
-        dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
+    # Get the dataset
+    dataset = run.input_datasets['training_data']
+    if (dataset):
         df = dataset.to_pandas_dataframe()
-        X = df.values
-        y = df.Y
+        X = df.drop('Y', axis=1).values
+        y = df['Y'].values
     else:
-        X, y = load_diabetes(return_X_y=True)
+        e = ("No dataset provided")
+        print(e)
+        raise Exception(e)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=0)
@@ -108,21 +109,18 @@ def main():
 
     reg = train_model(run, data, alpha)
 
-    joblib.dump(value=reg, filename=model_name)
+    # Pass model file to next step
+    os.makedirs(step_output_path, exist_ok=True)
+    model_output_path = os.path.join(step_output_path, model_name)
+    joblib.dump(value=reg, filename=model_output_path)
 
-    # upload model file explicitly into artifacts for parent run
-    run.parent.upload_file(name="./outputs/" + model_name,
-                           path_or_stream=model_name)
-    print("Uploaded the model {} to experiment {}".format(
-        model_name, run.experiment.name))
-    dirpath = os.getcwd()
-    print(dirpath)
-    print("Following files are uploaded ")
-    print(run.parent.get_file_names())
-
-    run.parent.tag("BuildId", value=build_id)
+    # Also upload model file to run outputs for history
+    os.makedirs('outputs', exist_ok=True)
+    output_path = os.path.join('outputs', model_name)
+    joblib.dump(value=reg, filename=output_path)
 
     # Add properties to identify this specific training run
+    run.parent.tag("BuildId", value=build_id)
     run.tag("BuildId", value=build_id)
     run.tag("run_type", value="train")
     builduri_base = os.environ.get("BUILDURI_BASE")

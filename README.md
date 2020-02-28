@@ -66,7 +66,7 @@ You can find the details of the code and scripts in the repository [here](/docs/
 - [Azure ML Python SDK Quickstart](https://docs.microsoft.com/en-us/azure/machine-learning/service/quickstart-create-workspace-with-python)
 - [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/?view=vsts)
 
-# Contributing
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us

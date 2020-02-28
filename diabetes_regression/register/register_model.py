@@ -27,6 +27,7 @@ import os
 import sys
 import argparse
 import traceback
+import joblib
 from azureml.core import Run, Experiment, Workspace
 from azureml.core.model import Model as AMLModel
 
@@ -63,16 +64,23 @@ def main():
         type=str,
         help="The Build ID of the build triggering this pipeline run",
     )
+
     parser.add_argument(
         "--run_id",
         type=str,
         help="Training run ID",
     )
+
     parser.add_argument(
         "--model_name",
         type=str,
         help="Name of the Model",
         default="sklearn_regression_model.pkl",
+    )
+    parser.add_argument(
+        "--step_input",
+        type=str,
+        help=("input from previous steps")
     )
 
     args = parser.parse_args()
@@ -83,18 +91,42 @@ def main():
     if (run_id == 'amlcompute'):
         run_id = run.parent.id
     model_name = args.model_name
+    model_path = args.step_input
 
-    if (build_id is None):
-        register_aml_model(model_name, exp, run_id)
-    else:
-        run.tag("BuildId", value=build_id)
-        builduri_base = os.environ.get("BUILDURI_BASE")
-        if (builduri_base is not None):
-            build_uri = builduri_base + build_id
-            run.tag("BuildUri", value=build_uri)
-            register_aml_model(model_name, exp, run_id, build_id, build_uri)
+    # load the model
+    print("Loading model from " + model_path)
+    model_file = os.path.join(model_path, model_name)
+    model = joblib.load(model_file)
+    model_mse = run.parent.get_metrics()["mse"]
+
+    if (model is not None):
+        if (build_id is None):
+            register_aml_model(model_file, model_name, exp, run_id)
         else:
-            register_aml_model(model_name, exp, run_id, build_id)
+            run.tag("BuildId", value=build_id)
+            builduri_base = os.environ.get("BUILDURI_BASE")
+            if (builduri_base is not None):
+                build_uri = builduri_base + build_id
+                run.tag("BuildUri", value=build_uri)
+                register_aml_model(
+                    model_file,
+                    model_name,
+                    model_mse,
+                    exp,
+                    run_id,
+                    build_id,
+                    build_uri)
+            else:
+                register_aml_model(
+                    model_file,
+                    model_name,
+                    model_mse,
+                    exp,
+                    run_id,
+                    build_id)
+    else:
+        print("Model not found. Skipping model registration.")
+        sys.exit(0)
 
 
 def model_already_registered(model_name, exp, run_id):
@@ -109,35 +141,30 @@ def model_already_registered(model_name, exp, run_id):
 
 
 def register_aml_model(
+    model_path,
     model_name,
+    model_mse,
     exp,
     run_id,
     build_id: str = 'none',
     build_uri=None
 ):
     try:
+        tagsValue = {"area": "diabetes_regression",
+                     "run_id": run_id,
+                     "experiment_name": exp.name,
+                     "mse": model_mse}
         if (build_id != 'none'):
             model_already_registered(model_name, exp, run_id)
-            run = Run(experiment=exp, run_id=run_id)
-            tagsValue = {"area": "diabetes_regression",
-                         "BuildId": build_id, "run_id": run_id,
-                         "experiment_name": exp.name}
+            tagsValue["BuildId"] = build_id
             if (build_uri is not None):
                 tagsValue["BuildUri"] = build_uri
-        else:
-            run = Run(experiment=exp, run_id=run_id)
-            if (run is not None):
-                tagsValue = {"area": "diabetes_regression",
-                             "run_id": run_id, "experiment_name": exp.name}
-            else:
-                print("A model run for experiment", exp.name,
-                      "matching properties run_id =", run_id,
-                      "was not found. Skipping model registration.")
-                sys.exit(0)
 
-        model = run.register_model(model_name=model_name,
-                                   model_path="./outputs/" + model_name,
-                                   tags=tagsValue)
+        model = AMLModel.register(
+            workspace=exp.workspace,
+            model_name=model_name,
+            model_path=model_path,
+            tags=tagsValue)
         os.chdir("..")
         print(
             "Model registered: {} \nModel Description: {} "

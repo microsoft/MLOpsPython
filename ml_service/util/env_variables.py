@@ -36,13 +36,10 @@ class Env(Singleton):
         self._experiment_name = os.environ.get("EXPERIMENT_NAME")
         self._model_version = os.environ.get('MODEL_VERSION')
         self._image_name = os.environ.get('IMAGE_NAME')
-        self._model_path = os.environ.get('MODEL_PATH')
         self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
         self._score_script = os.environ.get("SCORE_SCRIPT")
         self._collection_uri = os.environ.get("SYSTEM_COLLECTIONURI")
         self._teamproject_name = os.environ.get("SYSTEM_TEAMPROJECT")
-        self._datastore_name = os.environ.get("DATASTORE_NAME")
-        self._datafile_name = os.environ.get("DATAFILE_NAME")
         self._dataset_name = os.environ.get("DATASET_NAME")
         self._run_evaluation = os.environ.get("RUN_EVALUATION", "true")
         self._allow_run_cancel = os.environ.get(
@@ -138,10 +135,6 @@ class Env(Singleton):
         return self._image_name
 
     @property
-    def model_path(self):
-        return self._model_path
-
-    @property
     def score_script(self):
         return self._score_script
 
@@ -152,14 +145,6 @@ class Env(Singleton):
     @property
     def teamproject_name(self):
         return self._teamproject_name
-
-    @property
-    def datastore_name(self):
-        return self._datastore_name
-
-    @property
-    def datafile_name(self):
-        return self._datafile_name
 
     @property
     def dataset_name(self):
