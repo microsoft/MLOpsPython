@@ -22,7 +22,6 @@ We recommend working through this guide completely to ensure everything is worki
   - [Observability and Monitoring](#observability-and-monitoring)
   - [Clean up the example resources](#clean-up-the-example-resources)
 - [Next Steps: Integrating your project](#next-steps-integrating-your-project)
-  - [Using an existing dataset](#using-an-existing-dataset)
   - [Additional Variables and Configuration](#additional-variables-and-configuration)
     - [More variable options](#more-variable-options)
     - [Local configuration](#local-configuration)
@@ -125,7 +124,8 @@ Now that you've provisioned all the required Azure resources and service connect
 
 1. **Model Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a training pipeline.
 1. **Train Model**: invokes the Azure ML service to trigger the published training pipeline to train, evaluate, and register a model.
-2. **Release Deployment:** deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments.  For simplicity, we're going to initially focus on ACI. See [Further Exploration](#further-exploration) for other deployment types.
+1. **Release Deployment:** deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments. For simplicity, we're going to initially focus on ACI. See [Further Exploration](#further-exploration) for other deployment types.
+   1. **Note:** Edit the pipeline definition to remove unused stages. For example, if you're deploying to ACI and AKS only, delete the unused `Deploy_Webapp` stage.
 
 ### Set up the Pipeline
 
@@ -189,6 +189,8 @@ After successfully deploying to Azure Container Instances, the next stage will d
 
 ![build](./images/multi-stage-aci-aks.png)
 
+Consider enabling [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+
 ### Deploy the Model to Azure App Service (Azure Web App for containers)
 
 If you want to deploy your scoring service as an [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) instead of ACI and AKS, follow these additional steps.
@@ -249,12 +251,6 @@ To remove the resources created for this project, you can use the [/environment_
 
 * Follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case. This guide includes information on bringing your own code to this template.
 * You may want to use [Azure DevOps self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your ML pipeline execution. The Docker container image for the ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
-* Edit the pipeline definition to remove unused stages. For example, if you're deploying to ACI and AKS only, delete the unused `Deploy_Webapp` stage.
-* Consider enabling [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
-
-### Using an existing dataset
-
-The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data. To use your own data, you need to [create a Dataset](https://docs.microsoft.com/azure/machine-learning/how-to-create-register-datasets) in your workspace and add a DATASET_NAME variable in the ***devopsforai-aml-vg*** variable group with the Dataset name. You'll also need to modify the test cases in the **ml_service/util/smoke_test_scoring_service.py** script to match the schema of the training features in your dataset.
 
 ### Additional Variables and Configuration
 
