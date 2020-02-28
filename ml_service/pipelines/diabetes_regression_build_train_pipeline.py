@@ -1,11 +1,12 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline, PipelineData
-from azureml.core import Workspace, Environment
+from azureml.core import Workspace
 from azureml.core.runconfig import RunConfiguration
 from azureml.core import Dataset
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
+from MLOpsPython.ml_service.util.manage_environment import get_environment
 from sklearn.datasets import load_diabetes
 import pandas as pd
 import os
