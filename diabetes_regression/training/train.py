@@ -82,6 +82,13 @@ def main():
         help=("data file path, if specified, a new version of the dataset will be registered")
     )
 
+    parser.add_argument(
+        "--caller_run_id",
+        type=str,
+        help=("caller run id, for example ADF pipeline run id")
+    )
+
+
     args = parser.parse_args()
 
     print("Argument [build_id]: %s" % args.build_id)

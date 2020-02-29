@@ -52,6 +52,9 @@ def main():
         name="dataset_version", default_value=e.dataset_version)
     data_file_path_param = PipelineParameter(
         name="data_file_path", default_value="none")
+    caller_run_id_param = PipelineParameter(
+        name="caller_run_id", default_value="none")
+
 
     # Get dataset name
     dataset_name = e.dataset_name
@@ -107,7 +110,8 @@ def main():
             "--model_name", model_name_param,
             "--step_output", pipeline_data,            
             "--dataset_version", dataset_version_param,
-            "--data_file_path", data_file_path_param            
+            "--data_file_path", data_file_path_param,
+            "--caller_run_id_param", caller_run_id_param
         ],
         runconfig=run_config,
         allow_reuse=False,
