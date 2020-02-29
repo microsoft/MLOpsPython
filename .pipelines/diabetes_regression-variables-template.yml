@@ -30,7 +30,7 @@ variables:
 
   # AML Compute Cluster Config
   - name: AML_ENV_NAME
-    value: diabetes_regression__training_env1
+    value: diabetes_regression__training_env
   - name: AML_COMPUTE_CLUSTER_CPU_SKU
     value: STANDARD_DS2_V2
   - name: AML_COMPUTE_CLUSTER_NAME

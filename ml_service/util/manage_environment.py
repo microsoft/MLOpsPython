@@ -14,7 +14,7 @@ def get_environment(
         restored_environment = None
         for env in environments:
             if env == environment_name:
-                restored_environment = env
+                restored_environment = environments[environment_name]
 
         if restored_environment is None or create_new:
             new_env = Environment.from_conda_specification(environment_name, os.path.join(e.sources_directory_train, "conda_dependencies.yml"))  # NOQA: E501
