@@ -111,7 +111,7 @@ def main():
             "--step_output", pipeline_data,            
             "--dataset_version", dataset_version_param,
             "--data_file_path", data_file_path_param,
-            "--caller_run_id_param", caller_run_id_param
+            "--caller_run_id", caller_run_id_param
         ],
         runconfig=run_config,
         allow_reuse=False,
