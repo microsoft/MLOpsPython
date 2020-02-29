@@ -23,10 +23,15 @@ variables:
     value: mlopspython
   - name: DATASET_NAME
     value: diabetes_ds
+  - name: DATASTORE_NAME
+    value: datablobstore
+  - name: DATASET_VERSION
+    value: latest
   - name: TRAINING_PIPELINE_NAME
     value: "diabetes-Training-Pipeline"
   - name: MODEL_NAME
     value: diabetes_regression_model.pkl
+
 
   # AML Compute Cluster Config
   - name: AML_COMPUTE_CLUSTER_CPU_SKU

@@ -38,6 +38,7 @@ def main():
         builduri_base = e.collection_uri + e.teamproject_name
         builduri_base = builduri_base + "/_build/results?buildId="
         environment.environment_variables["BUILDURI_BASE"] = builduri_base
+    environment.environment_variables["DATASTORE_NAME"] = e.datastore_name
     environment.register(aml_workspace)
 
     run_config = RunConfiguration()
@@ -47,6 +48,10 @@ def main():
         name="model_name", default_value=e.model_name)
     build_id_param = PipelineParameter(
         name="build_id", default_value=e.build_id)
+    dataset_version_param = PipelineParameter(
+        name="dataset_version", default_value=e.dataset_version)
+    data_file_path_param = PipelineParameter(
+        name="data_file_path", default_value="none")
 
     # Get dataset name
     dataset_name = e.dataset_name
@@ -83,7 +88,7 @@ def main():
             create_new_version=True)
 
     # Get the dataset
-    dataset = Dataset.get_by_name(aml_workspace, dataset_name)
+    dataset = Dataset.get_by_name(aml_workspace, dataset_name)    
 
     # Create a PipelineData to pass data between steps
     pipeline_data = PipelineData(
@@ -100,7 +105,9 @@ def main():
         arguments=[
             "--build_id", build_id_param,
             "--model_name", model_name_param,
-            "--step_output", pipeline_data
+            "--step_output", pipeline_data,            
+            "--dataset_version", dataset_version_param,
+            "--data_file_path", data_file_path_param            
         ],
         runconfig=run_config,
         allow_reuse=False,

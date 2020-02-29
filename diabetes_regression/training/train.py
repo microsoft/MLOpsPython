@@ -31,6 +31,8 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import joblib
 import json
+from azureml.core import Dataset
+from util.dataset_helper import register_dataset
 
 
 def train_model(run, data, alpha):
@@ -68,15 +70,31 @@ def main():
         help=("output for passing data to next step")
     )
 
+    parser.add_argument(
+        "--dataset_version",
+        type=str,
+        help=("dataset version")
+    )
+
+    parser.add_argument(
+        "--data_file_path",
+        type=str,
+        help=("data file path, if specified, a new version of the dataset will be registered")
+    )
+
     args = parser.parse_args()
 
     print("Argument [build_id]: %s" % args.build_id)
     print("Argument [model_name]: %s" % args.model_name)
     print("Argument [step_output]: %s" % args.step_output)
+    print("Argument [dataset_version]: %s" % args.dataset_version)
+    print("Argument [data_file_path]: %s" % args.data_file_path)
 
     model_name = args.model_name
     build_id = args.build_id
     step_output_path = args.step_output
+    dataset_version = args.dataset_version
+    data_file_path = args.data_file_path
 
     print("Getting training parameters")
 
@@ -91,16 +109,24 @@ def main():
 
     run = Run.get_context()
 
-    # Get the dataset
+    # Get the dataset        
     dataset = run.input_datasets['training_data']
     if (dataset):
-        df = dataset.to_pandas_dataframe()
-        X = df.drop('Y', axis=1).values
-        y = df['Y'].values
-    else:
+        if (data_file_path == 'none'):
+            dataset = Dataset.get_by_name(run.experiment.workspace, dataset.name, dataset_version)
+        else:
+            dataset = register_dataset(run.experiment.workspace,
+                                        dataset.name,
+                                        os.environ.get("DATASTORE_NAME"),
+                                        data_file_path)
+    else:        
         e = ("No dataset provided")
         print(e)
         raise Exception(e)
+
+    df = dataset.to_pandas_dataframe()
+    X = df.drop('Y', axis=1).values
+    y = df['Y'].values
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=0)
