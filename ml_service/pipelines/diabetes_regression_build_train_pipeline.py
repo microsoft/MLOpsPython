@@ -36,9 +36,6 @@ def main():
     environment = get_environment(
         aml_workspace, e.aml_env_name, create_new=False)  # NOQA: E501
 
-    if environment is not None:
-        print(environment)
-
     run_config = RunConfiguration()
     run_config.environment = environment
     if (e.collection_uri is not None and e.teamproject_name is not None):

@@ -21,6 +21,8 @@ def get_environment(
             restored_environment = new_env
             restored_environment.register(workspace)
 
+        if environment is not None:
+            print(environment)
         return restored_environment
     except Exception as e:
         print(e)
