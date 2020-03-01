@@ -32,7 +32,7 @@ from sklearn.model_selection import train_test_split
 import joblib
 import json
 from azureml.core import Dataset
-from util.dataset_helper import register_dataset
+from diabetes_regression.util.dataset_helper import register_dataset
 
 
 def train_model(run, data, alpha):
@@ -130,7 +130,7 @@ def main():
     # Get the dataset
     if (dataset_name):
         if (data_file_path == 'none'):
-            dataset = Dataset.get_by_name(run.experiment.workspace, dataset_name, dataset_version)  # NOQA: E402
+            dataset = Dataset.get_by_name(run.experiment.workspace, dataset_name, dataset_version)  # NOQA: E402, E501
         else:
             dataset = register_dataset(run.experiment.workspace,
                                        dataset_name,
