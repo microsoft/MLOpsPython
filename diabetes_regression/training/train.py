@@ -88,6 +88,12 @@ def main():
         help=("caller run id, for example ADF pipeline run id")
     )
 
+    parser.add_argument(
+        "--dataset_name",
+        type=str,
+        help=("Dataset name. Dataset must be passed by name to always get \
+              the desired dataset version instead of the one used while the pipeline creation")
+    )
 
     args = parser.parse_args()
 
@@ -96,12 +102,15 @@ def main():
     print("Argument [step_output]: %s" % args.step_output)
     print("Argument [dataset_version]: %s" % args.dataset_version)
     print("Argument [data_file_path]: %s" % args.data_file_path)
+    print("Argument [caller_run_id]: %s" % args.caller_run_id)
+    print("Argument [dataset_name]: %s" % args.dataset_name)
 
     model_name = args.model_name
     build_id = args.build_id
     step_output_path = args.step_output
     dataset_version = args.dataset_version
     data_file_path = args.data_file_path
+    dataset_name = args.dataset_name
 
     print("Getting training parameters")
 
@@ -117,19 +126,22 @@ def main():
     run = Run.get_context()
 
     # Get the dataset        
-    dataset = run.input_datasets['training_data']
-    if (dataset):
+    if (dataset_name):
         if (data_file_path == 'none'):
-            dataset = Dataset.get_by_name(run.experiment.workspace, dataset.name, dataset_version)
+            dataset = Dataset.get_by_name(run.experiment.workspace, dataset_name, dataset_version)
         else:
             dataset = register_dataset(run.experiment.workspace,
-                                        dataset.name,
+                                        dataset_name,
                                         os.environ.get("DATASTORE_NAME"),
                                         data_file_path)
     else:        
         e = ("No dataset provided")
         print(e)
         raise Exception(e)
+    
+    # Link dataset to the step run so it is trackable in the UI 
+    run.input_datasets['training_data'] = dataset
+    run.parent.tag("dataset_id", value=dataset.id)
 
     df = dataset.to_pandas_dataframe()
     X = df.drop('Y', axis=1).values

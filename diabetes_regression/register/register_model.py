@@ -28,7 +28,7 @@ import sys
 import argparse
 import traceback
 import joblib
-from azureml.core import Run, Experiment, Workspace
+from azureml.core import Run, Experiment, Workspace, Dataset
 from azureml.core.model import Model as AMLModel
 
 
@@ -98,10 +98,11 @@ def main():
     model_file = os.path.join(model_path, model_name)
     model = joblib.load(model_file)
     model_mse = run.parent.get_metrics()["mse"]
+    dataset_id = run.parent.get_tags()["dataset_id"]
 
     if (model is not None):
         if (build_id is None):
-            register_aml_model(model_file, model_name, exp, run_id)
+            register_aml_model(model_file, model_name, exp, run_id, dataset_id)
         else:
             run.tag("BuildId", value=build_id)
             builduri_base = os.environ.get("BUILDURI_BASE")
@@ -114,6 +115,7 @@ def main():
                     model_mse,
                     exp,
                     run_id,
+                    dataset_id,
                     build_id,
                     build_uri)
             else:
@@ -123,6 +125,7 @@ def main():
                     model_mse,
                     exp,
                     run_id,
+                    dataset_id,
                     build_id)
     else:
         print("Model not found. Skipping model registration.")
@@ -146,6 +149,7 @@ def register_aml_model(
     model_mse,
     exp,
     run_id,
+    dataset_id,
     build_id: str = 'none',
     build_uri=None
 ):
@@ -164,7 +168,8 @@ def register_aml_model(
             workspace=exp.workspace,
             model_name=model_name,
             model_path=model_path,
-            tags=tagsValue)
+            tags=tagsValue,
+            datasets=[('training data', Dataset.get_by_id(exp.workspace, dataset_id))])
         os.chdir("..")
         print(
             "Model registered: {} \nModel Description: {} "
