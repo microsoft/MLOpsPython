@@ -79,7 +79,8 @@ def main():
     parser.add_argument(
         "--data_file_path",
         type=str,
-        help=("data file path, if specified, a new version of the dataset will be registered")
+        help=("data file path, if specified,\
+               a new version of the dataset will be registered")
     )
 
     parser.add_argument(
@@ -91,8 +92,9 @@ def main():
     parser.add_argument(
         "--dataset_name",
         type=str,
-        help=("Dataset name. Dataset must be passed by name to always get \
-              the desired dataset version instead of the one used while the pipeline creation")
+        help=("Dataset name. Dataset must be passed by name\
+              to always get the desired dataset version\
+              rather than the one used while the pipeline creation")
     )
 
     args = parser.parse_args()
@@ -125,21 +127,21 @@ def main():
 
     run = Run.get_context()
 
-    # Get the dataset        
+    # Get the dataset
     if (dataset_name):
         if (data_file_path == 'none'):
-            dataset = Dataset.get_by_name(run.experiment.workspace, dataset_name, dataset_version)
+            dataset = Dataset.get_by_name(run.experiment.workspace, dataset_name, dataset_version)  # NOQA: E402
         else:
             dataset = register_dataset(run.experiment.workspace,
-                                        dataset_name,
-                                        os.environ.get("DATASTORE_NAME"),
-                                        data_file_path)
-    else:        
+                                       dataset_name,
+                                       os.environ.get("DATASTORE_NAME"),
+                                       data_file_path)
+    else:
         e = ("No dataset provided")
         print(e)
         raise Exception(e)
-    
-    # Link dataset to the step run so it is trackable in the UI 
+
+    # Link dataset to the step run so it is trackable in the UI
     run.input_datasets['training_data'] = dataset
     run.parent.tag("dataset_id", value=dataset.id)
 

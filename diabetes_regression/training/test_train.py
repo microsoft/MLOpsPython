@@ -2,6 +2,7 @@ import numpy as np
 from azureml.core.run import Run
 from unittest.mock import Mock
 from diabetes_regression.training.train import train_model
+from util.dataset_helper import register_dataset
 
 
 def test_train_model():
