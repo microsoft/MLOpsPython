@@ -1,10 +1,11 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline, PipelineData
-from azureml.core import Workspace, Environment, Dataset, Datastore
+from azureml.core import Workspace, Dataset, Datastore
 from azureml.core.runconfig import RunConfiguration
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
+from ml_service.util.manage_environment import get_environment
 from sklearn.datasets import load_diabetes
 import pandas as pd
 import os
@@ -30,23 +31,22 @@ def main():
         print("aml_compute:")
         print(aml_compute)
 
+    # Create a reusable Azure ML environment
+    environment = get_environment(
+        aml_workspace, e.aml_env_name, create_new=False)  # NOQA: E501
+
+    run_config = RunConfiguration()
+    run_config.environment = environment
+    if (e.collection_uri is not None and e.teamproject_name is not None):
+        builduri_base = e.collection_uri + e.teamproject_name
+        builduri_base = builduri_base + "/_build/results?buildId="
+        run_config.environment.environment_variables["BUILDURI_BASE"] = builduri_base  # NOQA: E501
+
     if (e.datastore_name):
         datastore_name = e.datastore_name
     else:
         datastore_name = aml_workspace.get_default_datastore().name
-
-    # Create a reusable run configuration environment
-    # Read definition from diabetes_regression/azureml_environment.json
-    environment = Environment.load_from_directory(e.sources_directory_train)
-    if (e.collection_uri is not None and e.teamproject_name is not None):
-        builduri_base = e.collection_uri + e.teamproject_name
-        builduri_base = builduri_base + "/_build/results?buildId="
-        environment.environment_variables["BUILDURI_BASE"] = builduri_base
-    environment.environment_variables["DATASTORE_NAME"] = datastore_name
-    environment.register(aml_workspace)
-
-    run_config = RunConfiguration()
-    run_config.environment = environment
+    run_config.environment.environment_variables["DATASTORE_NAME"] = datastore_name
 
     model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)
