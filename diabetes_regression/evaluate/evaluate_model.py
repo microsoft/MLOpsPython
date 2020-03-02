@@ -23,7 +23,6 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import os
 from azureml.core import Run
 import argparse
 import traceback
@@ -74,11 +73,7 @@ ws = run.experiment.workspace
 run_id = 'amlcompute'
 
 parser = argparse.ArgumentParser("evaluate")
-parser.add_argument(
-    "--build_id",
-    type=str,
-    help="The Build ID of the build triggering this pipeline run",
-)
+
 parser.add_argument(
     "--run_id",
     type=str,
@@ -99,19 +94,13 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-if (args.build_id is not None):
-    build_id = args.build_id
 if (args.run_id is not None):
     run_id = args.run_id
 if (run_id == 'amlcompute'):
     run_id = run.parent.id
 model_name = args.model_name
 metric_eval = "mse"
-run.tag("BuildId", value=build_id)
-builduri_base = os.environ.get("BUILDURI_BASE")
-if (builduri_base is not None):
-    build_uri = builduri_base + build_id
-    run.tag("BuildUri", value=build_uri)
+
 allow_run_cancel = args.allow_run_cancel
 # Parameterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated

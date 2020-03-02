@@ -37,10 +37,6 @@ def main():
 
     run_config = RunConfiguration()
     run_config.environment = environment
-    if (e.collection_uri is not None and e.teamproject_name is not None):
-        builduri_base = e.collection_uri + e.teamproject_name
-        builduri_base = builduri_base + "/_build/results?buildId="
-        run_config.environment.environment_variables["BUILDURI_BASE"] = builduri_base  # NOQA: E501
 
     if (e.datastore_name):
         datastore_name = e.datastore_name
@@ -50,8 +46,6 @@ def main():
 
     model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)
-    build_id_param = PipelineParameter(
-        name="build_id", default_value=e.build_id)
     dataset_version_param = PipelineParameter(
         name="dataset_version", default_value=e.dataset_version)
     data_file_path_param = PipelineParameter(
@@ -105,7 +99,6 @@ def main():
         source_directory=e.sources_directory_train,
         outputs=[pipeline_data],
         arguments=[
-            "--build_id", build_id_param,
             "--model_name", model_name_param,
             "--step_output", pipeline_data,
             "--dataset_version", dataset_version_param,
@@ -124,7 +117,6 @@ def main():
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
         arguments=[
-            "--build_id", build_id_param,
             "--model_name", model_name_param,
             "--allow_run_cancel", e.allow_run_cancel,
         ],
@@ -140,7 +132,6 @@ def main():
         source_directory=e.sources_directory_train,
         inputs=[pipeline_data],
         arguments=[
-            "--build_id", build_id_param,
             "--model_name", model_name_param,
             "--step_input", pipeline_data,
         ],

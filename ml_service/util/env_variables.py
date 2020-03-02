@@ -38,8 +38,7 @@ class Env(Singleton):
         self._image_name = os.environ.get('IMAGE_NAME')
         self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
         self._score_script = os.environ.get("SCORE_SCRIPT")
-        self._collection_uri = os.environ.get("SYSTEM_COLLECTIONURI")
-        self._teamproject_name = os.environ.get("SYSTEM_TEAMPROJECT")
+        self._build_uri = os.environ.get("BUILD_URI")
         self._dataset_name = os.environ.get("DATASET_NAME")
         self._datastore_name = os.environ.get("DATASTORE_NAME")
         self._dataset_version = os.environ.get("DATASET_VERSION")
@@ -141,12 +140,8 @@ class Env(Singleton):
         return self._score_script
 
     @property
-    def collection_uri(self):
-        return self._collection_uri
-
-    @property
-    def teamproject_name(self):
-        return self._teamproject_name
+    def build_uri(self):
+        return self._build_uri
 
     @property
     def dataset_name(self):
