@@ -31,8 +31,22 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import joblib
 import json
-from azureml.core import Dataset
+from azureml.core import Dataset, Datastore
 
+
+def register_dataset(
+    aml_workspace: Workspace,
+    dataset_name: str,
+    datastore_name: str,
+    file_path: str
+) -> Dataset:
+    datastore = Datastore.get(aml_workspace, datastore_name)
+    dataset = Dataset.Tabular.from_delimited_files(path=(datastore, file_path))
+    dataset = dataset.register(workspace=aml_workspace,
+                               name=dataset_name,
+                               create_new_version=True)
+
+    return dataset
 
 def train_model(run, data, alpha):
     run.log("alpha", alpha)
@@ -46,7 +60,6 @@ def train_model(run, data, alpha):
         preds, data["test"]["y"]), description="Mean squared error metric")
     return reg
 
-from util.dataset_helper import register_dataset
 def main():
     print("Running train.py")
 
