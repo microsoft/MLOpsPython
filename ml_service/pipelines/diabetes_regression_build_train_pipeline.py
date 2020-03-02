@@ -46,7 +46,7 @@ def main():
         datastore_name = e.datastore_name
     else:
         datastore_name = aml_workspace.get_default_datastore().name
-    run_config.environment.environment_variables["DATASTORE_NAME"] = datastore_name
+    run_config.environment.environment_variables["DATASTORE_NAME"] = datastore_name  # NOQA: E501
 
     model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)
