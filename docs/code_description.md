@@ -43,15 +43,13 @@ The repository provides a template with folders structure suitable for maintaini
 
 ### Pipelines
 
-- `.pipelines/azdo-base-pipeline.yml` : a pipeline template used by ci-build-train pipeline and pr-build-train pipelines. It contains steps performing linting, data and unit testing.  
-- `.pipelines/diabetes_regression-ci-build-train.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
-- `.pipelines/azdo-pr-build-train.yml` : a pipeline triggered when a **pull request** to the **master** branch is created. It performs linting, data integrity testing and unit testing only.
-- `.pipelines/diabetes_regression-ci-image.yml` : a pipeline building a scoring image for the diabetes regression model. 
-- `.pipelines/diabetes_regression-template-get-model-version.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci-build-train.yml` pipeline. It finds out if a new model was registered and retrieves a version of the new model.
-- `.pipelines/azdo-abtest-pipeline.yml` : a pipeline demonstrating [Canary deployment strategy](./docs/canary_ab_deployment.md).
-- `.pipelines/azdo-helm-*.yml` : pipeline templates used by the `.pipelines/azdo-abtest-pipeline.yml` pipeline.
-
-
+- `.pipelines/abtest.yml` : a pipeline demonstrating [Canary deployment strategy](./docs/canary_ab_deployment.md).
+- `.pipelines/code-quality-template.yml` : a pipeline template used by the CI and PR pipelines. It contains steps performing linting, data and unit testing.
+- `.pipelines/diabetes_regression-ci-image.yml` : a pipeline building a scoring image for the diabetes regression model.
+- `.pipelines/diabetes_regression-ci.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
+- `.pipelines/diabetes_regression-get-model-version-template.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci.yml` pipeline. It finds out if a new model was registered and retrieves a version of the new model.
+- `.pipelines/helm-*.yml` : pipeline templates used by the `.pipelines/abtest.yml` pipeline.
+- `.pipelines/pr.yml` : a pipeline triggered when a **pull request** to the **master** branch is created. It performs linting, data integrity testing and unit testing only.
 
 ### ML Services
 
@@ -64,7 +62,6 @@ The repository provides a template with folders structure suitable for maintaini
 
 ### Environment Definitions
 
-- `diabetes_regression/azureml_environment.json` : Azure ML environment definition for the training environment, including base Docker image and a reference to `conda_dependencies.yml` Conda environment file.
 - `diabetes_regression/conda_dependencies.yml` : Conda environment definition for the environment used for both training and scoring (Docker image in which train.py and score.py are run).
 - `diabetes_regression/ci_dependencies.yml` : Conda environment definition for the CI environment.
 
@@ -90,4 +87,3 @@ The repository provides a template with folders structure suitable for maintaini
 - `diabetes_regression/scoring/score.py` : a scoring script which is about to be packed into a Docker Image along with a model while being deployed to QA/Prod environment.
 - `diabetes_regression/scoring/inference_config.yml`, `deployment_config_aci.yml`, `deployment_config_aks.yml` : configuration files for the [AML Model Deploy](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.private-vss-services-azureml&ssr=false#overview) pipeline task for ACI and AKS deployment targets.
 - `diabetes_regression/scoring/scoreA.py`, `diabetes_regression/scoring/scoreB.py` : simplified scoring files for the [Canary deployment sample](./docs/canary_ab_deployment.md).
-

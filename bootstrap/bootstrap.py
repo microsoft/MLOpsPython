@@ -90,12 +90,12 @@ class Helper:
 def replaceprojectname(project_dir, project_name, rename_name):
     # Replace instances of rename_name within files with project_name
     dirs = [r".env.example",
-            r".pipelines/azdo-base-pipeline.yml",
-            r".pipelines/azdo-pr-build-train.yml",
-            r".pipelines/diabetes_regression-ci-build-train.yml",
+            r".pipelines/code-quality-template.yml",
+            r".pipelines/pr.yml",
+            r".pipelines/diabetes_regression-ci.yml",
             r".pipelines/diabetes_regression-ci-image.yml",
-            r".pipelines/diabetes_regression-template-get-model-version.yml",  # NOQA: E501
-            r".pipelines/diabetes_regression-variables.yml",
+            r".pipelines/diabetes_regression-get-model-version-template.yml",  # NOQA: E501
+            r".pipelines/diabetes_regression-variables-template.yml",
             r"environment_setup/Dockerfile",
             r"environment_setup/install_requirements.sh",
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",  # NOQA: E501
@@ -103,7 +103,6 @@ def replaceprojectname(project_dir, project_name, rename_name):
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_verify_train_pipeline.py",  # NOQA: E501
             r"ml_service/util/create_scoring_image.py",
-            r"diabetes_regression/azureml_environment.json",
             r"diabetes_regression/conda_dependencies.yml",
             r"diabetes_regression/evaluate/evaluate_model.py",
             r"diabetes_regression/register/register_model.py",

@@ -18,7 +18,7 @@ trigger:
     - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py
 
 variables:
-- template: diabetes_regression-variables.yml
+- template: diabetes_regression-variables-template.yml
 - group: devopsforai-aml-vg
 
 pool:
@@ -34,7 +34,7 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: azdo-base-pipeline.yml
+    - template: code-quality-template.yml
     - task: AzureCLI@1
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
@@ -94,7 +94,7 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
 
 - stage: 'Deploy_ACI'
   displayName: 'Deploy to ACI'
@@ -106,7 +106,7 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
     - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
       displayName: 'Azure ML Model Deploy'
       inputs:
@@ -139,7 +139,7 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
     - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
       displayName: 'Azure ML Model Deploy'
       inputs:
@@ -173,7 +173,7 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-template-get-model-version.yml
+    - template: diabetes_regression-get-model-version-template.yml
     - task: AzureCLI@1
       displayName: 'Create scoring image and set IMAGE_LOCATION variable'
       inputs:
