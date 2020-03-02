@@ -43,7 +43,6 @@ def main():
         experiment_name = os.environ.get("EXPERIMENT_NAME")
         resource_group = os.environ.get("RESOURCE_GROUP")
         subscription_id = os.environ.get("SUBSCRIPTION_ID")
-        build_id = os.environ.get('BUILD_BUILDID')
         # run_id useful to query previous runs
         run_id = "bd184a18-2ac8-4951-8e78-e290bef3b012"
         aml_workspace = Workspace.get(
@@ -59,11 +58,6 @@ def main():
         run_id = 'amlcompute'
 
     parser = argparse.ArgumentParser("register")
-    parser.add_argument(
-        "--build_id",
-        type=str,
-        help="The Build ID of the build triggering this pipeline run",
-    )
 
     parser.add_argument(
         "--run_id",
@@ -84,8 +78,6 @@ def main():
     )
 
     args = parser.parse_args()
-    if (args.build_id is not None):
-        build_id = args.build_id
     if (args.run_id is not None):
         run_id = args.run_id
     if (run_id == 'amlcompute'):
@@ -98,32 +90,40 @@ def main():
     model_file = os.path.join(model_path, model_name)
     model = joblib.load(model_file)
     model_mse = run.parent.get_metrics()["mse"]
+    parent_tags = run.parent.get_tags()
+    try:
+        build_id = parent_tags["BuildId"]
+    except KeyError:
+        build_id = None
+        print("BuildId tag not found on parent run.")
+        print("Tags present: {parent_tags}")
+    try:
+        build_uri = parent_tags["BuildUri"]
+    except KeyError:
+        build_uri = None
+        print("BuildUri tag not found on parent run.")
+        print("Tags present: {parent_tags}")
 
     if (model is not None):
         if (build_id is None):
-            register_aml_model(model_file, model_name, exp, run_id)
+            register_aml_model(model_file, model_name, model_mse, exp, run_id)
+        elif (build_uri is None):
+            register_aml_model(
+                model_file,
+                model_name,
+                model_mse,
+                exp,
+                run_id,
+                build_id)
         else:
-            run.tag("BuildId", value=build_id)
-            builduri_base = os.environ.get("BUILDURI_BASE")
-            if (builduri_base is not None):
-                build_uri = builduri_base + build_id
-                run.tag("BuildUri", value=build_uri)
-                register_aml_model(
-                    model_file,
-                    model_name,
-                    model_mse,
-                    exp,
-                    run_id,
-                    build_id,
-                    build_uri)
-            else:
-                register_aml_model(
-                    model_file,
-                    model_name,
-                    model_mse,
-                    exp,
-                    run_id,
-                    build_id)
+            register_aml_model(
+                model_file,
+                model_name,
+                model_mse,
+                exp,
+                run_id,
+                build_id,
+                build_uri)
     else:
         print("Model not found. Skipping model registration.")
         sys.exit(0)

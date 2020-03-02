@@ -50,11 +50,7 @@ def main():
     print("Running train.py")
 
     parser = argparse.ArgumentParser("train")
-    parser.add_argument(
-        "--build_id",
-        type=str,
-        help="The build ID of the build triggering this pipeline run",
-    )
+
     parser.add_argument(
         "--model_name",
         type=str,
@@ -70,12 +66,10 @@ def main():
 
     args = parser.parse_args()
 
-    print("Argument [build_id]: %s" % args.build_id)
     print("Argument [model_name]: %s" % args.model_name)
     print("Argument [step_output]: %s" % args.step_output)
 
     model_name = args.model_name
-    build_id = args.build_id
     step_output_path = args.step_output
 
     print("Getting training parameters")
@@ -119,15 +113,7 @@ def main():
     output_path = os.path.join('outputs', model_name)
     joblib.dump(value=reg, filename=output_path)
 
-    # Add properties to identify this specific training run
-    run.parent.tag("BuildId", value=build_id)
-    run.tag("BuildId", value=build_id)
     run.tag("run_type", value="train")
-    builduri_base = os.environ.get("BUILDURI_BASE")
-    if (builduri_base is not None):
-        build_uri = builduri_base + build_id
-        run.tag("BuildUri", value=build_uri)
-        run.parent.tag("BuildUri", value=build_uri)
     print(f"tags now present for run: {run.tags}")
 
     run.complete()

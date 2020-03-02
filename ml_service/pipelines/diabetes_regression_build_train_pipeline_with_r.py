@@ -34,10 +34,6 @@ def main():
         aml_workspace, e.aml_env_name, create_new=False)  # NOQA: E501
     run_config = RunConfiguration()
     run_config.environment = environment
-    if (e.collection_uri is not None and e.teamproject_name is not None):
-        builduri_base = e.collection_uri + e.teamproject_name
-        builduri_base = builduri_base + "/_build/results?buildId="
-        run_config.environment.environment_variables["BUILDURI_BASE"] = builduri_base  # NOQA: E501
 
     train_step = PythonScriptStep(
         name="Train Model",
