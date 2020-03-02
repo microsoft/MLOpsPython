@@ -32,7 +32,6 @@ from sklearn.model_selection import train_test_split
 import joblib
 import json
 from azureml.core import Dataset
-from diabetes_regression.util.dataset_helper import register_dataset
 
 
 def train_model(run, data, alpha):
@@ -47,7 +46,7 @@ def train_model(run, data, alpha):
         preds, data["test"]["y"]), description="Mean squared error metric")
     return reg
 
-
+from util.dataset_helper import register_dataset
 def main():
     print("Running train.py")
 
