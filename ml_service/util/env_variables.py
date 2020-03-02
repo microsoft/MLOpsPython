@@ -40,6 +40,8 @@ class Env(Singleton):
         self._score_script = os.environ.get("SCORE_SCRIPT")
         self._build_uri = os.environ.get("BUILD_URI")
         self._dataset_name = os.environ.get("DATASET_NAME")
+        self._datastore_name = os.environ.get("DATASTORE_NAME")
+        self._dataset_version = os.environ.get("DATASET_VERSION")
         self._run_evaluation = os.environ.get("RUN_EVALUATION", "true")
         self._allow_run_cancel = os.environ.get(
             "ALLOW_RUN_CANCEL", "true")
@@ -144,6 +146,14 @@ class Env(Singleton):
     @property
     def dataset_name(self):
         return self._dataset_name
+
+    @property
+    def datastore_name(self):
+        return self._datastore_name
+
+    @property
+    def dataset_version(self):
+        return self._dataset_version
 
     @property
     def run_evaluation(self):

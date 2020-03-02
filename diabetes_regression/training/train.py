@@ -31,6 +31,22 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import joblib
 import json
+from azureml.core import Dataset, Datastore, Workspace
+
+
+def register_dataset(
+    aml_workspace: Workspace,
+    dataset_name: str,
+    datastore_name: str,
+    file_path: str
+) -> Dataset:
+    datastore = Datastore.get(aml_workspace, datastore_name)
+    dataset = Dataset.Tabular.from_delimited_files(path=(datastore, file_path))
+    dataset = dataset.register(workspace=aml_workspace,
+                               name=dataset_name,
+                               create_new_version=True)
+
+    return dataset
 
 
 def train_model(run, data, alpha):
@@ -64,13 +80,47 @@ def main():
         help=("output for passing data to next step")
     )
 
+    parser.add_argument(
+        "--dataset_version",
+        type=str,
+        help=("dataset version")
+    )
+
+    parser.add_argument(
+        "--data_file_path",
+        type=str,
+        help=("data file path, if specified,\
+               a new version of the dataset will be registered")
+    )
+
+    parser.add_argument(
+        "--caller_run_id",
+        type=str,
+        help=("caller run id, for example ADF pipeline run id")
+    )
+
+    parser.add_argument(
+        "--dataset_name",
+        type=str,
+        help=("Dataset name. Dataset must be passed by name\
+              to always get the desired dataset version\
+              rather than the one used while the pipeline creation")
+    )
+
     args = parser.parse_args()
 
     print("Argument [model_name]: %s" % args.model_name)
     print("Argument [step_output]: %s" % args.step_output)
+    print("Argument [dataset_version]: %s" % args.dataset_version)
+    print("Argument [data_file_path]: %s" % args.data_file_path)
+    print("Argument [caller_run_id]: %s" % args.caller_run_id)
+    print("Argument [dataset_name]: %s" % args.dataset_name)
 
     model_name = args.model_name
     step_output_path = args.step_output
+    dataset_version = args.dataset_version
+    data_file_path = args.data_file_path
+    dataset_name = args.dataset_name
 
     print("Getting training parameters")
 
@@ -86,15 +136,26 @@ def main():
     run = Run.get_context()
 
     # Get the dataset
-    dataset = run.input_datasets['training_data']
-    if (dataset):
-        df = dataset.to_pandas_dataframe()
-        X = df.drop('Y', axis=1).values
-        y = df['Y'].values
+    if (dataset_name):
+        if (data_file_path == 'none'):
+            dataset = Dataset.get_by_name(run.experiment.workspace, dataset_name, dataset_version)  # NOQA: E402, E501
+        else:
+            dataset = register_dataset(run.experiment.workspace,
+                                       dataset_name,
+                                       os.environ.get("DATASTORE_NAME"),
+                                       data_file_path)
     else:
         e = ("No dataset provided")
         print(e)
         raise Exception(e)
+
+    # Link dataset to the step run so it is trackable in the UI
+    run.input_datasets['training_data'] = dataset
+    run.parent.tag("dataset_id", value=dataset.id)
+
+    df = dataset.to_pandas_dataframe()
+    X = df.drop('Y', axis=1).values
+    y = df['Y'].values
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=0)
