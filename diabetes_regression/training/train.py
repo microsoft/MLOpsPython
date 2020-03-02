@@ -23,100 +23,55 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-from azureml.core.run import Run
+
 import os
-import argparse
+import pandas as pd
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-import joblib
-import json
 
 
-def train_model(run, data, alpha):
-    run.log("alpha", alpha)
-    run.parent.log("alpha", alpha)
-    reg = Ridge(alpha=alpha)
-    reg.fit(data["train"]["X"], data["train"]["y"])
-    preds = reg.predict(data["test"]["X"])
-    run.log("mse", mean_squared_error(
-        preds, data["test"]["y"]), description="Mean squared error metric")
-    run.parent.log("mse", mean_squared_error(
-        preds, data["test"]["y"]), description="Mean squared error metric")
-    return reg
-
-
-def main():
-    print("Running train.py")
-
-    parser = argparse.ArgumentParser("train")
-
-    parser.add_argument(
-        "--model_name",
-        type=str,
-        help="Name of the Model",
-        default="sklearn_regression_model.pkl",
-    )
-
-    parser.add_argument(
-        "--step_output",
-        type=str,
-        help=("output for passing data to next step")
-    )
-
-    args = parser.parse_args()
-
-    print("Argument [model_name]: %s" % args.model_name)
-    print("Argument [step_output]: %s" % args.step_output)
-
-    model_name = args.model_name
-    step_output_path = args.step_output
-
-    print("Getting training parameters")
-
-    with open("config.json") as f:
-        pars = json.load(f)
-    try:
-        alpha = pars["training"]["alpha"]
-    except KeyError:
-        alpha = 0.5
-
-    print("Parameter alpha: %s" % alpha)
-
-    run = Run.get_context()
-
-    # Get the dataset
-    dataset = run.input_datasets['training_data']
-    if (dataset):
-        df = dataset.to_pandas_dataframe()
-        X = df.drop('Y', axis=1).values
-        y = df['Y'].values
-    else:
-        e = ("No dataset provided")
-        print(e)
-        raise Exception(e)
+# Split the dataframe into test and train data
+def split_data(df):
+    X = df.drop('Y', axis=1).values
+    y = df['Y'].values
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=0)
     data = {"train": {"X": X_train, "y": y_train},
             "test": {"X": X_test, "y": y_test}}
+    return data
 
-    reg = train_model(run, data, alpha)
 
-    # Pass model file to next step
-    os.makedirs(step_output_path, exist_ok=True)
-    model_output_path = os.path.join(step_output_path, model_name)
-    joblib.dump(value=reg, filename=model_output_path)
+# Train the model, return the model and metrics dictionary
+def train_model(data, ridge_args):
+    reg_model = Ridge(**ridge_args)
+    reg_model.fit(data["train"]["X"], data["train"]["y"])
+    preds = reg_model.predict(data["test"]["X"])
+    mse = mean_squared_error(preds, data["test"]["y"])
+    metrics = {"mse": mse}
+    return reg_model, metrics
 
-    # Also upload model file to run outputs for history
-    os.makedirs('outputs', exist_ok=True)
-    output_path = os.path.join('outputs', model_name)
-    joblib.dump(value=reg, filename=output_path)
 
-    run.tag("run_type", value="train")
-    print(f"tags now present for run: {run.tags}")
+def main():
+    print("Running train.py")
 
-    run.complete()
+    # Define training parameters
+    ridge_args = {"alpha": 0.5}
+
+    # Load the training data as dataframe
+    data_dir = "data"
+    data_file = os.path.join(data_dir, 'diabetes.csv')
+    train_df = pd.read_csv(data_file)
+
+    data = split_data(train_df)
+
+    # Train the model
+    model, metrics = train_model(data, ridge_args)
+
+    # Log the metrics returned from the train function
+    for (k, v) in metrics.items():
+        print(f"{k}: {v}")
 
 
 if __name__ == '__main__':
