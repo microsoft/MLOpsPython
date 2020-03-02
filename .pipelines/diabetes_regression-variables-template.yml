@@ -33,7 +33,6 @@ variables:
   - name: MODEL_NAME
     value: diabetes_regression_model.pkl
 
-
   # AML Compute Cluster Config
   - name: AML_ENV_NAME
     value: diabetes_regression_training_env
