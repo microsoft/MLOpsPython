@@ -48,6 +48,7 @@ def register_dataset(
 
     return dataset
 
+
 def train_model(run, data, alpha):
     run.log("alpha", alpha)
     run.parent.log("alpha", alpha)
@@ -59,6 +60,7 @@ def train_model(run, data, alpha):
     run.parent.log("mse", mean_squared_error(
         preds, data["test"]["y"]), description="Mean squared error metric")
     return reg
+
 
 def main():
     print("Running train.py")
