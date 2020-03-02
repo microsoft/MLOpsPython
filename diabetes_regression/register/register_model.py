@@ -95,10 +95,14 @@ def main():
         build_id = parent_tags["BuildId"]
     except KeyError:
         build_id = None
+        print("BuildId tag not found on parent run.")
+        print("Tags present: {parent_tags}")
     try:
         build_uri = parent_tags["BuildUri"]
     except KeyError:
         build_uri = None
+        print("BuildUri tag not found on parent run.")
+        print("Tags present: {parent_tags}")
 
     if (model is not None):
         if (build_id is None):
