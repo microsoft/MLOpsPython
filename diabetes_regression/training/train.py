@@ -31,7 +31,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import joblib
 import json
-from azureml.core import Dataset, Datastore
+from azureml.core import Dataset, Datastore, Workspace
 
 
 def register_dataset(
