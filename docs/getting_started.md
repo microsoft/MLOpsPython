@@ -28,17 +28,17 @@ We recommend working through this guide completely to ensure everything is worki
 
 ## Setting up Azure DevOps
 
-You'll use Azure DevOps for running the multi-stage pipeline with build (CI), model training, and scoring service release (CD) stages. If you don't already have an Azure DevOps organization, create one by following the instructions at [Quickstart: Create an organization or project collection](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
+You'll use Azure DevOps for running the multi-stage pipeline with build, model training, and scoring service release stages. If you don't already have an Azure DevOps organization, create one by following the instructions at [Quickstart: Create an organization or project collection](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
 If you already have an Azure DevOps organization, create a new project using the guide at [Create a project in Azure DevOps and TFS](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
 ## Get the code
 
-If you intend to contribute back to this repository, fork the project. Otherwise use the [code template](https://github.com/microsoft/MLOpsPython/generate), which copies the entire code base to your own GitHub location with the git commit history restarted. You can use the resulting repository for this guide and for your own experimentation.
+We recommend using the [repository template](https://github.com/microsoft/MLOpsPython/generate), which effectively forks the repository to your own GitHub location and squashes the history. You can use the resulting repository for this guide and for your own experimentation.
 
 ## Create a Variable Group for your Pipeline
 
-You'll need to create a *variable group* in Azure DevOps to store values that are reused across multiple pipelines or pipeline stages. Either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Check out the [Add & use variable groups](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group) documentation to learn more about how to create a variable group and link it to your pipeline.
+MLOpsPython requires some variables to be set before you can run any pipelines. You'll need to create a *variable group* in Azure DevOps to store values that are reused across multiple pipelines or pipeline stages. Either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Check out the [Add & use variable groups](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group) documentation to learn more about how to create a variable group and link it to your pipeline.
 
 Navigate to **Library** in the **Pipelines** section as indicated below:
 
@@ -50,21 +50,23 @@ The variable group should contain the following required variables:
 
 | Variable Name            | Suggested Value           | Short description                                                                                                            |
 | ------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| BASE_NAME                | [unique base name]        | Naming prefix                                                                                                                |
+| BASE_NAME                | [your project name]       | Unique naming prefix for created resources - max 10 chars, letters and numbers only                                          |
 | LOCATION                 | centralus                 | Azure location                                                                                                               |
 | RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group                                                                                                         |
 | WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                      |
-| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
+| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name  |
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                  |
 | ACI_DEPLOYMENT_NAME      | diabetes-aci              | Azure Container Interface                                                                                                    |
 
 Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
+More variables are available for further tweaking, but the above variables are all you need to get started with this example. For more information, see the [Additional Variables and Configuration](#additional-variables-and-configuration) section.
+
 ### Variable Descriptions
 
 **WORKSPACE_NAME** is used for creating the Azure Machine Learning Workspace. You can provide an existing Azure ML Workspace here if you've got one.
 
-**BASE_NAME** is used as a prefix for naming Azure resources. When sharing an Azure subscription, the prefix allows you to avoid naming collisions for resources that require unique names, for example, Azure Blob Storage and Registry DNS. Make sure to set BASE_NAME to a unique name so that created resources will have unique names, for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, and so on. The length of the BASE_NAME value shouldn't exceed 10 characters and must contain numbers and letters only.
+**BASE_NAME** is used as a prefix for naming Azure resources. When sharing an Azure subscription, the prefix allows you to avoid naming collisions for resources that require unique names, for example, Azure Blob Storage and Registry DNS. Make sure to set BASE_NAME to a unique name so that created resources will have unique names, for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, and so on. The length of the BASE_NAME value shouldn't exceed 10 characters and must contain letters and numbers only.
 
 **RESOURCE_GROUP** is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing Azure ML Workspace, set this value to the corresponding resource group name.
 
@@ -252,7 +254,7 @@ To remove the resources created for this project, use the [/environment_setup/ia
 
 ## Next Steps: Integrating your project
 
-* Follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case. This guide includes information on bringing your own code to this template.
+* Follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case. This guide includes information on bringing your own code to this repository template.
 * Consider using [Azure Pipelines self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your Azure ML pipeline execution. The Docker container image for the Azure ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
 
 ### Additional Variables and Configuration
