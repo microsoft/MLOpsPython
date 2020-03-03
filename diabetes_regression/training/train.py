@@ -43,14 +43,19 @@ def split_data(df):
     return data
 
 
-# Train the model, return the model and metrics dictionary
+# Train the model, return the model
 def train_model(data, ridge_args):
     reg_model = Ridge(**ridge_args)
     reg_model.fit(data["train"]["X"], data["train"]["y"])
-    preds = reg_model.predict(data["test"]["X"])
+    return reg_model
+
+
+# Evaluate the metrics for the model
+def get_model_metrics(model, data):
+    preds = model.predict(data["test"]["X"])
     mse = mean_squared_error(preds, data["test"]["y"])
     metrics = {"mse": mse}
-    return reg_model, metrics
+    return metrics
 
 
 def main():
@@ -67,9 +72,10 @@ def main():
     data = split_data(train_df)
 
     # Train the model
-    model, metrics = train_model(data, ridge_args)
+    model = train_model(data, ridge_args)
 
-    # Log the metrics returned from the train function
+    # Log the metrics for the model
+    metrics = get_model_metrics(model, data)
     for (k, v) in metrics.items():
         print(f"{k}: {v}")
 

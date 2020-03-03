@@ -28,7 +28,7 @@ import os
 import argparse
 import joblib
 import json
-from train import split_data, train_model
+from train import split_data, train_model, get_model_metrics
 
 
 def register_dataset(
@@ -147,9 +147,10 @@ def main():
     data = split_data(df)
 
     # Train the model
-    model, metrics = train_model(data, train_args)
+    model = train_model(data, train_args)
 
-    # Log the metrics returned from the train function
+    # Evaluate and log the metrics returned from the train function
+    metrics = get_model_metrics(model, data)
     for (k, v) in metrics.items():
         run.log(k, v)
         run.parent.log(k, v)
