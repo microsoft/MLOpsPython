@@ -1,9 +1,8 @@
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline, PipelineData
-from azureml.core import Workspace
+from azureml.core import Workspace, Dataset, Datastore
 from azureml.core.runconfig import RunConfiguration
-from azureml.core import Dataset
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
 from ml_service.util.manage_environment import get_environment
@@ -39,8 +38,20 @@ def main():
     run_config = RunConfiguration()
     run_config.environment = environment
 
+    if (e.datastore_name):
+        datastore_name = e.datastore_name
+    else:
+        datastore_name = aml_workspace.get_default_datastore().name
+    run_config.environment.environment_variables["DATASTORE_NAME"] = datastore_name  # NOQA: E501
+
     model_name_param = PipelineParameter(
         name="model_name", default_value=e.model_name)
+    dataset_version_param = PipelineParameter(
+        name="dataset_version", default_value=e.dataset_version)
+    data_file_path_param = PipelineParameter(
+        name="data_file_path", default_value="none")
+    caller_run_id_param = PipelineParameter(
+        name="caller_run_id", default_value="none")
 
     # Get dataset name
     dataset_name = e.dataset_name
@@ -57,9 +68,9 @@ def main():
         df.to_csv(file_name, index=False)
 
         # Upload file to default datastore in workspace
-        default_ds = aml_workspace.get_default_datastore()
+        datatstore = Datastore.get(aml_workspace, datastore_name)
         target_path = 'training-data/'
-        default_ds.upload_files(
+        datatstore.upload_files(
             files=[file_name],
             target_path=target_path,
             overwrite=True,
@@ -68,16 +79,13 @@ def main():
         # Register dataset
         path_on_datastore = os.path.join(target_path, file_name)
         dataset = Dataset.Tabular.from_delimited_files(
-            path=(default_ds, path_on_datastore))
+            path=(datatstore, path_on_datastore))
         dataset = dataset.register(
             workspace=aml_workspace,
             name=dataset_name,
             description='diabetes training data',
             tags={'format': 'CSV'},
             create_new_version=True)
-
-    # Get the dataset
-    dataset = Dataset.get_by_name(aml_workspace, dataset_name)
 
     # Create a PipelineData to pass data between steps
     pipeline_data = PipelineData(
@@ -89,11 +97,14 @@ def main():
         script_name=e.train_script_path,
         compute_target=aml_compute,
         source_directory=e.sources_directory_train,
-        inputs=[dataset.as_named_input('training_data')],
         outputs=[pipeline_data],
         arguments=[
             "--model_name", model_name_param,
-            "--step_output", pipeline_data
+            "--step_output", pipeline_data,
+            "--dataset_version", dataset_version_param,
+            "--data_file_path", data_file_path_param,
+            "--caller_run_id", caller_run_id_param,
+            "--dataset_name", dataset_name,
         ],
         runconfig=run_config,
         allow_reuse=False,
