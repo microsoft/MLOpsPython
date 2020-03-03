@@ -17,7 +17,17 @@ MLOps will help you to understand how to build a Continuous Integration and Cont
 
 ![ML lifecycle](/docs/images/ml-lifecycle.png)
 
-This template contains code and pipeline definitions for a machine learning project that demonstrates how to automate an end to end ML/AI workflow. The build pipelines include DevOps tasks for data sanity tests, unit tests, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod and integration testing.
+This template contains code and pipeline definitions for a machine learning project that demonstrates how to automate an end to end ML/AI workflow.
+
+## Architecture and Features
+
+Architecture Reference: [Machine learning operationalization (MLOps) for Python models using Azure Machine Learning](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/ai/mlops-python)
+
+This reference architecture shows how to implement continuous integration (CI), continuous delivery (CD), and retraining pipeline for an AI application using Azure DevOps and [Azure Machine Learning](/azure/machine-learning/service/overview-what-is-azure-ml). The solution is built on the scikit-learn diabetes dataset but can be easily adapted for any AI scenario and other popular build systems such as Jenkins and Travis.
+
+![Architecture](/docs/images/main-flow.png)
+
+ The build pipelines include DevOps tasks for data sanity tests, unit tests, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod and integration testing.
 
 ## Prerequisite
 
@@ -27,32 +37,6 @@ This template contains code and pipeline definitions for a machine learning proj
 ## Getting Started
 
 To deploy this solution in your subscription, follow the manual instructions in the [getting started](docs/getting_started.md) doc
-
-## Architecture Diagram
-
-This reference architecture shows how to implement continuous integration (CI), continuous delivery (CD), and retraining pipeline for an AI application using Azure DevOps and Azure Machine Learning. The solution is built on the scikit-learn diabetes dataset but can be easily adapted for any AI scenario and other popular build systems such as Jenkins and Travis.
-
-![Architecture](/docs/images/main-flow.png)
-
-## Architecture Flow
-
-### Train Model
-
-1. Data Scientists write or update the code and push it to a Git repository. This triggers the Azure DevOps build pipeline (continuous integration).
-2. Once the Azure DevOps build pipeline is triggered, it performs code quality checks, data sanity tests, unit tests, builds an [Azure ML Pipeline](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-ml-pipelines) and publishes it in an [Azure ML Service Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#workspace).
-3. The [Azure ML Pipeline](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-ml-pipelines) is triggered once the Azure DevOps build pipeline completes. All the tasks in this pipeline runs on Azure ML Compute. Following are the tasks in this pipeline:
-
-    - **Train Model** task executes model training script on Azure ML Compute. It outputs a [model](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#models) file which is stored in the [run history](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#runs).
-
-    - **Evaluate Model** task evaluates the performance of the newly trained model with the model in production. If the model evaluation determines that the new model doesn't perform any better than the previous one, the new model won't register and the pipeline will be canceled.
-
-    - **Register Model** task takes the improved model and registers it with the [Azure ML Model registry](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#model-registry). This allows us to version control it.
-
-### Deploy Model
-
-Once you have registered your ML model, you can use Azure ML + Azure DevOps to deploy it.
-
-The [Azure DevOps multi-stage pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/stages?view=azure-devops&tabs=yaml) packages the new model along with the scoring file and its python dependencies into a [Docker image](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#image) and pushes it to [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-intro). This image is used to deploy the model as [web service](https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-azure-machine-learning-architecture#web-service) across QA and Prod environments. The QA environment is running on top of [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/) and the Prod environment is built with [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes).
 
 ### Repo Details
 
