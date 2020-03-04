@@ -25,9 +25,7 @@ Architecture Reference: [Machine learning operationalization (MLOps) for Python 
 
 This reference architecture shows how to implement continuous integration (CI), continuous delivery (CD), and retraining pipeline for an AI application using Azure DevOps and [Azure Machine Learning](/azure/machine-learning/service/overview-what-is-azure-ml). The solution is built on the scikit-learn diabetes dataset but can be easily adapted for any AI scenario and other popular build systems such as Jenkins and Travis.
 
-![Architecture](/docs/images/main-flow.png)
-
- The build pipelines include DevOps tasks for data sanity tests, unit tests, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod and integration testing.
+The build pipelines include DevOps tasks for data sanity tests, unit tests, model training on different compute targets, model version management, model evaluation/model selection, model deployment as realtime web service, staged deployment to QA/prod and integration testing.
 
 ## Prerequisite
 
