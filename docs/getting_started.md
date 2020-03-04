@@ -46,17 +46,17 @@ Navigate to **Library** in the **Pipelines** section as indicated below:
 
 Create a variable group named **``devopsforai-aml-vg``**. The YAML pipeline definitions in this repository refer to this variable group by name.
 
-The variable group should contain the following required variables:
+The variable group should contain the following required variables. **Azure resources that don't exist yet will be created in the [Provisioning resources using Azure Pipelines](#provisioning-resources-using-azure-pipelines) step below.**
 
 | Variable Name            | Suggested Value           | Short description                                                                                                            |
 | ------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | BASE_NAME                | [your project name]       | Unique naming prefix for created resources - max 10 chars, letters and numbers only                                          |
-| LOCATION                 | centralus                 | Azure location                                                                                                               |
-| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group                                                                                                         |
+| LOCATION                 | centralus                 | [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/), no spaces                              |
+| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group name                                                                                                    |
 | WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                      |
 | AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name  |
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                  |
-| ACI_DEPLOYMENT_NAME      | diabetes-aci              | Azure Container Interface                                                                                                    |
+| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                            |
 
 Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
@@ -64,15 +64,19 @@ More variables are available for further tweaking, but the above variables are a
 
 ### Variable Descriptions
 
-**WORKSPACE_NAME** is used for creating the Azure Machine Learning Workspace. You can provide an existing Azure ML Workspace here if you've got one.
-
 **BASE_NAME** is used as a prefix for naming Azure resources. When sharing an Azure subscription, the prefix allows you to avoid naming collisions for resources that require unique names, for example, Azure Blob Storage and Registry DNS. Make sure to set BASE_NAME to a unique name so that created resources will have unique names, for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, and so on. The length of the BASE_NAME value shouldn't exceed 10 characters and must contain letters and numbers only.
 
+**LOCATION** is the name of the [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/) for your resources. There should be no spaces in the name. For example, central, westus, westus2.
+
 **RESOURCE_GROUP** is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing Azure ML Workspace, set this value to the corresponding resource group name.
+
+**WORKSPACE_NAME** is used for creating the Azure Machine Learning Workspace. You can provide an existing Azure ML Workspace here if you've got one.
 
 **AZURE_RM_SVC_CONNECTION** is used by the [Azure Pipeline]((../environment_setup/iac-create-environment-pipeline.yml)) in Azure DevOps that creates the Azure ML workspace and associated resources through Azure Resource Manager. You'll create the connection in a [step below](#create-an-azure-devops-service-connection-for-the-azure-resource-manager).
 
 **WORKSPACE_SVC_CONNECTION** is used to reference a [service connection for the Azure ML workspace](#create-an-azure-devops-azure-ml-workspace-service-connection). You'll create the connection after [provisioning the workspace](#provisioning-resources-using-azure-pipelines) in the [Create an Azure DevOps Service Connection for the Azure ML Workspace](#create-an-azure-devops-service-connection-for-the-azure-ml-workspace) section below.
+
+**ACI_DEPLOYMENT_NAME** is used for naming the scoring service during deployment to [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/).
 
 ## Provisioning resources using Azure Pipelines
 
@@ -186,7 +190,7 @@ In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the va
 | Variable Name       | Suggested Value |
 | ------------------- | --------------- |
 | AKS_COMPUTE_NAME    | aks             |
-| AKS_DEPLOYMENT_NAME | diabetes-aks    |
+| AKS_DEPLOYMENT_NAME | mlops-aks       |
 
 Set **AKS_COMPUTE_NAME** to the *Compute name* of the Inference Cluster that references the Azure Kubernetes Service cluster in your Azure ML Workspace.
 
