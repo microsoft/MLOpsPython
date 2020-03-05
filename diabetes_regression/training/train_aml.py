@@ -23,7 +23,8 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-from azureml.core.run import Dataset, Datastore, Run, Workspace
+from azureml.core.run import Run
+from azureml.core import Dataset, Datastore, Workspace
 import os
 import argparse
 import joblib
