@@ -110,8 +110,8 @@ def main():
 
     print("Getting training parameters")
 
-    # Load the training parameters from the config file
-    with open("config.json") as f:
+    # Load the training parameters from the parameters file
+    with open("parameters.json") as f:
         pars = json.load(f)
     try:
         train_args = pars["training"]
