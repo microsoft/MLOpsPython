@@ -18,6 +18,7 @@ trigger:
     - ml_service/util/smoke_test_scoring_service.py
 
 variables:
+- template: diabetes_regression-variables-template.yml
 - group: 'devopsforai-aml-vg'
 - name: 'helmVersion'
   value: 'v3.0.1'
