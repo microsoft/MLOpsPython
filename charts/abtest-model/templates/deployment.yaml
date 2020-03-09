@@ -27,5 +27,4 @@ spec:
           containerPort: 5001
         - name: probe
           containerPort: 8086
-      imagePullSecrets:
-        - name: aks-secret     
+

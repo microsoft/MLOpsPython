@@ -21,7 +21,7 @@ variables:
 - template: diabetes_regression-variables-template.yml
 - group: 'devopsforai-aml-vg'
 - name: 'helmVersion'
-  value: 'v3.0.1'
+  value: 'v3.1.1'
 - name: 'helmDownloadURL'
   value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
 - name: 'blueReleaseName'
