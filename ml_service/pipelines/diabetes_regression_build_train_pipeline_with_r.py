@@ -31,7 +31,7 @@ def main():
     # Make sure to include `r-essentials'
     #   in diabetes_regression/conda_dependencies.yml
     environment = get_environment(
-        aml_workspace, e.aml_env_name, create_new=False)  # NOQA: E501
+        aml_workspace, e.aml_env_name, create_new=e.rebuild_env == "true")  # NOQA: E501
     run_config = RunConfiguration()
     run_config.environment = environment
 
