@@ -79,6 +79,7 @@ def get_model_by_tag(
     except Exception:
         raise
 
+
 def get_latest_model(
     model_name: str,
     aml_workspace: Workspace = None
@@ -106,7 +107,7 @@ def get_latest_model(
         # latest should only return 1 model, but if it does,
         # then maybe sdk or source code changed.
         too_many_model_message = ("Found more than one model. "
-                             f"Models found: {model_list}")
+                                  f"Models found: {model_list}")
         no_model_found_message = (f"No Model found with name: {model_name}")
 
         if len(model_list) > 1:
