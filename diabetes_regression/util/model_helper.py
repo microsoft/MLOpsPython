@@ -78,3 +78,43 @@ def get_model_by_tag(
             return None
     except Exception:
         raise
+
+def get_latest_model(
+    model_name: str,
+    aml_workspace: Workspace = None
+) -> AMLModel:
+    """
+    Retrieves and returns the latest model from the workspace.
+
+    Parameters:
+    aml_workspace (Workspace): aml.core Workspace that the model lives.
+    model_name (str): name of the model we are looking for
+
+    Return:
+    A single aml model from the workspace that matches the name and tag.
+    """
+    try:
+        # Validate params. cannot be None.
+        if model_name is None:
+            raise ValueError("model_name[:str] is required")
+        if aml_workspace is None:
+            aml_workspace = get_current_workspace()
+
+        # get model by tag.
+        model_list = AMLModel.list(aml_workspace, name=model_name, latest=True)
+
+        # latest should only return 1 model, but if it does,
+        # then maybe sdk or source code changed.
+        too_many_model_message = ("Found more than one model. "
+                             f"Models found: {model_list}")
+        no_model_found_message = (f"No Model found with name: {model_name}")
+
+        if len(model_list) > 1:
+            raise ValueError(too_many_model_message)
+        if len(model_list) == 1:
+            return model_list[0]
+        else:
+            print(no_model_found_message)
+            return None
+    except Exception:
+        raise
