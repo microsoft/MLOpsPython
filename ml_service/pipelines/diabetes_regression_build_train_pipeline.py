@@ -33,7 +33,7 @@ def main():
 
     # Create a reusable Azure ML environment
     environment = get_environment(
-        aml_workspace, e.aml_env_name, create_new=e.rebuild_env == "true")  # 
+        aml_workspace, e.aml_env_name, create_new=e.rebuild_env == "true")  #
     run_config = RunConfiguration()
     run_config.environment = environment
 
