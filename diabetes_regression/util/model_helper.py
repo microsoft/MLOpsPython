@@ -54,7 +54,7 @@ def get_latest_model(
 
         # Get lastest model
         # True: by name and tags
-        if tag_name is not None or tag_value is not None:
+        if tag_name is not None and tag_value is not None:
             model_list = AMLModel.list(
                 aml_workspace, name=model_name,
                 tags=[[tag_name, tag_value]], latest=True
