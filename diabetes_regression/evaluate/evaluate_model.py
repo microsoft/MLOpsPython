@@ -26,7 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 from azureml.core import Run
 import argparse
 import traceback
-from util.model_helper import get_model_by_tag
+from util.model_helper import get_latest_model
 
 run = Run.get_context()
 
@@ -45,7 +45,7 @@ run = Run.get_context()
 #         sources_dir = 'diabetes_regression'
 #     path_to_util = os.path.join(".", sources_dir, "util")
 #     sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
-#     from model_helper import get_model_by_tag
+#     from model_helper import get_latest_model
 #     workspace_name = os.environ.get("WORKSPACE_NAME")
 #     experiment_name = os.environ.get("EXPERIMENT_NAME")
 #     resource_group = os.environ.get("RESOURCE_GROUP")
@@ -108,7 +108,7 @@ try:
     firstRegistration = False
     tag_name = 'experiment_name'
 
-    model = get_model_by_tag(
+    model = get_latest_model(
         model_name, tag_name, exp.name, ws)
 
     if (model is not None):
