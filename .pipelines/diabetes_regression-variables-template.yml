@@ -70,5 +70,5 @@ variables:
 
   
   # Flag to allow rebuilding the AML Environment after it was built for the first time. This enables dependency updates from conda_dependencies.yaml.
-  # - name: AML_REBUILD_ENVIRONMENT
-  #  value: "false"
+  - name: AML_REBUILD_ENVIRONMENT
+    value: "true"
