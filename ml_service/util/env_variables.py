@@ -47,7 +47,7 @@ class Env(Singleton):
             "ALLOW_RUN_CANCEL", "true")
         self._aml_env_name = os.environ.get("AML_ENV_NAME")
         self._rebuild_env = os.environ.get("AML_REBUILD_ENVIRONMENT",
-                                           "false").lower().strip()
+                                           "false").lower().strip() == "true"
 
     @property
     def workspace_name(self):
