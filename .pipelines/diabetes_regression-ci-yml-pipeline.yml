@@ -1,0 +1,90 @@
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - diabetes_regression/
+
+variables:
+- template: diabetes_regression-variables-template.yml
+- group: devopsforai-aml-vg
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: 'Continuous_Integration'
+  displayName: 'Continuous Integration'
+  condition: not(variables['MODEL_BUILD_ID'])
+  variables:
+    BUILD_URI: '$(SYSTEM.COLLECTIONURI)$(SYSTEM.TEAMPROJECT)/_build/results?buildId=$(BUILD.BUILDID)'
+  jobs:
+  - job: "Preparation"
+    displayName: "Preparation"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: code-quality-template.yml
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: 'az extension add -n azure-cli-ml'
+      displayName: 'Install AzureML CLI'
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: 'az ml computetarget create amlcompute -n cpu-cluster --max-nodes 4 -s STANDARD_DS12_V2'
+      displayName: 'Create compute if nonexisted'
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: 'az ml datastore upload -n workspaceblobstore -p ./data -u diabetes_regression_training_data'
+      displayName: 'Upload to datastore'
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: 'az ml dataset register -f ./dataset.json'
+      displayName: 'Register dataset'
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: |
+          set -e # fail on error
+          AMLPIPELINEID=$(az ml pipeline create -n $(TRAINING_PIPELINE_NAME) -y ./.pipelines/ml_training_pipeline.yml --query Id -o tsv)
+          echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINEID"
+      name: 'Publish_ML_Pipeline'
+      displayName: 'Publish ML pipeline'
+  - job: "Run_ML_Pipeline"
+    displayName: "Trigger ML Training Pipeline"
+    dependsOn: "Preparation"
+    timeoutInMinutes: 0
+    pool: server
+    variables:
+      AMLPIPELINE_ID: $[ dependencies.Preparation.outputs['Publish_ML_Pipeline.AMLPIPELINEID'] ]
+    steps:
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke ML pipeline'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        PipelineId: '$(AMLPIPELINE_ID)'
+        ExperimentName: '$(EXPERIMENT_NAME)'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)"}, "tags": {"BuildId": "$(Build.BuildId)", "BuildUri": "$(BUILD_URI)"}, "StepTags": {"BuildId": "$(Build.BuildId)", "BuildUri": "$(BUILD_URI)"}'

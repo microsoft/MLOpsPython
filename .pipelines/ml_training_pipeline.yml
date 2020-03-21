@@ -1,0 +1,69 @@
+pipeline:
+    name: DiabetesTrainingPipeline
+    parameters:
+        model_name:
+            type: string
+            default: "model_from_pipeline_test"
+        model_folder:
+            type: string
+            default: "model_folder"
+    data_references:
+        diabetes_training_data:
+            datastore: workspaceblobstore
+            path_on_datastore: diabetes_regression_training_data/diabetes.csv
+    default_compute: cpu-cluster
+    steps:
+        Step1:
+            runconfig: "../.azureml/diabetes_regression.runconfig"
+            type: "PythonScriptStep"
+            name: "Train Model"
+            script_name: "training/train.py"
+            allow_reuse: False
+            source_directory: "../source"
+            arguments:
+                - "--source_data"
+                - input:sample_data
+                - "--model_name"
+                - parameter:model_name
+                - "--step_output"
+                - output:pipeline_data
+            parameters:
+                model_name:
+                    source: model_name
+            inputs:
+                sample_data:
+                    source: diabetes_training_data
+                    bind_mode: mount
+            outputs:
+                pipeline_data:
+                    destination: pipeline_data
+                    datastore: workspaceblobstore
+                    bind_mode: mount
+                    path_on_compute: "output"
+                    overwrite: true
+        Step2:
+            runconfig: "../.azureml/diabetes_regression.runconfig"
+            type: "PythonScriptStep"
+            name: "Register Model"
+            script_name: "register/eval_register.py"
+            allow_reuse: False
+            source_directory: "../source"
+            arguments:
+                - "--model_name"
+                - parameter:model_name
+                - "--step_input"
+                - input:pipeline_data
+                - "--model_upload_folder"
+                - parameter:model_folder
+            parameters:
+                model_name:
+                    source: model_name
+                model_folder:
+                    source: model_folder
+            inputs:
+                pipeline_data:
+                    source: pipeline_data
+                    datastore: workspaceblobstore
+                    bind_mode: mount
+                    path_on_compute: "input"
+                    overwrite: true

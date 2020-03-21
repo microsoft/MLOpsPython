@@ -1,0 +1,21 @@
+{
+  "datasetType": "Tabular",
+  "parameters": {
+    "path": [
+      {
+        "datastoreName": "workspaceblobstore",
+        "relativePath": "diabetes_regression_training_data/diabetes.csv"
+      }
+    ],
+    "sourceType": "delimited_files"
+  },
+  "registration": {
+    "createNewVersion": true,
+    "description": "diabetes training dataset",
+    "name": "diabetes-dataset",
+    "tags": {
+      "sample-tag": "diabetes"
+    }
+  },
+  "schemaVersion": 1
+}
