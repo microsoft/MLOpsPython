@@ -12,7 +12,9 @@ trigger:
     - master
   paths:
     include:
-    - diabetes_regression/
+    - data/
+    - source/
+    - .pipelines/
 
 variables:
 - template: diabetes_regression-variables-template.yml
