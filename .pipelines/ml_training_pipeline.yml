@@ -14,12 +14,12 @@ pipeline:
     default_compute: cpu-cluster
     steps:
         Step1:
-            runconfig: "../.azureml/diabetes_regression.runconfig"
+            runconfig: ".azureml/diabetes_regression.runconfig"
             type: "PythonScriptStep"
             name: "Train Model"
             script_name: "training/train.py"
             allow_reuse: False
-            source_directory: "../source"
+            source_directory: "source"
             arguments:
                 - "--source_data"
                 - input:sample_data
@@ -42,12 +42,12 @@ pipeline:
                     path_on_compute: "output"
                     overwrite: true
         Step2:
-            runconfig: "../.azureml/diabetes_regression.runconfig"
+            runconfig: ".azureml/diabetes_regression.runconfig"
             type: "PythonScriptStep"
             name: "Register Model"
             script_name: "register/eval_register.py"
             allow_reuse: False
-            source_directory: "../source"
+            source_directory: "source"
             arguments:
                 - "--model_name"
                 - parameter:model_name
