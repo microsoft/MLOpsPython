@@ -83,7 +83,7 @@ parser.add_argument(
     "--model_name",
     type=str,
     help="Name of the Model",
-    default="sklearn_regression_model.pkl",
+    default="diabetes_model.pkl",
 )
 
 parser.add_argument(
