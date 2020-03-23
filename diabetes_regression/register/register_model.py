@@ -104,7 +104,7 @@ def main():
             mtag = run.parent.get_metrics()[tag]
             model_tags[tag] = mtag
         except KeyError:
-            print("Could not find {tag} metric on parent run.")
+            print(f"Could not find {tag} metric on parent run.")
 
     # load the model
     print("Loading model from " + model_path)
@@ -116,13 +116,13 @@ def main():
     except KeyError:
         build_id = None
         print("BuildId tag not found on parent run.")
-        print("Tags present: {parent_tags}")
+        print(f"Tags present: {parent_tags}")
     try:
         build_uri = parent_tags["BuildUri"]
     except KeyError:
         build_uri = None
         print("BuildUri tag not found on parent run.")
-        print("Tags present: {parent_tags}")
+        print(f"Tags present: {parent_tags}")
 
     if (model is not None):
         dataset_id = parent_tags["dataset_id"]
