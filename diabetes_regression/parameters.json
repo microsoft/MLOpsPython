@@ -7,6 +7,10 @@
     {
 
     },
+    "registration":
+    {
+        "tags": ["mse"]
+    },
     "scoring":
     {
         
