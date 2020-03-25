@@ -28,6 +28,8 @@ steps:
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageName)'
       tags: |
+       $(Build.BuildNumber)
+       latest
        ${{format('amlsdk{0}', '$(amlsdkversion)')}}
        ${{format('githubrelease{0}', '$(githubrelease)')}}  
       buildContext: '$(Build.SourcesDirectory)' 
