@@ -28,7 +28,7 @@ steps:
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageName)'
       tags: |
-       amlsdk$(amlsdkversion)
-       githubrelease$(githubrelease)
+       amlsdk1.1.5.1
+       githubrelease131681
       buildContext: '$(Build.SourcesDirectory)' 
       dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'
