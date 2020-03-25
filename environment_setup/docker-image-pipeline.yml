@@ -26,9 +26,9 @@ steps:
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageName)'
       tags: |
-       $(Build.BuildNumber)
-       latest
+       ${{format('build-{0}', '$(Build.BuildNumber)')}}
        ${{format('amlsdk-{0}', '$(amlsdkversion)')}}
-       ${{format('githubreleaseversion-{0}', '$(githubrelease)')}}  
+       ${{format('release-{0}', '$(githubrelease)')}}  
+       latest
       buildContext: '$(Build.SourcesDirectory)' 
       dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'
