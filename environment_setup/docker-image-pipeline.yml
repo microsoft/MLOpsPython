@@ -17,8 +17,9 @@ trigger:
 variables:
   containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
   imageName: $[coalesce(variables['agentImageName'], 'public/mlops/python')]
-  githubrelease: $[format('githubrelease{0}',variables['githubrelease'])]   
-    
+  amlsdkversion: $[coalesce(variables['amlsdkversion'], '1.1.5.1')]
+  githubrelease: $[coalesce(variables['githubrelease'], '131681')]
+      
 steps:
   - task: Docker@2
     displayName: Build and Push
@@ -27,6 +28,7 @@ steps:
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageName)'
       tags: |
-       ${{format('amlsdk{0}', '$(amlsdkversion)')}} 
+       ${{format('amlsdk{0}', '$(amlsdkversion)')}}
+       ${{format('githubrelease{0}', '$(githubrelease)')}}  
       buildContext: '$(Build.SourcesDirectory)' 
       dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'
