@@ -17,6 +17,7 @@ We recommend working through this guide completely to ensure everything is worki
   - [Set up the Pipeline](#set-up-the-pipeline)
 - [Further Exploration](#further-exploration)
   - [Deploy the model to Azure Kubernetes Service](#deploy-the-model-to-azure-kubernetes-service)
+    - [Web Service Authentication on Azure Kubernetes Service](#web-service-authentication-on-azure-kubernetes-service)
   - [Deploy the model to Azure App Service (Azure Web App for containers)](#deploy-the-model-to-azure-app-service-azure-web-app-for-containers)
   - [Example pipelines using R](#example-pipelines-using-r)
   - [Observability and Monitoring](#observability-and-monitoring)
@@ -48,15 +49,15 @@ Create a variable group named **``devopsforai-aml-vg``**. The YAML pipeline defi
 
 The variable group should contain the following required variables. **Azure resources that don't exist yet will be created in the [Provisioning resources using Azure Pipelines](#provisioning-resources-using-azure-pipelines) step below.**
 
-| Variable Name            | Suggested Value           | Short description                                                                                                            |
-| ------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| BASE_NAME                | [your project name]       | Unique naming prefix for created resources - max 10 chars, letters and numbers only                                          |
-| LOCATION                 | centralus                 | [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/), no spaces                              |
-| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group name                                                                                                    |
-| WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                      |
-| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name  |
-| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                  |
-| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                            |
+| Variable Name            | Suggested Value           | Short description                                                                                                           |
+| ------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| BASE_NAME                | [your project name]       | Unique naming prefix for created resources - max 10 chars, letters and numbers only                                         |
+| LOCATION                 | centralus                 | [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/), no spaces                             |
+| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group name                                                                                                   |
+| WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                     |
+| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
+| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                 |
+| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                           |
 
 Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
@@ -199,6 +200,10 @@ After successfully deploying to Azure Container Instances, the next stage will d
 ![build](./images/multi-stage-aci-aks.png)
 
 Consider enabling [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+
+#### Web Service Authentication on Azure Kubernetes Service
+
+When deploying to Azure Kubernetes Service, key-based authentication is enabled by default. You can also enable token-based authentication. Token-based authentication requires clients to use an Azure Active Directory account to request an authentication token, which is used to make requests to the deployed service. For more details on how to authenticate with ML web service deployed on the AKS service please follow [Smoke Test](../ml_service/util/smoke_test_scoring_service.py) or the Azure documentation on [web service authentication](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-deploy-azure-kubernetes-service#web-service-authentication).
 
 ### Deploy the model to Azure App Service (Azure Web App for containers)
 
