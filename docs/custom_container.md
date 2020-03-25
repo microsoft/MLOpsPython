@@ -7,7 +7,7 @@ to run test and deployment code.
 `mcr.microsoft.com/mlops/python:latest` is built with this
 [Dockerfile](../environment_setup/Dockerfile).
 
-**Note:** Additionally mcr.microsoft.com/mlops/python image is also tagged with amlsdk[version] e.g amlsdk1.1.5.1 and githubrelease[version] e.g. githubrelease131681 which helps in tracking the exact version of amlsdk and other python dependencies included in the image.
+**Note:** Additionally mcr.microsoft.com/mlops/python image is also tagged with amlsdk-[version] e.g amlsdk-1.1.5.1 and githubreleaseversion-[version] e.g. githubreleaseversion-131681 which helps in tracking the exact version of amlsdk and other python dependencies included in the image.
 
 In your project you will want to build your own
 Docker image that only contains the dependencies and tools required for your

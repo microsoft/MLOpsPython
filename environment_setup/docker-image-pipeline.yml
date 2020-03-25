@@ -28,7 +28,7 @@ steps:
       tags: |
        $(Build.BuildNumber)
        latest
-       ${{format('amlsdk{0}', '$(amlsdkversion)')}}
-       ${{format('githubrelease{0}', '$(githubrelease)')}}  
+       ${{format('amlsdk-{0}', '$(amlsdkversion)')}}
+       ${{format('githubreleaseversion-{0}', '$(githubrelease)')}}  
       buildContext: '$(Build.SourcesDirectory)' 
       dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'
