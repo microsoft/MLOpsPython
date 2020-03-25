@@ -7,12 +7,14 @@ to run test and deployment code.
 `mcr.microsoft.com/mlops/python:latest` is built with this
 [Dockerfile](../environment_setup/Dockerfile).
 
+**Note:** Additionally mcr.microsoft.com/mlops/python image is also tagged with amlsdk[version] e.g amlsdk1.1.5.1 and githubrelease[version] e.g. githubrelease131681 which helps in tracking the exact version of amlsdk and other python dependencies included in the image.
+
 In your project you will want to build your own
 Docker image that only contains the dependencies and tools required for your
 use case. This image will be more likely smaller and therefore faster, and it
-will be totally maintained by your team. 
+will be totally maintained by your team.
 
-## Provision an Azure Container Registry 
+## Provision an Azure Container Registry
 
 An Azure Container Registry is deployed along your Azure ML Workspace to manage models.
 You can use that registry instance to store your MLOps container image as well, or
@@ -21,6 +23,7 @@ provision a separate instance.
 ## Create a Registry Service Connection
 
 [Create a service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#sep-docreg) to your Azure Container Registry:
+
 - As *Connection type*, select *Docker Registry*
 - As *Registry type*, select *Azure Container Registry*
 - As *Azure container registry*, select your Container registry instance
@@ -83,7 +86,7 @@ Run the pipeline and ensure your container has been used.
 Especially when working in a team, it's possible for environment changes across branches to interfere with one another.
 
 For example, if the master branch is using scikit-learn and you create a branch to use Tensorflow instead, and you
-decide to remove scikit-learn from the 
+decide to remove scikit-learn from the
 [ci_dependencies.yml](../diabetes_regression/ci_dependencies.yml) Conda environment definition
 and run the [docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml) Docker image,
 then the master branch will stop building.
