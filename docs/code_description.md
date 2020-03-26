@@ -67,7 +67,8 @@ The repository provides a template with folders structure suitable for maintaini
 
 ### Training Step
 
-- `diabetes_regression/training/train.py` : a training step of an ML training pipeline.
+- `diabetes_regression/training/train_aml.py`: a training step of an ML training pipeline.
+- `diabetes_regression/training/train.py` : ML functionality called by train_aml.py
 - `diabetes_regression/training/R/r_train.r` : training a model with R basing on a sample dataset (weight_data.csv).
 - `diabetes_regression/training/R/train_with_r.py` : a python wrapper (ML Pipeline Step) invoking R training script on ML Compute
 - `diabetes_regression/training/R/train_with_r_on_databricks.py` : a python wrapper (ML Pipeline Step) invoking R training script on Databricks Compute
