@@ -106,7 +106,7 @@ def main():
             "--dataset_name", dataset_name,
         ],
         runconfig=run_config,
-        allow_reuse=False,
+        allow_reuse=True,
     )
     print("Step Train created")
 
