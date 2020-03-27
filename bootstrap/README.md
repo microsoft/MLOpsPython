@@ -16,5 +16,3 @@ To bootstrap from the existing MLOpsPython repository:
 `python bootstrap.py --d [dirpath] --n [projectname]`
     * `[dirpath]` is the absolute path to the root of the directory where MLOpsPython is cloned
     * `[projectname]` is the name of your ML project
-
-[This article](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production#use-your-own-model-with-mlopspython-code-template) will also assist to use this code template for your own ML project.

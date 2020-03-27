@@ -1,6 +1,6 @@
-# Train your own model with the MLOpsPython repository template
+# Bring your own code with the MLOpsPython repository template
 
-This document provides steps to follow when using this repository as a template to train models in Azure ML with your own scripts and data.
+This document provides steps to follow when using this repository as a template to train models and deploy the models with real-time inference in Azure ML with your own scripts and data.
 
 1. Follow the MLOpsPython [Getting Started](https://github.com/microsoft/MLOpsPython/blob/master/docs/getting_started.md) guide
 1. Follow the MLOpsPython [bootstrap instructions](https://github.com/microsoft/MLOpsPython/blob/master/bootstrap/README.md) to create your project starting point
@@ -9,7 +9,7 @@ This document provides steps to follow when using this repository as a template 
 1. Replace the training code
 1. Update the evaluation code
 1. Customize the build agent environment
-1. Replace the score code
+1. [If appropriate] Replace the score code
 
 ## Follow the Getting Started guide
 
@@ -20,8 +20,6 @@ Follow the [Getting Started](https://github.com/microsoft/MLOpsPython/blob/maste
 The [Bootstrap from MLOpsPython repository](https://github.com/microsoft/MLOpsPython/blob/master/bootstrap/README.md) guide will help you to quickly prepare the repository for your project.
 
 **Note:** Since the bootstrap script will rename the `diabetes_regression` folder to the project name of your choice, we'll refer to your project as `[project name]` when paths are involved.
-
-The names of the pipeline definition files will also be updated, so your pipelines may need to be updated or remade to point to the new files.
 
 ## Configure training data
 
@@ -34,11 +32,10 @@ To use your own data:
 
 ## Convert your ML experimental code into production ready code
 
-The MLOpsPython template creates an Azure Machine Learning (ML) pipeline that invokes a set of [Azure ML pipeline steps](https://docs.microsoft.com/python/api/azureml-pipeline-steps/azureml.pipeline.steps) (see `ml_service/pipelines/[project name]_build_train_pipeline.py`). If your experiment is currently in a Jupyter notebook, it will need to be refactored into scripts that can be run as Azure ML pipeline steps.
+The MLOpsPython template creates an Azure Machine Learning (ML) pipeline that invokes a set of [Azure ML pipeline steps](https://docs.microsoft.com/python/api/azureml-pipeline-steps/azureml.pipeline.steps) (see `ml_service/pipelines/[project name]_build_train_pipeline.py`). If your experiment is currently in a Jupyter notebook, it will need to be refactored into scripts that can be run independantly and dropped into the template which the existing Azure ML pipeline steps utilize.
 
 1. Refactor your experiment code into scripts
-1. Prepare unit tests
-1. Prepare a scoring script
+1. [Recommended] Prepare unit tests
 
 Examples of all these scripts are provided in this repository.
 See the [Convert ML experimental code to production code tutorial](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production) for a step by step guide and additional details.
@@ -48,11 +45,10 @@ See the [Convert ML experimental code to production code tutorial](https://docs.
 The template contains three scripts in the `[project name]/training` folder. Update these scripts for your experiment code.
 
 * `train.py` contains the platform-agnostic logic required to do basic data preparation and train the model. This script can be invoked against a static data file for local development.
-* `train_aml.py` is the entry script for the ML pipeline step. It invokes the functions in `train.py` in an Azure ML context and adds logging.
-  * `train_aml.py` loads parameters for training from `[project name]/parameters.json` and passes them to the training function in `train.py`.
-* `test_train.py` contains tests that guard against functional regressions in `train.py`.
+* `train_aml.py` is the entry script for the ML pipeline step. It invokes the functions in `train.py` in an Azure ML context and adds logging. `train_aml.py` loads parameters for training from `[project name]/parameters.json` and passes them to the training function in `train.py`. If your experiment code can be refactored to match the function signatures in `train.py`, this file shouldn't need many changes.
+* `test_train.py` contains tests that guard against functional regressions in `train.py`. Remove this file if you have no tests for your own code.
 
-Add any dependencies required by training to `[project name]/conda_dependencies.yml]`.
+Add any dependencies required by training to `[project name]/conda_dependencies.yml]`. This file will be used to generate the environment that the pipeline steps will run in.
 
 ## Update evaluation code
 
