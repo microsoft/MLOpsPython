@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-import sys
-import os
-import json
-import requests
-from azure.common.credentials import ServicePrincipalCredentials
-
-
-tenant_id = os.environ.get("TENANT_ID")
-app_id = os.environ.get("SP_APP_ID")
-app_secret = os.environ.get("SP_APP_SECRET")
-
-try:
-    with open("train_pipeline.json") as f:
-        train_pipeline_json = json.load(f)
-except Exception:
-    print("No pipeline json found")
-    sys.exit(0)
-=======
 from azureml.pipeline.core import PublishedPipeline
 from azureml.core import Experiment, Workspace
 import argparse
@@ -24,7 +5,6 @@ from ml_service.util.env_variables import Env
 
 
 def main():
->>>>>>> af2b77295365f449d535a4903f5516561e82b9fd
 
     parser = argparse.ArgumentParser("register")
     parser.add_argument(
@@ -41,19 +21,7 @@ def main():
     )
     args = parser.parse_args()
 
-<<<<<<< HEAD
-credentials = ServicePrincipalCredentials(
-    client_id=app_id,
-    secret=app_secret,
-    tenant=tenant_id
-)
-
-token = credentials.token['access_token']
-print("token", token)
-auth_header = {"Authorization": "Bearer " + token}
-=======
     e = Env()
->>>>>>> af2b77295365f449d535a4903f5516561e82b9fd
 
     aml_workspace = Workspace.get(
         name=e.workspace_name,
@@ -61,17 +29,9 @@ auth_header = {"Authorization": "Bearer " + token}
         resource_group=e.resource_group
     )
 
-<<<<<<< HEAD
-response = requests.post(
-    rest_endpoint, headers=auth_header,
-    json={"ExperimentName": experiment_name,
-          "ParameterAssignments": {"model_name": model_name}}
-)
-=======
     # Find the pipeline that was published by the specified build ID
     pipelines = PublishedPipeline.list(aml_workspace)
     matched_pipes = []
->>>>>>> af2b77295365f449d535a4903f5516561e82b9fd
 
     for p in pipelines:
         if p.name == e.pipeline_name:
