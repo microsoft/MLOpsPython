@@ -65,8 +65,8 @@ To disable the evaluation step, either:
 
 The DevOps pipeline definitions in the MLOpsPython template run several steps in a Docker container that contains the dependencies required to work through the Getting Started guide. If additional dependencies are required to run your unit tests or generate your Azure ML pipeline, there are a few options:
 
-* Add a pipeline step to install dependencies required by unit tests to `.pipelines/code-quality-template.yml`.
-* Create a new Docker image containing your dependencies. See [docs/custom_container.md](custom_container.md).
+* Add a pipeline step to install dependencies required by unit tests to `.pipelines/code-quality-template.yml`. Recommended if you only have a small number of test dependencies.
+* Create a new Docker image containing your dependencies. See [docs/custom_container.md](custom_container.md). Recommended if you have a larger number of dependencies, or if the overhead of installing additional dependencies on each run is too high.
 * Remove the container references from the pipeline definition files and run the pipelines on self hosted agents with dependencies pre-installed.
 
 ## Replace score code
