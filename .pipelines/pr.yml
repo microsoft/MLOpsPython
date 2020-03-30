@@ -1,0 +1,24 @@
+# Pipeline to run basic code quality tests as part of pull requests to the master branch.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
+trigger: none
+pr:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+container: mlops
+
+variables:
+- template: diabetes_regression-variables-template.yml
+- group: devopsforai-aml-vg
+
+steps:
+- template: code-quality-template.yml

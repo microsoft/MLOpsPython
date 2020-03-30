@@ -1,0 +1,168 @@
+# Pipeline for the canary deployment workflow.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - docs/
+    - environment_setup/
+    - ml_service/util/create_scoring_image.*
+    - ml_service/util/smoke_test_scoring_service.py
+
+variables:
+- template: diabetes_regression-variables-template.yml
+- group: 'devopsforai-aml-vg'
+- name: 'helmVersion'
+  value: 'v3.1.1'
+- name: 'helmDownloadURL'
+  value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
+- name: 'blueReleaseName'
+  value: 'model-blue'
+- name: 'greenReleaseName'
+  value: 'model-green'
+- name: 'SCORE_SCRIPT'
+  value: 'scoring/scoreA.py'
+
+stages:
+- stage: 'Building'
+  jobs:
+  - job: "Build_Scoring_image"
+    timeoutInMinutes: 0
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mlops
+    steps:
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.create_scoring_image --output_image_location_file image_location.txt          
+      displayName: 'Create Scoring Image'
+      name: 'buildscoringimage'
+
+    - publish: image_location.txt
+      artifact: image_location
+
+    - publish: $(System.DefaultWorkingDirectory)/charts
+      artifact: allcharts
+
+- stage: 'Blue_Staging'
+  jobs:
+  - deployment: "Deploy_to_Staging"
+    timeoutInMinutes: 0
+    environment: abtestenv
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
+              echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+            displayName: 'Get Image Location'
+          - template: helm-upgrade-template.yml
+            parameters:
+              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
+              releaseName: $(blueReleaseName) 
+              overrideValues: 'deployment.name=$(blueReleaseName),deployment.bluegreen=blue,deployment.image.name=$(IMAGE_LOCATION)'
+
+- stage: 'Blue_50'
+  jobs:
+  - job: 'Blue_Rollout_50'
+    displayName: 50 50 rollout to blue environment
+    timeoutInMinutes: 0
+    steps:
+    - template: helm-upgrade-template.yml
+      parameters:
+        chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
+        releaseName: 'abtest-istio' 
+        overrideValues: 'weight.blue=50,weight.green=50'
+
+- stage: 'Blue_100'
+  jobs:
+  - deployment: 'blue_Rollout_100'
+    timeoutInMinutes: 0
+    environment: abtestenv
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: helm-upgrade-template.yml
+            parameters:
+              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
+              releaseName: 'abtest-istio' 
+              overrideValues: 'weight.blue=100,weight.green=0'
+
+- stage: 'Rollback'
+  dependsOn: 'Blue_100'
+  condition: failed()
+  jobs:
+  - deployment: 'Roll_Back'
+    displayName: 'Roll Back after failure'
+    environment: abtestenv
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: helm-upgrade-template.yml
+            parameters:
+              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
+              releaseName: 'abtest-istio' 
+              overrideValues: 'weight.blue=0,weight.green=100'
+
+- stage: 'Set_Production_Tag'
+  dependsOn: 'Blue_100'
+  condition: succeeded()
+  jobs:
+  - deployment: 'green_blue_tagging'
+    timeoutInMinutes: 0
+    environment: abtestenv
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
+              echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+            displayName: 'Get Image Location'
+          - template: helm-upgrade-template.yml
+            parameters:
+              chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
+              releaseName: $(greenReleaseName) 
+              overrideValues: 'deployment.name=$(greenReleaseName),deployment.bluegreen=green,deployment.image.name=$(IMAGE_LOCATION)'
+
+- stage: 'Green_100'
+  jobs:
+  - job: 'Prod_Rollout_100'
+    timeoutInMinutes: 0
+    steps:
+    - template: helm-upgrade-template.yml
+      parameters:
+        chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
+        releaseName: 'abtest-istio' 
+        overrideValues: 'weight.blue=0,weight.green=100'
+
+- stage: 'Disable_blue'
+  condition: always()
+  jobs:
+  - job: 'blue_disable'
+    timeoutInMinutes: 0
+    steps:
+    - template: helm-install-template.yml
+    - task: HelmDeploy@0
+      displayName: 'helm uninstall blue'
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+        command: delete
+        arguments: $(blueReleaseName) --namespace $(K8S_AB_NAMESPACE)

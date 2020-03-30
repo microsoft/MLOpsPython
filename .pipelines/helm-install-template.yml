@@ -1,0 +1,10 @@
+# Pipeline template for installing helm on the agent.
+steps:
+- task: Bash@3
+  displayName: 'Install Helm $(helmVersion)'
+  inputs:
+    targetType: inline
+    script: wget -q $(helmDownloadURL) -O /tmp/$FILENAME && tar -zxvf /tmp/$FILENAME -C /tmp && sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+  env:
+    HELM_VERSION: $(helmVersion)
+    FILENAME: helm-$(helmVersion)-linux-amd64.tar.gz

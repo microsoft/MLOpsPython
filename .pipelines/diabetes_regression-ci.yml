@@ -1,0 +1,206 @@
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - diabetes_regression/
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py
+
+variables:
+- template: diabetes_regression-variables-template.yml
+- group: devopsforai-aml-vg
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: 'Model_CI'
+  displayName: 'Model CI'
+  condition: not(variables['MODEL_BUILD_ID'])
+  jobs:
+  - job: "Model_CI_Pipeline"
+    displayName: "Model CI Pipeline"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: code-quality-template.yml
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          # Invoke the Python building and publishing a training pipeline
+          python -m ml_service.pipelines.diabetes_regression_build_train_pipeline
+      displayName: 'Publish Azure Machine Learning Pipeline'
+
+- stage: 'Trigger_AML_Pipeline'
+  displayName: 'Train model'
+  condition: and(succeeded(), not(variables['MODEL_BUILD_ID']))
+  variables:
+    BUILD_URI: '$(SYSTEM.COLLECTIONURI)$(SYSTEM.TEAMPROJECT)/_build/results?buildId=$(BUILD.BUILDID)'
+  jobs:
+  - job: "Get_Pipeline_ID"
+    condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
+    displayName: "Get Pipeline ID for execution"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.pipelines.run_train_pipeline --output_pipeline_id_file "pipeline_id.txt" --skip_train_execution
+          # Set AMLPIPELINEID variable for next AML Pipeline task in next job
+          AMLPIPELINEID="$(cat pipeline_id.txt)"
+          echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINEID"
+      name: 'getpipelineid'
+      displayName: 'Get Pipeline ID'
+  - job: "Run_ML_Pipeline"
+    dependsOn: "Get_Pipeline_ID"
+    displayName: "Trigger ML Training Pipeline"
+    timeoutInMinutes: 0
+    pool: server
+    variables:
+      AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
+    steps:
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke ML pipeline'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        PipelineId: '$(AMLPIPELINE_ID)'
+        ExperimentName: '$(EXPERIMENT_NAME)'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)"}, "tags": {"BuildId": "$(Build.BuildId)", "BuildUri": "$(BUILD_URI)"}, "StepTags": {"BuildId": "$(Build.BuildId)", "BuildUri": "$(BUILD_URI)"}'
+  - job: "Training_Run_Report"
+    dependsOn: "Run_ML_Pipeline"
+    condition: always()
+    displayName: "Determine if evaluation succeeded and new model is registered"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-get-model-version-template.yml
+
+- stage: 'Deploy_ACI'
+  displayName: 'Deploy to ACI'
+  dependsOn: Trigger_AML_Pipeline
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['ACI_DEPLOYMENT_NAME'])
+  jobs:
+  - job: "Deploy_ACI"
+    displayName: "Deploy to ACI"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-get-model-version-template.yml
+    - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
+      displayName: 'Azure ML Model Deploy'
+      inputs:
+        azureSubscription: $(WORKSPACE_SVC_CONNECTION)
+        modelSourceType: manualSpec
+        modelName: '$(MODEL_NAME)'
+        modelVersion: $(MODEL_VERSION)
+        inferencePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/inference_config.yml'
+        deploymentTarget: ACI
+        deploymentName: $(ACI_DEPLOYMENT_NAME)
+        deployConfig: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/deployment_config_aci.yml'
+        overwriteExistingDeployment: true
+    - task: AzureCLI@1
+      displayName: 'Smoke test'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.smoke_test_scoring_service --type ACI --service "$(ACI_DEPLOYMENT_NAME)"
+
+- stage: 'Deploy_AKS'
+  displayName: 'Deploy to AKS'
+  dependsOn: Deploy_ACI
+  condition: and(succeeded(), variables['AKS_DEPLOYMENT_NAME'])
+  jobs:
+  - job: "Deploy_AKS"
+    displayName: "Deploy to AKS"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-get-model-version-template.yml
+    - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
+      displayName: 'Azure ML Model Deploy'
+      inputs:
+        azureSubscription: $(WORKSPACE_SVC_CONNECTION)
+        modelSourceType: manualSpec
+        modelName: '$(MODEL_NAME)'
+        modelVersion: $(MODEL_VERSION)
+        inferencePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/inference_config.yml'
+        deploymentTarget: AKS
+        aksCluster: $(AKS_COMPUTE_NAME)
+        deploymentName: $(AKS_DEPLOYMENT_NAME)
+        deployConfig: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/deployment_config_aks.yml'
+        overwriteExistingDeployment: true
+    - task: AzureCLI@1
+      displayName: 'Smoke test'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.smoke_test_scoring_service --type AKS --service "$(AKS_DEPLOYMENT_NAME)"
+
+- stage: 'Deploy_Webapp'
+  displayName: 'Deploy to Webapp'
+  dependsOn: Trigger_AML_Pipeline
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['WEBAPP_DEPLOYMENT_NAME'])
+  jobs:
+  - job: "Deploy_Webapp"
+    displayName: "Deploy to Webapp"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-get-model-version-template.yml
+    - task: AzureCLI@1
+      displayName: 'Create scoring image and set IMAGE_LOCATION variable'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.create_scoring_image --output_image_location_file image_location.txt
+          # Output image location to Azure DevOps job
+          IMAGE_LOCATION="$(cat image_location.txt)"
+          echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+    - task: AzureWebAppContainer@1
+      name: WebAppDeploy
+      displayName: 'Azure Web App on Container Deploy'
+      inputs:
+        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
+        appName: '$(WEBAPP_DEPLOYMENT_NAME)'
+        resourceGroupName: '$(RESOURCE_GROUP)'
+        imageName: '$(IMAGE_LOCATION)'
+    - task: AzureCLI@1
+      displayName: 'Smoke test'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.smoke_test_scoring_service --type Webapp --service "$(WebAppDeploy.AppServiceApplicationUrl)/score"

@@ -1,0 +1,60 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: mlmodel-gateway
+  namespace: abtesting
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: {{ .Values.ingress.port }}
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---      
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: mlmodel-virtualservice
+  namespace: abtesting
+spec:
+  gateways:
+    - mlmodel-gateway 
+  hosts:
+    - '*'    
+  http:
+  - match:
+    - uri:
+        prefix: /score
+      headers:
+        x-api-version:
+          exact: 'blue'
+    route:
+    - destination:
+        host: {{ .Values.svc.name }}-blue.abtesting.svc.cluster.local  
+        port:
+          number: {{ .Values.svc.port }}
+  - match:
+    - uri:
+        prefix: /score
+      headers:
+        x-api-version:
+          exact: 'green'
+    route:
+    - destination:
+        host: {{ .Values.svc.name }}-green.abtesting.svc.cluster.local  
+        port:
+          number: {{ .Values.svc.port }}
+  - route:
+    - destination:
+        host: {{ .Values.svc.name }}-green.abtesting.svc.cluster.local  
+        port:
+          number: {{ .Values.svc.port }}
+      weight: {{ .Values.weight.green }}
+    - destination:
+        host: {{ .Values.svc.name }}-blue.abtesting.svc.cluster.local  
+        port:
+          number: {{ .Values.svc.port }}
+      weight: {{ .Values.weight.blue }}

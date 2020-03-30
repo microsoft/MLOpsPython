@@ -1,0 +1,43 @@
+# Pipeline for building the container image that is used by other pipelines for scoring.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - ml_service/util/create_scoring_image.py
+    - ml_service/util/Dockerfile
+    - diabetes_regression/scoring/
+    exclude:
+    - diabetes_regression/scoring/deployment_config_aci.yml
+    - diabetes_regression/scoring/deployment_config_aks.yml
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+container: mlops
+
+variables:
+- group: devopsforai-aml-vg
+- name: 'SCORE_SCRIPT'
+  value: 'scoring/scoreB.py'
+
+steps:
+- task: AzureCLI@1
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    workingDirectory: $(Build.SourcesDirectory)
+    inlineScript: |
+      set -e
+      export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+      python3 -m ml_service.util.create_scoring_image
+  displayName: 'Create Scoring Image'
+

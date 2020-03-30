@@ -1,0 +1,15 @@
+ingress:
+  port: 80
+
+svc:
+  port: 5001
+  name: model-svc
+
+  
+weight:
+  green: 50
+  blue: 50
+
+uri:
+  prefix: /score
+
