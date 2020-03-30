@@ -1,0 +1,40 @@
+# Conda environment specification. The dependencies defined in this file will
+# be automatically provisioned for managed runs. These include runs against
+# the localdocker, remotedocker, and cluster compute targets.
+
+# Note that this file is NOT used to automatically manage dependencies for the
+# local compute target. To provision these dependencies locally, run:
+# conda env update --file conda_dependencies.yml
+
+# Details about the Conda environment file format:
+# https://conda.io/docs/using/envs.html#create-environment-file-by-hand
+
+# For managing Spark packages and configuration, see spark_dependencies.yml.
+# Version of this configuration file's structure and semantics in AzureML.
+# This directive is stored in a comment to preserve the Conda file structure.
+# [AzureMlVersion] = 2
+
+name: diabetes_regression_training_env
+dependencies:
+  # The python interpreter version.
+  # Currently Azure ML Workbench only supports 3.5.2 and later.
+  - python=3.7.5
+  # Required by azureml-defaults, installed separately through Conda to
+  # get a prebuilt version and not require build tools for the install.
+  - psutil=5.6 #latest
+
+  - pip:
+      # Required packages for AzureML execution, history, and data preparation.
+      - azureml-model-management-sdk==1.0.1b6.post1
+      - azureml-sdk==1.0.74
+      - scipy==1.3.1
+      - scikit-learn==0.22
+      - pandas==0.25.3
+      - numpy==1.17.3
+      - joblib==0.14.0
+      - gunicorn==19.9.0
+      - flask==1.1.1
+      - inference-schema[numpy-support]
+      - azure
+      - azure-storage-blob
+      - azureml-dataprep

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.appname }}
+    model_version: {{ .Values.deployment.bluegreen }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.appname }}
+      model_version: {{ .Values.deployment.bluegreen }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appname }}
+        model_version: {{ .Values.deployment.bluegreen }}
+    spec:
+      containers:
+      - name: {{ .Values.deployment.container.name }}
+        image: "{{ .Values.deployment.image.name }}"
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 5001
+        - name: probe
+          containerPort: 8086
+

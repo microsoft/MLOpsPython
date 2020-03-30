@@ -1,0 +1,20 @@
+# Pipeline template for deploying / upgrading using Helm.
+parameters:
+  chartPath: ''
+  releaseName: '' 
+  overrideValues: ''
+
+steps:
+- template: helm-install-template.yml
+- task: HelmDeploy@0
+  displayName: 'helm upgrade'
+  inputs:
+    connectionType: 'Kubernetes Service Connection'
+    kubernetesServiceConnection: $(K8S_AB_SERVICE_CONNECTION)
+    command: upgrade
+    chartType: FilePath
+    chartPath: ${{ parameters.chartPath }}
+    releaseName: ${{ parameters.releaseName }}  
+    overrideValues: ${{ parameters.overrideValues }}
+    install: true
+    arguments: --namespace $(K8S_AB_NAMESPACE)

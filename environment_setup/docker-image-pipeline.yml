@@ -1,8 +1,9 @@
+# Pipeline that builds and pushes the microsoft/mlopspython image.
 resources:
 - repo: self
 
-queue:
-  name: Hosted Ubuntu 1604
+pool: 
+  vmImage: 'ubuntu-latest'
 
 trigger:
   branches:
@@ -11,12 +12,12 @@ trigger:
 
   paths:
     include:
-    - environment_setup/*
+    - environment_setup/Dockerfile
 
 variables:
   containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
-  imageName: $[coalesce(variables['agentImageName'], 'public/mlops/mlopspython')]  
-
+  imageName: $[coalesce(variables['agentImageName'], 'public/mlops/python')]
+        
 steps:
   - task: Docker@2
     displayName: Build and Push
@@ -24,6 +25,10 @@ steps:
       command: buildAndPush
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageName)'
-      tags: 'latest'
+      tags: |
+       ${{format('build-{0}', '$(Build.BuildNumber)')}}
+       ${{format('amlsdk-{0}', '$(amlsdkversion)')}}
+       ${{format('release-{0}', '$(githubrelease)')}}  
+       latest
       buildContext: '$(Build.SourcesDirectory)' 
       dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'

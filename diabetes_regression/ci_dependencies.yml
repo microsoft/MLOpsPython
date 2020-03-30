@@ -1,0 +1,27 @@
+name: mlopspython_ci
+
+dependencies:
+  # The python interpreter version.
+  - python=3.7.5
+
+  # dependencies with versions aligned with conda_dependencies.yml.
+  - numpy=1.18.1
+  - pandas=1.0.0
+  - scikit-learn=0.22.1
+    # dependencies for MLOps with R.
+  - r=3.6.0
+  - r-essentials=3.6.0
+
+  - pip=20.0.2
+  - pip:
+      # dependencies with versions aligned with conda_dependencies.yml.
+      - azureml-sdk==1.1.5.1
+
+      # Additional pip dependencies for the CI environment.
+      - pytest==5.3.1
+      - pytest-cov==2.8.1
+      - requests==2.22.0
+      - python-dotenv==0.10.3
+      - flake8==3.7.9
+      - flake8_formatter_junit_xml==0.0.6
+      - azure-cli==2.2.0
