@@ -263,7 +263,7 @@ To remove the resources created for this project, use the [/environment_setup/ia
 
 ## Next Steps: Integrating your project
 
-* Follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case. This guide includes information on bringing your own code to this repository template.
+* The [custom model](custom_model.md) guide includes information on bringing your own code to this repository template.
 * Consider using [Azure Pipelines self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your Azure ML pipeline execution. The Docker container image for the Azure ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
 
 ### Additional Variables and Configuration
