@@ -4,6 +4,7 @@ import platform
 import argparse
 import re
 
+
 class Helper:
 
     def __init__(self, project_directory, project_name):
@@ -73,9 +74,10 @@ class Helper:
         if (os.path.isdir(self._project_directory) is False):
             raise Exception("Not a valid directory. Please provide an absolute directory path.")  # NOQA: E501
         if (len(self._project_name) < 3 or len(self._project_name) > 15):
-            raise Exception("Invalid project name length. Project name should be 3 to 15 chars long, letters and underscores only.")
-        if (not re.search("^[\w_]+$", self._project_name)):
+            raise Exception("Invalid project name length. Project name should be 3 to 15 chars long, letters and underscores only.")  # NOQA: E501
+        if (not re.search("^[\\w_]+$", self._project_name)):
             raise Exception("Invalid characters in project name. Project name should be 3 to 15 chars long, letters and underscores only.")  # NOQA: E501
+
 
 def replace_project_name(project_dir, project_name, rename_name):
     # Replace instances of rename_name within files with project_name
@@ -123,7 +125,7 @@ def main(args):
                         "--name",
                         type=str,
                         required=True,
-                        help="Name of the project [3-15 chars, letters and underscores only]")
+                        help="Name of the project [3-15 chars, letters and underscores only]")  # NOQA: E501
     try:
         args = parser.parse_args()
 

@@ -61,7 +61,7 @@ def main():
         try:
             from sklearn.datasets import load_diabetes
         except ImportError as e:
-            print("Project has already been bootstrapped, you must provide your own data.") # NOQA: E501
+            print("Project has already been bootstrapped, you must provide your own data.")  # NOQA: E501
             raise e
 
         # Create dataset from diabetes sample data
