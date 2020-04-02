@@ -2,7 +2,7 @@ import os
 import sys
 import platform
 import argparse
-
+import re
 
 class Helper:
 
@@ -72,9 +72,10 @@ class Helper:
         # Validate arguments
         if (os.path.isdir(self._project_directory) is False):
             raise Exception("Not a valid directory. Please provide absolute directory path")  # NOQA: E501
-        if(len(self._project_name) < 3 or len(self._project_name) > 15):
+        if (len(self._project_name) < 3 or len(self._project_name) > 15):
             raise Exception("Project name should be 3 to 15 chars long")
-
+        if (re.search("^[\w_]+$", self._project_name)):
+            raise Exception("Invalid characters in project name. Use letters and underscores only.")  # NOQA: E501
 
 def replace_project_name(project_dir, project_name, rename_name):
     # Replace instances of rename_name within files with project_name
