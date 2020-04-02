@@ -71,15 +71,15 @@ class Helper:
     def validate_args(self):
         # Validate arguments
         if (os.path.isdir(self._project_directory) is False):
-            raise Exception("Not a valid directory. Please provide absolute directory path")  # NOQA: E501
+            raise Exception("Not a valid directory. Please provide an absolute directory path.")  # NOQA: E501
         if (len(self._project_name) < 3 or len(self._project_name) > 15):
-            raise Exception("Project name should be 3 to 15 chars long")
-        if (re.search("^[\w_]+$", self._project_name)):
-            raise Exception("Invalid characters in project name. Use letters and underscores only.")  # NOQA: E501
+            raise Exception("Invalid project name length. Project name should be 3 to 15 chars long, letters and underscores only.")
+        if (not re.search("^[\w_]+$", self._project_name)):
+            raise Exception("Invalid characters in project name. Project name should be 3 to 15 chars long, letters and underscores only.")  # NOQA: E501
 
 def replace_project_name(project_dir, project_name, rename_name):
     # Replace instances of rename_name within files with project_name
-    dirs = [r".env.example",
+    files = [r".env.example",
             r".pipelines/code-quality-template.yml",
             r".pipelines/pr.yml",
             r".pipelines/diabetes_regression-ci.yml",
@@ -99,30 +99,36 @@ def replace_project_name(project_dir, project_name, rename_name):
             r"diabetes_regression/register/register_model.py",
             r"diabetes_regression/training/test_train.py"]
 
-    for dir in dirs:
-        file = os.path.join(project_dir, os.path.normpath(dir))
-        fin = open(file, "rt", encoding="utf8")
-        data = fin.read()
-        data = data.replace(rename_name, project_name)
-        fin.close()
-        fin = open(os.path.join(project_dir, file), "wt", encoding="utf8")
-        fin.write(data)
-        fin.close()
+    for file in files:
+        path = os.path.join(project_dir, os.path.normpath(file))
+        try:
+            with open(path, "rt", encoding="utf8") as f_in:
+                data = f_in.read()
+            data = data.replace(rename_name, project_name)
+            with open(os.path.join(project_dir, file), "wt", encoding="utf8") as f_out:  # NOQA: E501
+                f_out.write(data)
+        except IOError as e:
+            print("Could not modify \"%s\". Is the MLOpsPython repo already cloned at \"%s\"?" % (path, project_dir))  # NOQA: E501
+            raise e
 
 
 def main(args):
     parser = argparse.ArgumentParser(description='New Template')
-    parser.add_argument("--d",
+    parser.add_argument("-d",
+                        "--directory",
                         type=str,
+                        required=True,
                         help="Absolute path to new project direcory")
-    parser.add_argument("--n",
+    parser.add_argument("-n",
+                        "--name",
                         type=str,
-                        help="Name of the project[3-15 chars] ")
+                        required=True,
+                        help="Name of the project [3-15 chars, letters and underscores only]")
     try:
         args = parser.parse_args()
 
-        project_directory = args.d
-        project_name = args.n
+        project_directory = args.directory
+        project_name = args.name
 
         helper = Helper(project_directory, project_name)
         helper.validate_args()
