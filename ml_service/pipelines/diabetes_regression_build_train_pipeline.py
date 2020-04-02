@@ -3,10 +3,10 @@ from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import Pipeline, PipelineData
 from azureml.core import Workspace, Dataset, Datastore
 from azureml.core.runconfig import RunConfiguration
+from ml_service.pipelines.load_sample_data import create_sample_data_csv
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
 from ml_service.util.manage_environment import get_environment
-import pandas as pd
 import os
 
 
@@ -56,22 +56,16 @@ def main():
 
     # Check to see if dataset exists
     if (dataset_name not in aml_workspace.datasets):
-        # This is a hack for the bootstrap script so that we handle our global
-        # find/replace of the project name gracefully.
-        try:
-            from sklearn.datasets import load_diabetes
-        except ImportError as e:
-            print("Project has already been bootstrapped, you must provide your own data.")  # NOQA: E501
-            raise e
+        # This call creates an example CSV from sklearn sample data. If you
+        # have already bootstrapped your project, you can comment this line
+        # out and use your own CSV.
+        create_sample_data_csv()
 
-        # Create dataset from diabetes sample data
-        sample_data = load_diabetes()
-        df = pd.DataFrame(
-            data=sample_data.data,
-            columns=sample_data.feature_names)
-        df['Y'] = sample_data.target
+        # Use a CSV to read in the data set.
         file_name = 'diabetes.csv'
-        df.to_csv(file_name, index=False)
+
+        if (not os.path.exists(file_name)):
+            raise Exception("Could not find CSV dataset at \"%s\". If you have bootstrapped your project, you will need to provide a CSV." % file_name)  # NOQA: E501
 
         # Upload file to default datastore in workspace
         datatstore = Datastore.get(aml_workspace, datastore_name)
