@@ -10,7 +10,7 @@ def test_train_model():
     reg_model = train_model(data, {"alpha": 1.2})
 
     preds = reg_model.predict([[1], [2]])
-    np.testing.assert_equal(preds, [9.93939393939394, 9.03030303030303])
+    np.testing.assert_almost_equal(preds, [9.93939393939394, 9.03030303030303])
 
 
 def test_get_model_metrics():
