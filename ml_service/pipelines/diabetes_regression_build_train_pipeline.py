@@ -6,7 +6,6 @@ from azureml.core.runconfig import RunConfiguration
 from ml_service.util.attach_compute import get_compute
 from ml_service.util.env_variables import Env
 from ml_service.util.manage_environment import get_environment
-from sklearn.datasets import load_diabetes
 import pandas as pd
 import os
 
@@ -57,6 +56,14 @@ def main():
 
     # Check to see if dataset exists
     if (dataset_name not in aml_workspace.datasets):
+        # This is a hack for the bootstrap script so that we handle our global
+        # find/replace of the project name gracefully.
+        try:
+            from sklearn.datasets import load_diabetes
+        except ImportError as e:
+            print("Project has already been bootstrapped, you must provide your own data.") # NOQA: E501
+            raise e
+
         # Create dataset from diabetes sample data
         sample_data = load_diabetes()
         df = pd.DataFrame(
