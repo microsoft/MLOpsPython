@@ -4,7 +4,7 @@ To use this existing project structure and scripts for your new ML project, you 
 
 Bootstrapping will prepare a directory structure for your project which includes:
 
-* renaming files and folders from the base project name `diabetes` to your project name
+* renaming files and folders from the base project name `diabetes_regression` to your project name
 * fixing imports and absolute path based on your project name
 * deleting and cleaning up some directories
 

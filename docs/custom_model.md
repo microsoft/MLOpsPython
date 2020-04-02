@@ -2,8 +2,8 @@
 
 This document provides steps to follow when using this repository as a template to train models and deploy the models with real-time inference in Azure ML with your own scripts and data.
 
-1. Follow the MLOpsPython [Getting Started](https://github.com/microsoft/MLOpsPython/blob/master/docs/getting_started.md) guide
-1. Follow the MLOpsPython [bootstrap instructions](https://github.com/microsoft/MLOpsPython/blob/master/bootstrap/README.md) to create your project starting point
+1. Follow the MLOpsPython [Getting Started](getting_started.md) guide
+1. Follow the MLOpsPython [bootstrap instructions](../bootstrap/README.md) to create your project starting point
 1. Configure training data
 1. [If necessary] Convert your ML experimental code into production ready code
 1. Replace the training code
@@ -13,11 +13,13 @@ This document provides steps to follow when using this repository as a template 
 
 ## Follow the Getting Started guide
 
-Follow the [Getting Started](https://github.com/microsoft/MLOpsPython/blob/master/docs/getting_started.md) guide to set up the infrastructure and pipelines to execute MLOpsPython.
+Follow the [Getting Started](getting_started.md) guide to set up the infrastructure and pipelines to execute MLOpsPython.
+
+Take a look at the [Repo Details](code_description.md) document for a description of the structure of this repository.
 
 ## Follow the Bootstrap instructions
 
-The [Bootstrap from MLOpsPython repository](https://github.com/microsoft/MLOpsPython/blob/master/bootstrap/README.md) guide will help you to quickly prepare the repository for your project.
+The [Bootstrap from MLOpsPython repository](../bootstrap/README.md) guide will help you to quickly prepare the repository for your project.
 
 **Note:** Since the bootstrap script will rename the `diabetes_regression` folder to the project name of your choice, we'll refer to your project as `[project name]` when paths are involved.
 
