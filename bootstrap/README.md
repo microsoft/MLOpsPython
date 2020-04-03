@@ -13,6 +13,6 @@ To bootstrap from the existing MLOpsPython repository:
 1. Ensure Python 3 is installed locally
 1. Clone this repository locally
 1. Run bootstrap.py script  
-`python bootstrap.py --d [dirpath] --n [projectname]`
+`python bootstrap.py -d [dirpath] -n [projectname]`
     * `[dirpath]` is the absolute path to the root of the directory where MLOpsPython is cloned
     * `[projectname]` is the name of your ML project
