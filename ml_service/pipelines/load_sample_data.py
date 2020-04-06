@@ -5,7 +5,7 @@ from sklearn.datasets import load_diabetes
 
 # Loads the diabetes sample data from sklearn and produces a csv file that can
 # be used by the build/train pipeline script.
-def create_sample_data_csv(file_name):
+def create_sample_data_csv():
     sample_data = load_diabetes()
     df = pd.DataFrame(
         data=sample_data.data,
