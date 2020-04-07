@@ -59,11 +59,11 @@ def main():
         # This call creates an example CSV from sklearn sample data. If you
         # have already bootstrapped your project, you can comment this line
         # out and use your own CSV.
-        create_sample_data_csv()
+        
 
         # Use a CSV to read in the data set.
         file_name = 'diabetes.csv'
-
+        create_sample_data_csv(file_name)
         if (not os.path.exists(file_name)):
             raise Exception("Could not find CSV dataset at \"%s\". If you have bootstrapped your project, you will need to provide a CSV." % file_name)  # NOQA: E501
 
