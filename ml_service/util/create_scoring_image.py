@@ -47,7 +47,7 @@ print(package.location)
 
 os.chdir(cwd)
 
-if package.creation_state != "Succeeded":
+if package.state != "Succeeded":
     raise Exception("Image creation status: {package.creation_state}")
 
 print("Package stored at {} with build log {}".format(package.location, package.package_build_log_uri))  # NOQA: E501
