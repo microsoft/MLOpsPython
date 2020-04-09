@@ -1,8 +1,8 @@
 import os
 import argparse
 from azureml.core import Workspace
-from azureml.core.image import ContainerImage, Image
-from azureml.core.model import Model
+from azureml.core.environment import Environment
+from azureml.core.model import Model, InferenceConfig
 import shutil
 from ml_service.util.env_variables import Env
 
@@ -36,37 +36,24 @@ cwd = os.getcwd()
 shutil.copy(os.path.join(".", sources_dir,
                          "conda_dependencies.yml"), path_to_scoring)
 os.chdir(path_to_scoring)
-image_config = ContainerImage.image_configuration(
-    execution_script=score_file,
-    runtime="python",
-    conda_file="conda_dependencies.yml",
-    description="Image with ridge regression model",
-    tags={"area": "diabetes_regression"},
-)
 
-image = Image.create(
-    name=e.image_name, models=[
-        model], image_config=image_config, workspace=ws
-)
+scoring_env = Environment.from_conda_specification(name="scoringenv", file_path="conda_dependencies.yml")  # NOQA: E501
+inference_config = InferenceConfig(
+    entry_script=score_file, environment=scoring_env)
+package = Model.package(ws, [model], inference_config)
+package.wait_for_creation(show_output=True)
+# Display the package location/ACR path
+print(package.location)
 
 os.chdir(cwd)
 
-image.wait_for_creation(show_output=True)
+if package.creation_state != "Succeeded":
+    raise Exception("Image creation status: {package.creation_state}")
 
-if image.creation_state != "Succeeded":
-    raise Exception("Image creation status: {image.creation_state}")
-
-print("{}(v.{} [{}]) stored at {} with build log {}".format(
-    image.name,
-    image.version,
-    image.creation_state,
-    image.image_location,
-    image.image_build_log_uri,
-)
-)
+print("Package stored at {} with build log {}".format(package.location, package.package_build_log_uri))  # NOQA: E501
 
 # Save the Image Location for other AzDO jobs after script is complete
 if args.output_image_location_file is not None:
     print("Writing image location to %s" % args.output_image_location_file)
     with open(args.output_image_location_file, "w") as out_file:
-        out_file.write(str(image.image_location))
+        out_file.write(str(package.location))
