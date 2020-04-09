@@ -17,6 +17,7 @@ We recommend working through this guide completely to ensure everything is worki
   - [Set up the Pipeline](#set-up-the-pipeline)
 - [Further Exploration](#further-exploration)
   - [Deploy the model to Azure Kubernetes Service](#deploy-the-model-to-azure-kubernetes-service)
+    - [Web Service Authentication on Azure Kubernetes Service](#web-service-authentication-on-azure-kubernetes-service)
   - [Deploy the model to Azure App Service (Azure Web App for containers)](#deploy-the-model-to-azure-app-service-azure-web-app-for-containers)
   - [Example pipelines using R](#example-pipelines-using-r)
   - [Observability and Monitoring](#observability-and-monitoring)
@@ -48,15 +49,15 @@ Create a variable group named **``devopsforai-aml-vg``**. The YAML pipeline defi
 
 The variable group should contain the following required variables. **Azure resources that don't exist yet will be created in the [Provisioning resources using Azure Pipelines](#provisioning-resources-using-azure-pipelines) step below.**
 
-| Variable Name            | Suggested Value           | Short description                                                                                                            |
-| ------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| BASE_NAME                | [your project name]       | Unique naming prefix for created resources - max 10 chars, letters and numbers only                                          |
-| LOCATION                 | centralus                 | [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/), no spaces                              |
-| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group name                                                                                                    |
-| WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                      |
-| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name  |
-| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                  |
-| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                            |
+| Variable Name            | Suggested Value           | Short description                                                                                                           |
+| ------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| BASE_NAME                | [your project name]       | Unique naming prefix for created resources - max 10 chars, letters and numbers only                                         |
+| LOCATION                 | centralus                 | [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/), no spaces                             |
+| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group name                                                                                                   |
+| WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                     |
+| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
+| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                 |
+| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                           |
 
 Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
@@ -150,16 +151,29 @@ Also check the published training pipeline in the **mlops-AML-WS** workspace in 
 
 Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master branch!
 
-* The first stage of the pipeline, **Model CI**, does linting, unit testing, code coverage, building, and publishes an **ML Training Pipeline** in an **ML Workspace**.
+The pipeline stages are summarized below:
 
-* The second stage of the pipeline, **Train model**, triggers the run of the Azure ML training pipeline. The training pipeline will train, evaluate, and register a new model. The actual computation happens on an [Azure Machine Learning Compute cluster](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-set-up-training-targets#amlcompute). In Azure DevOps, the stage runs an agentless job that waits for the completion of the Azure ML job. This allows the pipeline to wait for training completion for hours or even days without using agent resources.
+#### Model CI
 
-* **Note:** If the model evaluation determines that the new model doesn't perform any better than the previous one, the new model won't register and the pipeline will be **canceled**.
-  * In this case, you'll see a message in the 'Train Model' job under the 'Determine if evaluation succeeded and new model is registered' step saying '**Model was not registered for this run.**'
-  * See [evaluate_model.py](../diabetes_regression/evaluate/evaluate_model.py#L118) for the evaluation logic and [diabetes_regression_verify_train_pipeline.py](../ml_service/pipelines/diabetes_regression_verify_train_pipeline.py#L54) for the pipeline reporting logic.
-  * [Additional Variables and Configuration](#additional-variables-and-configuration) for configuring this and other behavior.
+- Linting (code quality analysis)
+- Unit tests and code coverage analysis
+- Build and publish *ML Training Pipeline* in an *ML Workspace*
 
-* The third stage of the pipeline, **Deploy to ACI**, deploys the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/). After deployment, it runs a *smoke test* for validation. The test sends a sample query to the scoring web service and verifies that it returns the expected response. Have a look at the [smoke test code](../ml_service/util/smoke_test_scoring_service.py) for an example.
+#### Train model
+
+- Determine the ID of the *ML Training Pipeline* published in the previous stage.
+- Trigger the *ML Training Pipeline* and waits for it to complete.
+  - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
+- Determine if a new model was registered by the *ML Training Pipeline*.
+  - If the model evaluation determines that the new model doesn't perform any better than the previous one, the new model won't register and the *ML Training Pipeline* will be **canceled**. In this case, you'll see a message in the 'Train Model' job under the 'Determine if evaluation succeeded and new model is registered' step saying '**Model was not registered for this run.**'
+  - See [evaluate_model.py](../diabetes_regression/evaluate/evaluate_model.py#L118) for the evaluation logic and [diabetes_regression_verify_train_pipeline.py](../ml_service/pipelines/diabetes_regression_verify_train_pipeline.py#L54) for the ML pipeline reporting logic.
+  - [Additional Variables and Configuration](#additional-variables-and-configuration) for configuring this and other behavior.
+
+#### Deploy to ACI
+
+- Deploy the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/).
+- Smoke test
+  - The test sends a sample query to the scoring web service and verifies that it returns the expected response. Have a look at the [smoke test code](../ml_service/util/smoke_test_scoring_service.py) for an example.
 
 The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The container image ***mcr.microsoft.com/mlops/python:latest*** is built with [this Dockerfile](../environment_setup/Dockerfile) and has all the necessary dependencies installed for MLOpsPython and ***diabetes_regression***. This image is an example of a custom Docker image with a pre-baked environment. The environment is guaranteed to be the same on any building agent, VM, or local machine. In your project, you'll want to build your own Docker image that only contains the dependencies and tools required for your use case. Your image will probably be smaller and faster, and it will be maintained by your team.
 
@@ -199,6 +213,10 @@ After successfully deploying to Azure Container Instances, the next stage will d
 ![build](./images/multi-stage-aci-aks.png)
 
 Consider enabling [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+
+#### Web Service Authentication on Azure Kubernetes Service
+
+When deploying to Azure Kubernetes Service, key-based authentication is enabled by default. You can also enable token-based authentication. Token-based authentication requires clients to use an Azure Active Directory account to request an authentication token, which is used to make requests to the deployed service. For more details on how to authenticate with ML web service deployed on the AKS service please follow [Smoke Test](../ml_service/util/smoke_test_scoring_service.py) or the Azure documentation on [web service authentication](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-deploy-azure-kubernetes-service#web-service-authentication).
 
 ### Deploy the model to Azure App Service (Azure Web App for containers)
 
@@ -258,7 +276,7 @@ To remove the resources created for this project, use the [/environment_setup/ia
 
 ## Next Steps: Integrating your project
 
-* Follow the [bootstrap instructions](../bootstrap/README.md) to create a starting point for your project use case. This guide includes information on bringing your own code to this repository template.
+* The [custom model](custom_model.md) guide includes information on bringing your own code to this repository template.
 * Consider using [Azure Pipelines self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your Azure ML pipeline execution. The Docker container image for the Azure ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
 
 ### Additional Variables and Configuration

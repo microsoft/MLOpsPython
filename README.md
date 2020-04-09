@@ -34,7 +34,7 @@ The build pipelines include DevOps tasks for data sanity tests, unit tests, mode
 
 ## Getting Started
 
-To deploy this solution in your subscription, follow the manual instructions in the [getting started](docs/getting_started.md) doc
+To deploy this solution in your subscription, follow the manual instructions in the [getting started](docs/getting_started.md) doc. Then optionally follow the guide for [integrating your own code](docs/custom_model.md) with this repository template.
 
 ### Repo Details
 
