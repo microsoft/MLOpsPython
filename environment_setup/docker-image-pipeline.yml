@@ -25,10 +25,6 @@ steps:
       command: buildAndPush
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageName)'
-      tags: |
-       ${{format('build-{0}', '$(Build.BuildNumber)')}}
-       ${{format('amlsdk-{0}', '$(amlsdkversion)')}}
-       ${{format('release-{0}', '$(githubrelease)')}}
-       latest
+      tags: openhack
       buildContext: '$(Build.SourcesDirectory)' 
       dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'
