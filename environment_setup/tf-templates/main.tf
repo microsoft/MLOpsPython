@@ -23,8 +23,8 @@ data "azurerm_client_config" "currentconfig" {
 # Storage account for AML Service
 resource "azurerm_storage_account" "amlstor" {
   name                     = "${var.BASE_NAME}amlsa"
-  location                 = azurerm_resource_group.amlrg.location
-  resource_group_name      = azurerm_resource_group.amlrg.name
+  location                 = data.azurerm_resource_group.amlrg.location
+  resource_group_name      = data.azurerm_resource_group.amlrg.name
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
@@ -32,8 +32,8 @@ resource "azurerm_storage_account" "amlstor" {
 # Keyvault for AML Service
 resource "azurerm_key_vault" "amlkv" {
   name                = "${var.BASE_NAME}-AML-KV"
-  location            = azurerm_resource_group.amlrg.location
-  resource_group_name = azurerm_resource_group.amlrg.name
+  location            = data.azurerm_resource_group.amlrg.location
+  resource_group_name = data.azurerm_resource_group.amlrg.name
   tenant_id           = data.azurerm_client_config.currentconfig.tenant_id
   sku_name            = "standard"
 }
@@ -41,16 +41,16 @@ resource "azurerm_key_vault" "amlkv" {
 # App Insights for AML Service
 resource "azurerm_application_insights" "amlai" {
   name                = "${var.BASE_NAME}-AML-AI"
-  location            = azurerm_resource_group.amlrg.location
-  resource_group_name = azurerm_resource_group.amlrg.name
+  location            = data.azurerm_resource_group.amlrg.location
+  resource_group_name = data.azurerm_resource_group.amlrg.name
   application_type    = "web"
 }
 
 # Container registry for AML Service
 resource "azurerm_container_registry" "amlacr" {
   name                     = "${var.BASE_NAME}amlcr"
-  resource_group_name      = azurerm_resource_group.amlrg.name
-  location                 = azurerm_resource_group.amlrg.location
+  resource_group_name      = data.azurerm_resource_group.amlrg.name
+  location                 = data.azurerm_resource_group.amlrg.location
   sku                      = "Standard"
   admin_enabled            = true
 }
@@ -58,8 +58,8 @@ resource "azurerm_container_registry" "amlacr" {
 # ML Workspace for AML Service, depending on the storage account, Keyvault, App Insights and ACR.
 resource "azurerm_machine_learning_workspace" "amlws" {
   name                    = var.WORKSPACE_NAME
-  location                = azurerm_resource_group.amlrg.location
-  resource_group_name     = azurerm_resource_group.amlrg.name
+  location                = data.azurerm_resource_group.amlrg.location
+  resource_group_name     = data.azurerm_resource_group.amlrg.name
   application_insights_id = azurerm_application_insights.amlai.id
   key_vault_id            = azurerm_key_vault.amlkv.id
   storage_account_id      = azurerm_storage_account.amlstor.id

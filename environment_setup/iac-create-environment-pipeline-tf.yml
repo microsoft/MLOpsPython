@@ -21,15 +21,6 @@ variables:
 - group: devopsforai-aml-vg
 
 steps:
-- task: AzureCLI@2
-        displayName: 'Create rg and tfstate storage'
-        inputs:
-          azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
-          scriptType: 'bash'
-          scriptLocation: 'scriptPath'
-          scriptPath: '$(Build.SourcesDirectory)/environment_setup/other-templates/create-state-storage.sh'
-          arguments: '-rgName $(RESOURCE_GROUP) -rgLoc $(LOCATION)'
-
 - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
   displayName: 'Use Terraform 0.12.24'
   inputs:
