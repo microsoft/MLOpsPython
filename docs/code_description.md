@@ -18,7 +18,8 @@ High level directory structure for this repository:
 │   ├── util              <- Python script for various utility operations specific to this ML project.
 ├── docs                  <- Extensive markdown documentation for entire project.
 ├── environment_setup     <- The top-level folder for everything related to infrastructure.
-│   ├── arm-templates     <- Azure Resource Manager(ARM) templates to build infrastructure needed for this project.
+│   ├── arm-templates     <- Azure Resource Manager(ARM) templates to build infrastructure needed for this project. 
+│   ├── tf-templates      <- Terraform templates to build infrastructure needed for this project.
 ├── experimentation       <- Jupyter notebooks with ML experimentation code.
 ├── ml_service            <- The top-level folder for all Azure Machine Learning resources.
 │   ├── pipelines         <- Python script that builds Azure Machine Learning pipelines.
@@ -35,7 +36,11 @@ The repository provides a template with folders structure suitable for maintaini
 
 - `environment_setup/install_requirements.sh` : This script prepares a local conda environment i.e. install the Azure ML SDK and the packages specified in environment definitions.
 
-- `environment_setup/iac-*.yml, arm-templates` : Infrastructure as Code piplines to create and delete required resources along with corresponding arm-templates.
+- `environment_setup/iac-*-arm.yml, arm-templates` : Infrastructure as Code piplines to create required resources using ARM, along with corresponding arm-templates. Infrastructure as Code can be deployed with this template or with the Terraform template.
+
+- `environment_setup/iac-*-tf.yml, tf-templates` : Infrastructure as Code piplines to create required resources using Terraform, along with corresponding tf-templates. Infrastructure as Code can be deployed with this template or with the ARM template.
+
+- `environment_setup/iac-remove-environment.yml` : Infrastructure as Code piplines to delete the created required resources.
 
 - `environment_setup/Dockerfile` : Dockerfile of a build agent containing Python 3.6 and all required packages.
 
