@@ -1,0 +1,23 @@
+# Pipeline template that attempts to get the latest model version and adds it to the environment for subsequent tasks to use.
+steps:
+- task: AzureCLI@1
+  displayName: 'Install AzureML CLI'
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    workingDirectory: $(Build.SourcesDirectory)
+    inlineScript: 'az extension add -n azure-cli-ml'
+- task: AzureCLI@1
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e # fail on error
+      MODEL_ID=$(az ml model list -g $(RESOURCE_GROUP) --workspace-name $(WORKSPACE_NAME) --tag BuildId=$(modelbuildid) --query '[0].id' -o tsv)
+      [[ -z "$MODEL_ID" ]] && { echo "Model not found" ; exit 1; }
+      echo $(MODEL_ID) >model.txt
+      echo "##vso[task.setvariable variable=MODEL_ID]$MODEL_ID"
+  name: 'getversion'
+  displayName: "Determine if evaluation succeeded and new model is registered"
+- publish: model.txt
+  artifact: model_id

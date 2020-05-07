@@ -1,0 +1,33 @@
+# Pipeline template that creates a model package and adds the package location to the environment for subsequent tasks to use.
+parameters:
+- name: modelName
+  type: string
+  default: ''
+- name: modelVersion
+  type: string
+  default: ''
+- name: scoringScriptPath
+  type: string
+  default: ''
+- name: condaFilePath
+  type: string
+  default: ''
+
+steps:
+  - task: AzureCLI@1
+    displayName: 'Install AzureML CLI'
+    inputs:
+      azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+      scriptLocation: inlineScript
+      workingDirectory: $(Build.SourcesDirectory)
+      inlineScript: 'az extension add -n azure-cli-ml'
+  - task: AzureCLI@1
+    displayName: 'Create model package and set IMAGE_LOCATION variable'
+    inputs:
+      azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e # fail on error
+        IMAGE_LOCATION=$(az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) --model '${{ parameters.modelName }}:${{ parameters.modelVersion }}' --entry-script '${{ parameters.scoringScriptPath }}' --cf '${{ parameters.condaFilePath }}' --rt python --query 'location')
+        echo $IMAGE_LOCATION
+        echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"

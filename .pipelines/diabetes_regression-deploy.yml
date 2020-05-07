@@ -1,0 +1,136 @@
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+  pipelines:
+  - pipeline: model-train-ci
+    source: model-train-ci
+    trigger:
+      branches:
+        include:
+        - master
+      paths:
+        include:
+        - diabetes_regression/
+
+variables:
+- template: diabetes_regression-variables-template.yml
+- group: devopsforai-aml-vg
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: 'Deploy_ACI'
+  displayName: 'Deploy to ACI'
+  dependsOn: Trigger_AML_Pipeline
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['ACI_DEPLOYMENT_NAME'])
+  jobs:
+  - job: "Deploy_ACI"
+    displayName: "Deploy to ACI"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-get-model-version-template.yml
+    - task: AzureCLI@1
+      displayName: "Deploy to ACI (CLI)"
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
+        inlineScript: |
+          set -e # fail on error
+          az ml model deploy --name $(ACI_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(MODEL_VERSION)' \
+          --ic inference_config.yml \
+          --dc deployment_config_aci.yml \
+          -g $(RESOURCE_GROUP) --workspace-name $(WORKSPACE_NAME) \
+          --overwrite -v
+    - task: AzureCLI@1
+      displayName: 'Smoke test'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.smoke_test_scoring_service --type ACI --service "$(ACI_DEPLOYMENT_NAME)"
+
+- stage: 'Deploy_AKS'
+  displayName: 'Deploy to AKS'
+  dependsOn: Deploy_ACI
+  condition: and(succeeded(), variables['AKS_DEPLOYMENT_NAME'])
+  jobs:
+  - job: "Deploy_AKS"
+    displayName: "Deploy to AKS"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-get-model-version-template.yml
+    - task: AzureCLI@1
+      displayName: "Deploy to AKS (CLI)"
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
+        inlineScript: |
+          set -e # fail on error
+          az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(MODEL_VERSION)' \
+          --compute-target $(AKS_COMPUTE_NAME) \
+          --ic inference_config.yml \ 
+          --dc deployment_config_aks.yml \
+          -g $(RESOURCE_GROUP) --workspace-name $(WORKSPACE_NAME) \
+          --overwrite -v
+    - task: AzureCLI@1
+      displayName: 'Smoke test'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.smoke_test_scoring_service --type AKS --service "$(AKS_DEPLOYMENT_NAME)"
+
+- stage: 'Deploy_Webapp'
+  displayName: 'Deploy to Webapp'
+  dependsOn: Trigger_AML_Pipeline
+  condition: and(or(succeeded(), variables['MODEL_BUILD_ID']), variables['WEBAPP_DEPLOYMENT_NAME'])
+  jobs:
+  - job: "Package_Model"
+    displayName: "Package model"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-get-model-version-template.yml
+    - template: diabetes_regression-model-package-template.yml
+      parameters:
+        modelName: $(MODEL_NAME)
+        modelVersion: $(MODEL_VERSION)
+        scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/score.py'
+        condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
+    - script: echo $(IMAGE_LOCATION) >image_location.txt
+      displayName: "Write image location file"
+  - job: "Deploy_Webapp"
+    displayName: "Deploy Webapp"
+    container: mlops
+    dependsOn: Package_Model
+    condition: succeeded()
+    steps:
+    - task: AzureWebAppContainer@1
+      name: WebAppDeploy
+      displayName: 'Azure Web App on Container Deploy'
+      inputs:
+        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
+        appName: '$(WEBAPP_DEPLOYMENT_NAME)'
+        resourceGroupName: '$(RESOURCE_GROUP)'
+        imageName: '$(IMAGE_LOCATION)'
+    - task: AzureCLI@1
+      displayName: 'Smoke test'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.util.smoke_test_scoring_service --type Webapp --service "$(WebAppDeploy.AppServiceApplicationUrl)/score"
