@@ -27,4 +27,3 @@ dependencies:
       - flake8==3.7.*
       - flake8_formatter_junit_xml==0.0.*
       - azure-cli==2.3.*
-      - jq==1.5.*
