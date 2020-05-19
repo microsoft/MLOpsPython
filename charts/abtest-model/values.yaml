@@ -1,0 +1,13 @@
+namespace: abtesting
+appname: model
+
+deployment:
+  name: model-green  
+  bluegreen: green
+  container:
+    name: model  
+    port: 5001
+
+svc:
+  name: model-svc
+  port: 5001

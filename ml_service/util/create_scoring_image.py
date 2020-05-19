@@ -1,61 +1,59 @@
 import os
+import argparse
 from azureml.core import Workspace
-from azureml.core.image import ContainerImage, Image
-from azureml.core.model import Model
-from dotenv import load_dotenv
-from azureml.core.authentication import ServicePrincipalAuthentication
+from azureml.core.environment import Environment
+from azureml.core.model import Model, InferenceConfig
+import shutil
+from ml_service.util.env_variables import Env
 
-load_dotenv()
+e = Env()
 
-TENANT_ID = os.environ.get('TENANT_ID')
-APP_ID = os.environ.get('SP_APP_ID')
-APP_SECRET = os.environ.get('SP_APP_SECRET')
-WORKSPACE_NAME = os.environ.get("BASE_NAME")+"-AML-WS"
-SUBSCRIPTION_ID = os.environ.get('SUBSCRIPTION_ID')
-RESOURCE_GROUP = os.environ.get("BASE_NAME")+"-AML-RG"
-MODEL_NAME = os.environ.get('MODEL_NAME')
-MODEL_VERSION = os.environ.get('MODEL_VERSION')
-IMAGE_NAME = os.environ.get('IMAGE_NAME')
-
-
-SP_AUTH = ServicePrincipalAuthentication(
-    tenant_id=TENANT_ID,
-    service_principal_id=APP_ID,
-    service_principal_password=APP_SECRET)
-
+# Get Azure machine learning workspace
 ws = Workspace.get(
-    WORKSPACE_NAME,
-    SP_AUTH,
-    SUBSCRIPTION_ID,
-    RESOURCE_GROUP
+    name=e.workspace_name,
+    subscription_id=e.subscription_id,
+    resource_group=e.resource_group
 )
 
-
-model = Model(ws, name=MODEL_NAME, version=MODEL_VERSION)
-os.chdir("./code/scoring")
-
-image_config = ContainerImage.image_configuration(
-    execution_script="score.py",
-    runtime="python",
-    conda_file="conda_dependencies.yml",
-    description="Image with ridge regression model",
-    tags={"area": "diabetes", "type": "regression"},
+parser = argparse.ArgumentParser("create scoring image")
+parser.add_argument(
+    "--output_image_location_file",
+    type=str,
+    help=("Name of a file to write image location to, "
+          "in format REGISTRY.azurecr.io/IMAGE_NAME:IMAGE_VERSION")
 )
+args = parser.parse_args()
 
-image = Image.create(
-    name=IMAGE_NAME, models=[model], image_config=image_config, workspace=ws
-)
+model = Model(ws, name=e.model_name, version=e.model_version)
+sources_dir = e.sources_directory_train
+if (sources_dir is None):
+    sources_dir = 'diabetes_regression'
+score_script = os.path.join(".", sources_dir, e.score_script)
+score_file = os.path.basename(score_script)
+path_to_scoring = os.path.dirname(score_script)
+cwd = os.getcwd()
+# Copy conda_dependencies.yml into scoring as this method does not accept relative paths. # NOQA: E501
+shutil.copy(os.path.join(".", sources_dir,
+                         "conda_dependencies.yml"), path_to_scoring)
+os.chdir(path_to_scoring)
 
-image.wait_for_creation(show_output=True)
+scoring_env = Environment.from_conda_specification(name="scoringenv", file_path="conda_dependencies.yml")  # NOQA: E501
+inference_config = InferenceConfig(
+    entry_script=score_file, environment=scoring_env)
+package = Model.package(ws, [model], inference_config)
+package.wait_for_creation(show_output=True)
+# Display the package location/ACR path
+print(package.location)
 
-if image.creation_state != "Succeeded":
-    raise Exception("Image creation status: {image.creation_state}")
+os.chdir(cwd)
 
-print("{}(v.{} [{}]) stored at {} with build log {}".format(
-    image.name,
-    image.version,
-    image.creation_state,
-    image.image_location,
-    image.image_build_log_uri,
-)
-)
+if package.state != "Succeeded":
+    raise Exception("Image creation status: {package.creation_state}")
+
+print("Package stored at {} with build log {}".format(package.location, package.package_build_log_uri))  # NOQA: E501
+
+# Save the Image Location for other AzDO jobs after script is complete
+if args.output_image_location_file is not None:
+    print("Writing image location to %s" % args.output_image_location_file)
+    with open(args.output_image_location_file, "w") as out_file:
+        out_file.write(str(package.location))

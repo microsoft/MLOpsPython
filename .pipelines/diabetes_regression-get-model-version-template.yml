@@ -1,0 +1,15 @@
+# Pipeline template that attempts to get the latest model version and adds it to the environment for subsequent tasks to use.
+steps:
+- task: AzureCLI@1
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e # fail on error
+      export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+      python -m ml_service.pipelines.diabetes_regression_verify_train_pipeline --build_id $(modelbuildid) --output_model_version_file "model_version.txt"
+      # Output model version to Azure DevOps job
+      MODEL_VERSION="$(cat model_version.txt)"
+      echo "##vso[task.setvariable variable=MODEL_VERSION]$MODEL_VERSION"
+  name: 'getversion'
+  displayName: "Determine if evaluation succeeded and new model is registered"

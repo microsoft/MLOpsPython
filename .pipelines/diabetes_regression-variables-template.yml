@@ -1,0 +1,74 @@
+# Pipeline template that defines common runtime environment variables.
+variables:
+
+  # Source Config
+    # The directory containing the scripts for training, evaluating, and registering the model
+  - name: SOURCES_DIR_TRAIN
+    value: diabetes_regression
+    # The path to the model training script under SOURCES_DIR_TRAIN
+  - name: TRAIN_SCRIPT_PATH
+    value: training/train_aml.py
+    # The path to the model evaluation script under SOURCES_DIR_TRAIN
+  - name: EVALUATE_SCRIPT_PATH
+    value: evaluate/evaluate_model.py
+    # The path to the model registration script under SOURCES_DIR_TRAIN
+  - name: REGISTER_SCRIPT_PATH
+    value: register/register_model.py
+    # The path to the model scoring script relative to SOURCES_DIR_TRAIN
+  - name: SCORE_SCRIPT
+    value: scoring/score.py
+
+  # Azure ML Variables
+  - name: EXPERIMENT_NAME
+    value: mlopspython
+  - name: DATASET_NAME
+    value: diabetes_ds
+  # Uncomment DATASTORE_NAME if you have configured non default datastore to point to your data   
+  # - name: DATASTORE_NAME
+  #   value: datablobstore
+  - name: DATASET_VERSION
+    value: latest
+  - name: TRAINING_PIPELINE_NAME
+    value: "diabetes-Training-Pipeline"
+  - name: MODEL_NAME
+    value: diabetes_regression_model.pkl
+
+  # AML Compute Cluster Config
+  - name: AML_ENV_NAME
+    value: diabetes_regression_training_env
+  - name: AML_COMPUTE_CLUSTER_CPU_SKU
+    value: STANDARD_DS2_V2
+  - name: AML_COMPUTE_CLUSTER_NAME
+    value: train-cluster
+  - name: AML_CLUSTER_MIN_NODES
+    value: 0
+  - name: AML_CLUSTER_MAX_NODES
+    value: 4
+  - name: AML_CLUSTER_PRIORITY
+    value: lowpriority
+
+  # The name for the (docker/webapp) scoring image
+  - name: IMAGE_NAME
+    value: "diabetestrained"
+ 
+    # Optional. Used by a training pipeline with R on Databricks
+  - name: DB_CLUSTER_ID
+    value: ""
+
+  # These are the default values set in ml_service\util\env_variables.py. Uncomment and override if desired.
+    # Set to false to disable the evaluation step in the ML pipeline and register the newly trained model unconditionally.
+  # - name: RUN_EVALUATION
+  #   value: "true"
+    # Set to false to register the model regardless of the outcome of the evaluation step in the ML pipeline.
+  # - name: ALLOW_RUN_CANCEL
+  #   value: "true"
+
+    # For debugging deployment issues. Specify a build id with the MODEL_BUILD_ID pipeline variable at queue time
+    # to skip training and deploy a model registered by a previous build.
+  - name: modelbuildid
+    value: $[coalesce(variables['MODEL_BUILD_ID'], variables['Build.BuildId'])]
+
+  
+  # Flag to allow rebuilding the AML Environment after it was built for the first time. This enables dependency updates from conda_dependencies.yaml.
+  # - name: AML_REBUILD_ENVIRONMENT
+  #  value: "false"
