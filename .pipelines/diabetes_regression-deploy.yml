@@ -1,28 +1,25 @@
-# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, registration, deployment, and testing of the diabetes_regression model.
+# Continuous Integration (CI) pipeline that orchestrates the deployment of the diabetes_regression model.
+
 # Runtime parameters to select artifacts
 parameters:
-- name : artifactBranch
-  displayName: Artifact Branch (e.g. feature/myfeature)
-  type: string
-  default: $(Build.SourceBranch)
 - name : artifactBuildId
-  displayName: Artifact Build Id (e.g. run Id for the build to download). Overrides Artifact Branch if not "latest".
+  displayName: Model Train CI Build ID. Default is 'latest'.
   type: string
   default: latest
 
+# Trigger this pipeline on model-train pipeline completion
+trigger: none
 resources:
   containers:
   - container: mlops
-    image: mcr.microsoft.com/mlops/python:latest
+    image: mlops/diabetes_regression
+    endpoint: acrconnection
   pipelines:
   - pipeline: model-train-ci
     source: model-train-ci
     trigger:
       branches:
-        include:
         - master
-
-trigger: none
 
 variables:
 - template: diabetes_regression-variables-template.yml
@@ -38,12 +35,19 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - script: jq --version
     - download: none
-    - template: diabetes_regression-get-model-id-template.yml
+    - template: diabetes_regression-get-model-id-artifact-template.yml
       parameters:
         projectId: '$(resources.pipeline.model-train-ci.projectID)'
         pipelineId: '$(resources.pipeline.model-train-ci.pipelineID)'
+        artifactBuildId: ${{ parameters.artifactBuildId }}
+    - task: AzureCLI@1
+      displayName: 'Install AzureML CLI'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: 'az extension add -n azure-cli-ml'
     - task: AzureCLI@1
       displayName: "Deploy to ACI (CLI)"
       inputs:
@@ -77,10 +81,11 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-get-model-id-template.yml
+    - template: diabetes_regression-get-model-id-artifact-template.yml
       parameters:
         projectId: '$(resources.pipeline.model-train-ci.projectID)'
         pipelineId: '$(resources.pipeline.model-train-ci.pipelineID)'
+        artifactBuildId: ${{ parameters.artifactBuildId }}
     - task: AzureCLI@1
       displayName: 'Install AzureML CLI'
       inputs:
@@ -122,10 +127,11 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - template: diabetes_regression-get-model-id-template.yml
+    - template: diabetes_regression-get-model-id-artifact-template.yml
       parameters:
         projectId: '$(resources.pipeline.model-train-ci.projectID)'
         pipelineId: '$(resources.pipeline.model-train-ci.pipelineID)'
+        artifactBuildId: ${{ parameters.artifactBuildId }}
     - template: diabetes_regression-package-model-template.yml
       parameters:
         modelId: $(MODEL_NAME):$(MODEL_VERSION)

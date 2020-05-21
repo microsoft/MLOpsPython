@@ -18,6 +18,6 @@ steps:
       [[ -z "$FOUND_MODEL" ]] && { echo "Model not found" ; exit 1; }
       echo $FOUND_MODEL >model.json
   name: 'getversion'
-  displayName: "Determine if evaluation succeeded and new model is registered"
+  displayName: "Determine if evaluation succeeded and new model is registered (CLI)"
 - publish: model.json
   artifact: model
