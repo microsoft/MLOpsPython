@@ -48,7 +48,7 @@ stages:
       displayName: 'Publish Azure Machine Learning Pipeline'
 
 - stage: 'Trigger_AML_Pipeline'
-  displayName: 'Train model'
+  displayName: 'Train and evaluate model'
   condition: succeeded()
   variables:
     BUILD_URI: '$(SYSTEM.COLLECTIONURI)$(SYSTEM.TEAMPROJECT)/_build/results?buildId=$(BUILD.BUILDID)'

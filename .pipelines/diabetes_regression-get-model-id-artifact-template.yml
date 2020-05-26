@@ -33,12 +33,13 @@ steps:
         # Print JSON
         cat $(Build.SourcesDirectory)/bin/model/model.json | jq '.'
 
-        # Set model name and version variables as strings
+        # Set model name and version variables
         MODEL_NAME=$(jq -r '.name' <$(Build.SourcesDirectory)/bin/model/model.json)
         MODEL_VERSION=$(jq -r '.version' <$(Build.SourcesDirectory)/bin/model/model.json)
 
         echo "Model Name: $MODEL_NAME"
         echo "Model Version: $MODEL_VERSION"
 
+        # Set environment variables
         echo "##vso[task.setvariable variable=MODEL_VERSION]$MODEL_VERSION"
         echo "##vso[task.setvariable variable=MODEL_NAME]$MODEL_NAME"
