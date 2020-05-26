@@ -3,8 +3,7 @@
 resources:
   containers:
   - container: mlops
-    image: mlops/diabetes_regression
-    endpoint: acrconnection
+    image: mcr.microsoft.com/mlops/python:latest
 
 pr: none
 trigger:

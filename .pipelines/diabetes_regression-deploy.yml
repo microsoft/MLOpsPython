@@ -12,13 +12,13 @@ trigger: none
 resources:
   containers:
   - container: mlops
-    image: mlops/diabetes_regression
-    endpoint: acrconnection
+    image: mcr.microsoft.com/mlops/python:latest
   pipelines:
   - pipeline: model-train-ci
     source: Model-Train-Register-CI # Name of the triggering pipeline
     trigger:
       branches:
+        include:
         - master
 
 variables:
