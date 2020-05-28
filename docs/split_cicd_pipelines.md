@@ -25,7 +25,7 @@ In this section, we will create the pipeline that will perform model IC, trainin
 
 ### Set up the Pipeline
 
-In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-train-register.yml](../.pipelines/diabetes_regression-train-register.yml)
+In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-ci-train-register.yml](../.pipelines/diabetes_regression-ci-train-register.yml)
 pipeline definition in your forked repository.
 
 If you plan to use the release deployment pipeline (in the next section), you will need to rename this pipeline to `Model-Train-Register-CI`.
@@ -85,7 +85,7 @@ This pipeline has the following behaviors:
 
 ### Set up the pipeline
 
-In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-deploy.yml](../.pipelines/diabetes_regression-deploy.yml)
+In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-cd-deploy.yml](../.pipelines/diabetes_regression-cd-deploy.yml)
 pipeline definition in your forked repository.
 
 Your first run will use the latest model created by the Model-Train-Register-CI pipeline.
