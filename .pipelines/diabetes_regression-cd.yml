@@ -142,6 +142,32 @@ stages:
         condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
+    
+    - task: AzureResourceGroupDeployment@2
+      inputs:
+        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '$(RESOURCE_GROUP)'
+        location: $(LOCATION)
+        templateLocation: 'Linked artifact'
+        csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/aci-password.json'
+        overrideParameters: '-baseName $(BASE_NAME)'
+        deploymentMode: 'Incremental'
+        deploymentOutputs: 'ACRCREDENTIALS'
+      displayName: 'Get ACR username and password'
+
+    - task: AzureResourceGroupDeployment@2
+      inputs:
+        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '$(RESOURCE_GROUP)'
+        location: $(LOCATION)
+        templateLocation: 'Linked artifact'
+        csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/webapp-env.json'
+        overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION) -imagelocation $(IMAGE_TAGGED) -acrcredentials $(ACRCREDENTIALS)'
+        deploymentMode: 'Incremental'
+      displayName: 'Create webapp'
+
     - task: AzureWebAppContainer@1
       name: WebAppDeploy
       displayName: 'Azure Web App on Container Deploy'
