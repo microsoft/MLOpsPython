@@ -17,6 +17,9 @@ variables:
     # The path to the model scoring script relative to SOURCES_DIR_TRAIN
   - name: SCORE_SCRIPT
     value: scoring/score.py
+    # The path to the batch scoring script relative to SOURCES_DIR_TRAIN
+  - name: BATCHSCORE_SCRIPT_PATH
+    value: scoring/parallel_batchscore.py
 
   # Azure ML Variables
   - name: EXPERIMENT_NAME
@@ -72,3 +75,52 @@ variables:
   # Flag to allow rebuilding the AML Environment after it was built for the first time. This enables dependency updates from conda_dependencies.yaml.
   # - name: AML_REBUILD_ENVIRONMENT
   #  value: "false"
+
+  - name: USE_GPU_FOR_TRAINING
+    value: False
+  - name: USE_GPU_FOR_SCORING
+    value: False
+
+    # AML Compute Cluster Config for parallel batch scoring
+  - name: AML_ENV_NAME_SCORING
+    value: diabetes_regression_scoring_env
+  - name: AML_COMPUTE_CLUSTER_CPU_SKU_SCORING
+    value: STANDARD_DS2_V2
+  - name: AML_COMPUTE_CLUSTER_NAME_SCORING
+    value: score-cluster
+  - name: AML_CLUSTER_MIN_NODES_SCORING
+    value: 0
+  - name: AML_CLUSTER_MAX_NODES_SCORING
+    value: 4
+  - name: AML_CLUSTER_PRIORITY_SCORING
+    value: lowpriority
+
+  # Flag to allow rebuilding the AML Environment after it was built for the first time. 
+  # This enables dependency updates from conda_dependencies.yaml.
+  # - name: AML_REBUILD_ENVIRONMENT_SCORING
+  #  value: "false"
+
+# Datastore config for scoring
+  # The storage account name and key are supplied as variables in a variable group 
+  # in the Azure Pipelines library for this project. Please refer to repo docs for 
+  # more details
+
+  # Blob container where the input data for scoring can be found
+  - name: SCORING_DATASTORE_INPUT_CONTAINER
+    value: "input"
+  # Blobname for the input data - include any applicable path in the string 
+  - name: SCORING_DATASTORE_INPUT_FILENAME
+    value: "diabetes_scoring_input.csv"
+  # Blob container where the output data for scoring can be found
+  - name: SCORING_DATASTORE_OUTPUT_CONTAINER
+    value: "output"
+  # Blobname for the output data - include any applicable path in the string 
+  - name: SCORING_DATASTORE_OUTPUT_FILENAME
+    value: "diabetes_scoring_output.csv"
+  # Dataset name for input data for scoring
+  - name: SCORING_DATASET_NAME
+    value: "diabetes_scoring_ds"
+  # Scoring pipeline name
+  - name: SCORING_PIPELINE_NAME
+    value: "diabetes-scoring-pipeline"
+    

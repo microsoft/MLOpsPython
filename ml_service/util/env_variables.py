@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 class Env:
     """Loads all environment variables into a predefined set of properties
     """
+
     # to load .env file into environment variables for local execution
     load_dotenv()
     workspace_name: Optional[str] = os.environ.get("WORKSPACE_NAME")
@@ -21,23 +22,19 @@ class Env:
     app_secret: Optional[str] = os.environ.get("SP_APP_SECRET")
     vm_size: Optional[str] = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
     compute_name: Optional[str] = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
-    vm_priority: Optional[str] = os.environ.get("AML_CLUSTER_PRIORITY",
-                                                'lowpriority')
+    vm_priority: Optional[str] = os.environ.get("AML_CLUSTER_PRIORITY", "lowpriority")  # NOQA: E501
     min_nodes: int = int(os.environ.get("AML_CLUSTER_MIN_NODES", 0))
     max_nodes: int = int(os.environ.get("AML_CLUSTER_MAX_NODES", 4))
     build_id: Optional[str] = os.environ.get("BUILD_BUILDID")
     pipeline_name: Optional[str] = os.environ.get("TRAINING_PIPELINE_NAME")
-    sources_directory_train: Optional[str] = os.environ.get(
-        "SOURCES_DIR_TRAIN")
+    sources_directory_train: Optional[str] = os.environ.get("SOURCES_DIR_TRAIN")  # NOQA: E501
     train_script_path: Optional[str] = os.environ.get("TRAIN_SCRIPT_PATH")
-    evaluate_script_path: Optional[str] = os.environ.get(
-        "EVALUATE_SCRIPT_PATH")
-    register_script_path: Optional[str] = os.environ.get(
-        "REGISTER_SCRIPT_PATH")
+    evaluate_script_path: Optional[str] = os.environ.get("EVALUATE_SCRIPT_PATH")  # NOQA: E501
+    register_script_path: Optional[str] = os.environ.get("REGISTER_SCRIPT_PATH")  # NOQA: E501
     model_name: Optional[str] = os.environ.get("MODEL_NAME")
     experiment_name: Optional[str] = os.environ.get("EXPERIMENT_NAME")
-    model_version: Optional[str] = os.environ.get('MODEL_VERSION')
-    image_name: Optional[str] = os.environ.get('IMAGE_NAME')
+    model_version: Optional[str] = os.environ.get("MODEL_VERSION")
+    image_name: Optional[str] = os.environ.get("IMAGE_NAME")
     db_cluster_id: Optional[str] = os.environ.get("DB_CLUSTER_ID")
     score_script: Optional[str] = os.environ.get("SCORE_SCRIPT")
     build_uri: Optional[str] = os.environ.get("BUILD_URI")
@@ -45,8 +42,51 @@ class Env:
     datastore_name: Optional[str] = os.environ.get("DATASTORE_NAME")
     dataset_version: Optional[str] = os.environ.get("DATASET_VERSION")
     run_evaluation: Optional[str] = os.environ.get("RUN_EVALUATION", "true")
-    allow_run_cancel: Optional[str] = os.environ.get("ALLOW_RUN_CANCEL",
-                                                     "true")
+    allow_run_cancel: Optional[str] = os.environ.get("ALLOW_RUN_CANCEL", "true")  # NOQA: E501
     aml_env_name: Optional[str] = os.environ.get("AML_ENV_NAME")
     rebuild_env: Optional[bool] = os.environ.get(
-        "AML_REBUILD_ENVIRONMENT", "false").lower().strip() == "true"
+        "AML_REBUILD_ENVIRONMENT", "false"
+    ).lower().strip() == "true"
+
+    use_gpu_for_training: Optional[bool] = os.environ.get(
+        "USE_GPU_FOR_TRAINING", "false"
+    ).lower().strip() == "true"
+    use_gpu_for_scoring: Optional[bool] = os.environ.get(
+        "USE_GPU_FOR_SCORING", "false"
+    ).lower().strip() == "true"
+    vm_size_scoring: Optional[str] = os.environ.get(
+        "AML_COMPUTE_CLUSTER_CPU_SKU_SCORING"
+    )
+    compute_name_scoring: Optional[str] = os.environ.get(
+        "AML_COMPUTE_CLUSTER_NAME_SCORING"
+    )
+    vm_priority_scoring: Optional[str] = os.environ.get(
+        "AML_CLUSTER_PRIORITY_SCORING", "lowpriority"
+    )
+    min_nodes_scoring: int = int(os.environ.get("AML_CLUSTER_MIN_NODES_SCORING", 0))  # NOQA: E501
+    max_nodes_scoring: int = int(os.environ.get("AML_CLUSTER_MAX_NODES_SCORING", 4))  # NOQA: E501
+    rebuild_env_scoring: Optional[bool] = os.environ.get(
+        "AML_REBUILD_ENVIRONMENT_SCORING", "false"
+    ).lower().strip() == "true"
+    scoring_datastore_storage_name: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_STORAGE_NAME"
+    )
+    scoring_datastore_access_key: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_ACCESS_KEY"
+    )
+    scoring_datastore_input_container: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_INPUT_CONTAINER"
+    )
+    scoring_datastore_input_filename: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_INPUT_FILENAME"
+    )
+    scoring_datastore_output_container: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_OUTPUT_CONTAINER"
+    )
+    scoring_datastore_output_filename: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_OUTPUT_FILENAME"
+    )
+    scoring_dataset_name: Optional[str] = os.environ.get("SCORING_DATASET_NAME")  # NOQA: E501
+    scoring_pipeline_name: Optional[str] = os.environ.get("SCORING_PIPELINE_NAME")  # NOQA: E501
+    aml_env_name_scoring: Optional[str] = os.environ.get("AML_ENV_NAME_SCORING")  # NOQA: E501
+    batchscore_script_path: Optional[str] = os.environ.get("BATCHSCORE_SCRIPT_PATH")  # NOQA: E501
