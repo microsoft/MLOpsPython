@@ -119,8 +119,8 @@ stages:
   displayName: 'Deploy to Webapp'
   condition: and(succeeded(), variables['WEBAPP_DEPLOYMENT_NAME'])
   jobs:
-  - job: "Package_Model"
-    displayName: "Package model"
+  - job: "Deploy_Webapp"
+    displayName: "Package and deploy model"
     container: mlops
     timeoutInMinutes: 0
     steps:
@@ -136,12 +136,6 @@ stages:
         condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
-  - job: "Deploy_Webapp"
-    displayName: "Deploy Webapp"
-    container: mlops
-    dependsOn: Package_Model
-    condition: succeeded()
-    steps:
     - task: AzureWebAppContainer@1
       name: WebAppDeploy
       displayName: 'Azure Web App on Container Deploy'
