@@ -3,7 +3,10 @@ parameters:
 - name: modelId
   type: string
   default: ''
-- name: inferenceConfigPath
+- name: workingDirectory
+  type: string
+  default: ''
+- name: inferencePath
   type: string
   default: ''
 
@@ -18,6 +21,7 @@ steps:
   - task: AzureCLI@1
     displayName: 'Create model package and set IMAGE_LOCATION variable'
     inputs:
+      workingDirectory: '${{ parameters.workingDirectory }}'
       azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
       scriptLocation: inlineScript
       inlineScript: |

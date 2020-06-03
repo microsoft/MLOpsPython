@@ -178,7 +178,8 @@ stages:
     - template: diabetes_regression-package-model-template.yml
       parameters:
         modelId: $(MODEL_NAME):$(MODEL_VERSION)
-        inferenceConfigPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/inference_config.yml'
+        workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
+        inferencePath: 'inference_config.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
     - task: AzureWebAppContainer@1
