@@ -31,7 +31,7 @@ steps:
         IMAGE_LOCATION=$(\
         az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
         --model '${{ parameters.modelId }}' \
-        --ic '${{ parameters.inferenceConfigPath }}' \
+        --ic '${{ parameters.inferencePath }}' \
         --rt python --query 'location')
 
         # Set environment variable
