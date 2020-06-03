@@ -175,18 +175,12 @@ stages:
     timeoutInMinutes: 0
     steps:
     - template: diabetes_regression-get-model-version-template.yml
-    - task: AzureCLI@1
-      displayName: 'Create scoring image and set IMAGE_LOCATION variable'
-      inputs:
-        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
-        scriptLocation: inlineScript
-        inlineScript: |
-          set -e # fail on error
-          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          python -m ml_service.util.create_scoring_image --output_image_location_file image_location.txt
-          # Output image location to Azure DevOps job
-          IMAGE_LOCATION="$(cat image_location.txt)"
-          echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+    - template: diabetes_regression-package-model-template.yml
+      parameters:
+        modelId: $(MODEL_NAME):$(MODEL_VERSION)
+        inferenceConfigPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/inference_config.yml'
+    - script: echo $(IMAGE_LOCATION) >image_location.txt
+      displayName: "Write image location file"
     - task: AzureWebAppContainer@1
       name: WebAppDeploy
       displayName: 'Azure Web App on Container Deploy'
