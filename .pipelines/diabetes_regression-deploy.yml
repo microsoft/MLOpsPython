@@ -117,7 +117,7 @@ stages:
 
 - stage: 'Deploy_Webapp'
   displayName: 'Deploy to Webapp'
-  condition: and(succeeded(), variables['WEBAPP_DEPLOYMENT_NAME'])
+  condition: variables['WEBAPP_DEPLOYMENT_NAME']
   jobs:
   - job: "Deploy_Webapp"
     displayName: "Package and deploy model"
