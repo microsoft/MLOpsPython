@@ -42,10 +42,6 @@ stages:
         workingDirectory: $(Build.SourcesDirectory)
         inlineScript: |
           set -e # fail on error
-          echo "##vso[task.prependpath]$CONDA/bin"
-          conda create --yes --quiet --name batchscoreenv Anaconda python=3.7.6
-          source activate batchscoreenv
-          pip install --upgrade azureml-sdk python-dotenv
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
           # Invoke the Python building and publishing a training pipeline
           python -m ml_service.pipelines.diabetes_regression_build_parallel_batchscore_pipeline

@@ -48,9 +48,6 @@ class Env:
         "AML_REBUILD_ENVIRONMENT", "false"
     ).lower().strip() == "true"
 
-    use_gpu_for_training: Optional[bool] = os.environ.get(
-        "USE_GPU_FOR_TRAINING", "false"
-    ).lower().strip() == "true"
     use_gpu_for_scoring: Optional[bool] = os.environ.get(
         "USE_GPU_FOR_SCORING", "false"
     ).lower().strip() == "true"
@@ -89,4 +86,6 @@ class Env:
     scoring_dataset_name: Optional[str] = os.environ.get("SCORING_DATASET_NAME")  # NOQA: E501
     scoring_pipeline_name: Optional[str] = os.environ.get("SCORING_PIPELINE_NAME")  # NOQA: E501
     aml_env_name_scoring: Optional[str] = os.environ.get("AML_ENV_NAME_SCORING")  # NOQA: E501
+    aml_env_name_score_copy: Optional[str] = os.environ.get("AML_ENV_NAME_SCORE_COPY")  # NOQA: E501
     batchscore_script_path: Optional[str] = os.environ.get("BATCHSCORE_SCRIPT_PATH")  # NOQA: E501
+    batchscore_copy_script_path: Optional[str] = os.environ.get("BATCHSCORE_COPY_SCRIPT_PATH")  # NOQA: E501

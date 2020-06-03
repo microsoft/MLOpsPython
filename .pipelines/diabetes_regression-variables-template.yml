@@ -20,6 +20,8 @@ variables:
     # The path to the batch scoring script relative to SOURCES_DIR_TRAIN
   - name: BATCHSCORE_SCRIPT_PATH
     value: scoring/parallel_batchscore.py
+  - name: BATCHSCORE_COPY_SCRIPT_PATH
+    value: scoring/parallel_batchscore_copyoutput.py
 
   # Azure ML Variables
   - name: EXPERIMENT_NAME
@@ -76,14 +78,14 @@ variables:
   # - name: AML_REBUILD_ENVIRONMENT
   #  value: "false"
 
-  - name: USE_GPU_FOR_TRAINING
-    value: False
   - name: USE_GPU_FOR_SCORING
     value: False
 
     # AML Compute Cluster Config for parallel batch scoring
   - name: AML_ENV_NAME_SCORING
     value: diabetes_regression_scoring_env
+  - name: AML_ENV_NAME_SCORE_COPY
+    value: diabetes_regression_score_copy_env
   - name: AML_COMPUTE_CLUSTER_CPU_SKU_SCORING
     value: STANDARD_DS2_V2
   - name: AML_COMPUTE_CLUSTER_NAME_SCORING

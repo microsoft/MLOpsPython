@@ -25,13 +25,26 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 import os
 from azureml.pipeline.steps import ParallelRunConfig, ParallelRunStep
-from ml_service.util.manage_environment import get_environment_for_scoring
+from ml_service.util.manage_environment import (
+    get_environment_for_scoring,
+    get_environment_for_score_copy,
+)
 from ml_service.util.env_variables import Env
-from ml_service.util.attach_compute import get_compute_for_scoring
-from azureml.core import Workspace, Dataset, Datastore, Model
+from ml_service.util.attach_compute import (
+    get_compute_for_scoring,
+    # get_compute_for_score_copy,
+)
+from azureml.core import (
+    Workspace,
+    Dataset,
+    Datastore,
+    Model,
+    RunConfiguration,
+)
 from azureml.pipeline.core import Pipeline, PipelineData, PipelineParameter
 from azureml.core.compute import ComputeTarget
 from azureml.data.datapath import DataPath
+from azureml.pipeline.steps import PythonScriptStep
 from argparse import ArgumentParser, Namespace
 from typing import Tuple
 
@@ -76,7 +89,8 @@ def get_model(
         tagvalue is None and tagname is not None
     ):
         raise ValueError(
-            "model_tag_name and model_tag_value should both be supplied" + "or excluded"  # NOQA: E501
+            "model_tag_name and model_tag_value should both be supplied"
+            + "or excluded"  # NOQA: E501
         )
     else:
         model = Model(ws, name=env.model_name)
@@ -269,18 +283,18 @@ def get_inputds_outputloc(
     return (scoringinputds, output_loc)
 
 
-def get_run_config(
+def get_run_configs(
     ws: Workspace, computetarget: ComputeTarget, env: Env
-) -> ParallelRunConfig:
+) -> Tuple[ParallelRunConfig, RunConfiguration]:
     """
-    Creates a ParallelRunConfig required by the
+    Creates the necessary run configurations required by the
     pipeline to enable parallelized scoring.
 
     :param ws: AML Workspace
     :param computetarget: AML Compute target
     :param env: Environment Variables
 
-    :returns: Run configuration
+    :returns: Tuple[Scoring Run configuration, Score copy run configuration]
     """
 
     # get a conda environment for scoring
@@ -288,7 +302,7 @@ def get_run_config(
         ws, env.aml_env_name_scoring, create_new=env.rebuild_env_scoring
     )
 
-    run_config = ParallelRunConfig(
+    score_run_config = ParallelRunConfig(
         entry_script=env.batchscore_script_path,
         source_directory=env.sources_directory_train,
         error_threshold=10,
@@ -299,14 +313,20 @@ def get_run_config(
         run_invocation_timeout=300,
     )
 
-    return run_config
+    copy_run_config = RunConfiguration()
+    copy_run_config.environment = get_environment_for_score_copy(
+        ws, env.aml_env_name_score_copy, create_new=env.rebuild_env_scoring
+    )
+    return (score_run_config, copy_run_config)
 
 
 def get_scoring_pipeline(
     model: Model,
     scoring_dataset: Dataset,
     output_loc: PipelineData,
-    run_config: ParallelRunConfig,
+    score_run_config: ParallelRunConfig,
+    copy_run_config: RunConfiguration,
+    computetarget: ComputeTarget,
     ws: Workspace,
     env: Env,
 ) -> Pipeline:
@@ -316,8 +336,11 @@ def get_scoring_pipeline(
     :param model: The model to use for scoring
     :param scoring_dataset: Data to score
     :param output_loc: Location to save the scoring results
-    :param run_config: Parallel Run configuration to support
+    :param score_run_config: Parallel Run configuration to support
     parallelized scoring
+    :param copy_run_config: Script Run configuration to support
+    score copying
+    :param computetarget: AML Compute target
     :param ws: AML Workspace
     :param env: Environment Variables
 
@@ -326,9 +349,15 @@ def get_scoring_pipeline(
     # To help filter the model make the model name, model version and a
     # tag/value pair bindable parameters so that they can be passed to
     # the pipeline when invoked either over REST or via the AML SDK.
-    model_name_param = PipelineParameter("model_name", default_value=env.model_name)  # NOQA: E501
-    model_tag_name_param = PipelineParameter("model_tag_name", default_value=" ")  # NOQA: E501
-    model_tag_value_param = PipelineParameter("model_tag_value", default_value=" ")  # NOQA: E501
+    model_name_param = PipelineParameter(
+        "model_name", default_value=env.model_name
+    )  # NOQA: E501
+    model_tag_name_param = PipelineParameter(
+        "model_tag_name", default_value=" "
+    )  # NOQA: E501
+    model_tag_value_param = PipelineParameter(
+        "model_tag_value", default_value=" "
+    )  # NOQA: E501
 
     scoring_step = ParallelRunStep(
         name="scoringstep",
@@ -342,11 +371,32 @@ def get_scoring_pipeline(
             "--model_tag_value",
             model_tag_value_param,
         ],
-        parallel_run_config=run_config,
+        parallel_run_config=score_run_config,
         allow_reuse=False,
     )
 
-    return Pipeline(workspace=ws, steps=[scoring_step])
+    copying_step = PythonScriptStep(
+        name="scorecopystep",
+        script_name=env.batchscore_copy_script_path,
+        source_directory=env.sources_directory_train,
+        arguments=[
+            "--output_path",
+            output_loc,
+            "--scoring_output_filename",
+            env.scoring_datastore_output_filename,
+            "--scoring_datastore",
+            env.scoring_datastore_storage_name,
+            "--score_container",
+            env.scoring_datastore_output_container,
+            "--scoring_datastore_key",
+            env.scoring_datastore_access_key,
+        ],
+        inputs=[output_loc],
+        allow_reuse=False,
+        compute_target=computetarget,
+        runconfig=copy_run_config,
+    )
+    return Pipeline(workspace=ws, steps=[scoring_step, copying_step])
 
 
 def build_batchscore_pipeline():
@@ -367,13 +417,17 @@ def build_batchscore_pipeline():
         )
 
         # Get Azure machine learning cluster
-        aml_compute = get_compute_for_scoring(
+        aml_compute_score = get_compute_for_scoring(
             aml_workspace, env.compute_name_scoring, env.vm_size_scoring
         )
 
-        input_dataset, output_location = get_inputds_outputloc(aml_workspace, env)  # NOQA: E501
+        input_dataset, output_location = get_inputds_outputloc(
+            aml_workspace, env
+        )  # NOQA: E501
 
-        scoring_runconfig = get_run_config(aml_workspace, aml_compute, env)
+        scoring_runconfig, score_copy_runconfig = get_run_configs(
+            aml_workspace, aml_compute_score, env
+        )
 
         trained_model = get_model(
             aml_workspace, env, args.model_tag_name, args.model_tag_value
@@ -384,12 +438,12 @@ def build_batchscore_pipeline():
             input_dataset,
             output_location,
             scoring_runconfig,
+            score_copy_runconfig,
+            aml_compute_score,
             aml_workspace,
             env,
         )
 
-        # scoring_pipeline.validate() - Need to think through this -
-        # what if validation fails ? How do we handle ?
         published_pipeline = scoring_pipeline.publish(
             name=env.scoring_pipeline_name,
             description="Diabetes Batch Scoring Pipeline",
@@ -398,7 +452,8 @@ def build_batchscore_pipeline():
             published_pipeline.id
         )
         print(pipeline_id_string)
-    except Exception:
+    except Exception as e:
+        print(e)
         exit(1)
 
 
