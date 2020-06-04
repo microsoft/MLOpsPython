@@ -59,7 +59,7 @@ stages:
           --model '$(MODEL_NAME):$(MODEL_VERSION)' \
           --entry-script '$(SCORE_SCRIPT)' \
           --cf 'conda_dependencies.yml' \
-          --verbose \
+          -v \
           --rt python --query 'location' -o tsv
 
     - script: echo $(IMAGE_LOCATION) >image_location.txt

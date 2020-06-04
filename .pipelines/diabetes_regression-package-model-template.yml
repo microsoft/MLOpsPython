@@ -35,7 +35,7 @@ steps:
         az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
         --model '${{ parameters.modelId }}' \
         --ic '${{ parameters.inferencePath }}' \
-        --verbose \
+        -v \
         --query 'location' -o tsv)
 
         # Set environment variable
