@@ -58,6 +58,8 @@ The variable group should contain the following required variables. **Azure reso
 | AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                 |
 | ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                           |
+| SCORING_DATASTORE_STORAGE_NAME      | [your project name]scoredata                 | [Azure Blob Storage Account](https://docs.microsoft.com/en-us/azure/storage/blobs/) name (optional)                          |
+| SCORING_DATASTORE_ACCESS_KEY      |                  | [Azure Storage Account Key](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-requests-to-azure-storage) (optional)                          |
 
 Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
@@ -79,9 +81,16 @@ More variables are available for further tweaking, but the above variables are a
 
 **ACI_DEPLOYMENT_NAME** is used for naming the scoring service during deployment to [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/).
 
+**SCORING_DATASTORE_STORAGE_NAME** is the name for an Azure Blob Storage account that will contain both data used as input to batch scoring, as well as the batch scoring outputs. This variable is optional and only needed if you intend to use the batch scoring facility. Note that since this resource is optional, the resource provisioning pipelines mentioned below do not create this resource automatically, and manual creation is required before use.
+
+**SCORING_DATASTORE_ACCESS_KEY** is the access key for the scoring data Azure storage account mentioned above. You may want to consider linking this variable to Azure KeyVault to avoid storing the access key in plain text. This variable is optional and only needed if you intend to use the batch scoring facility. 
+
+
 ## Provisioning resources using Azure Pipelines
 
 The easiest way to create all required Azure resources (Resource Group, Azure ML Workspace, Container Registry, and others) is to use the **Infrastructure as Code (IaC)** [pipeline with ARM templates](../environment_setup/iac-create-environment-pipeline-arm.yml) or the [pipeline with Terraform templates](../environment_setup/iac-create-environment-pipeline-tf.yml). The pipeline takes care of setting up all required resources based on these [Azure Resource Manager templates](../environment_setup/arm-templates/cloud-environment.json), or based on these [Terraform templates](../environment_setup/tf-templates).
+
+**Note:** Since Azure Blob storage account required for batch scoring is optional, the resource provisioning pipelines mentioned above do not create this resource automatically, and manual creation is required before use.
 
 ### Create an Azure DevOps Service Connection for the Azure Resource Manager
 
@@ -129,14 +138,16 @@ You'll need sufficient permissions to register an application with your Azure AD
 
 ## Set up Build, Release Trigger, and Release Multi-Stage Pipeline
 
-Now that you've provisioned all the required Azure resources and service connections, you can set up the pipeline for deploying your machine learning model to production. The pipeline has a sequence of stages for:
+Now that you've provisioned all the required Azure resources and service connections, you can set up the pipelines for deploying your machine learning model to production. The pipelines have a sequence of stages for:
 
 1. **Model Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a training pipeline.
 1. **Train Model**: invokes the Azure ML service to trigger the published training pipeline to train, evaluate, and register a model.
 1. **Release Deployment:** deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments. For simplicity, you're going to initially focus on Azure Container Instances. See [Further Exploration](#further-exploration) for other deployment types.
    1. **Note:** Edit the pipeline definition to remove unused stages. For example, if you're deploying to Azure Container Instances and Azure Kubernetes Service only, delete the unused `Deploy_Webapp` stage.
+1. **Batch Scoring Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a batch scoring pipeline.
+1. **Run Batch Scoring**: invokes the published batch scoring pipeline to score a model.
 
-### Set up the Pipeline
+### Set up the Training Pipeline
 
 In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml)
 pipeline definition in your forked repository.
@@ -151,7 +162,7 @@ Also check the published training pipeline in the **mlops-AML-WS** workspace in 
 
 ![Training pipeline](./images/training-pipeline.png)
 
-Great, you now have the build pipeline set up which automatically triggers every time there's a change in the master branch!
+Great, you now have the build pipeline for training set up which automatically triggers every time there's a change in the master branch!
 
 The pipeline stages are summarized below:
 
@@ -186,6 +197,40 @@ After the pipeline is finished, you'll see a new model in the **ML Workspace**:
 To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci.yml` pipeline to `false`.  You can also override the variable at runtime execution of the pipeline.
 
 To skip model training and registration, and deploy a model successfully registered by a previous build (for testing changes to the score file or inference configuration), add the variable `MODEL_BUILD_ID` when the pipeline is queued, and set the value to the ID of the previous build.
+
+### Set up the Batch Scoring Pipeline
+
+In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-batchscoring-ci.yml](../.pipelines/diabetes_regression-batchscoring-ci.yml)
+pipeline definition in your forked repository. 
+
+Once the pipeline is finished, check the execution result:
+
+![Build](./images/batchscoring-ci-result.png)
+
+Also check the published batch scoring pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://portal.azure.com/):
+
+![Training pipeline](./images/batchscoring-pipeline.png)
+
+Great, you now have the build pipeline set up for batch scoring which automatically triggers every time there's a change in the master branch!
+
+The pipeline stages are summarized below:
+
+#### Batch Scoring CI
+
+- Linting (code quality analysis)
+- Unit tests and code coverage analysis
+- Build and publish *ML Batch Scoring Pipeline* in an *ML Workspace*
+
+#### Batch Score model
+
+- Determine the model to be used based on the model name, model tag name and model tag value bound pipeline parameters.
+- Trigger the *ML Batch Scoring Pipeline* and waits for it to complete.
+  - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
+- Use the scoring input data supplied via the SCORING_DATASTORE_INPUT_* configuration variables.
+- Once scoring is completed, the scores are made available in the same blob storage at the locations specified via the SCORING_DATASTORE_OUTPUT_* configuration variables.
+
+**Note** In the event a scoring data store is not yet configured, you can still try out batch scoring by supplying a scoring input data file within the data folder. Do make sure to set the SCORING_DATASTORE_INPUT_FILENAME variable to the name of the file. This approach will cause the score output to be written to the ML workspace's default datastore. 
+
 
 ## Further Exploration
 
