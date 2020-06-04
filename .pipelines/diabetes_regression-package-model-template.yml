@@ -35,7 +35,8 @@ steps:
         az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
         --model '${{ parameters.modelId }}' \
         --ic '${{ parameters.inferencePath }}' \
-        --rt python --query 'location' -o tsv)
+        --verbose \
+        --query 'location' -o tsv)
 
         # Set environment variable
         echo $IMAGE_LOCATION

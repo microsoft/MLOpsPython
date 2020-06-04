@@ -37,7 +37,6 @@ class Env:
     model_name: Optional[str] = os.environ.get("MODEL_NAME")
     experiment_name: Optional[str] = os.environ.get("EXPERIMENT_NAME")
     model_version: Optional[str] = os.environ.get('MODEL_VERSION')
-    image_name: Optional[str] = os.environ.get('IMAGE_NAME')
     db_cluster_id: Optional[str] = os.environ.get("DB_CLUSTER_ID")
     score_script: Optional[str] = os.environ.get("SCORE_SCRIPT")
     build_uri: Optional[str] = os.environ.get("BUILD_URI")

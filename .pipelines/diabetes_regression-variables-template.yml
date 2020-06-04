@@ -46,10 +46,6 @@ variables:
     value: 4
   - name: AML_CLUSTER_PRIORITY
     value: lowpriority
-
-  # The name for the (docker/webapp) scoring image
-  - name: IMAGE_NAME
-    value: "diabetestrained"
  
     # Optional. Used by a training pipeline with R on Databricks
   - name: DB_CLUSTER_ID
