@@ -52,13 +52,14 @@ stages:
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
         inlineScript: |
           set -e # fail on error
 
           az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
           --model '$(MODEL_NAME):$(MODEL_VERSION)' \
-          --entry-script '$(SCORE_SCRIPT)' \
-          --cf 'conda_dependencies.yml' \
+          --entry-script '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/$(SCORE_SCRIPT)' \
+          --cf '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml' \
           -v \
           --rt python --query 'location' -o tsv
 
