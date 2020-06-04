@@ -60,7 +60,7 @@ stages:
           --entry-script '$(SCORE_SCRIPT)' \
           --cf 'conda_dependencies.yml' \
           --verbose \
-          --rt python --query 'location' -o tsv)
+          --rt python --query 'location' -o tsv
 
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
