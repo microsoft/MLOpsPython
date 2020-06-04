@@ -7,6 +7,8 @@ parameters:
   type: string
   default: latest
 
+pr: none
+
 # Trigger this pipeline on model-train pipeline completion
 trigger: none
 resources:
