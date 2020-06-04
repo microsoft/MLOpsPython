@@ -180,8 +180,6 @@ stages:
         modelId: $(MODEL_NAME):$(MODEL_VERSION)
         workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
         inferencePath: 'inference_config.yml'
-    - script: echo $(IMAGE_LOCATION) >image_location.txt
-      displayName: "Write image location file"
     - task: AzureWebAppContainer@1
       name: WebAppDeploy
       displayName: 'Azure Web App on Container Deploy'

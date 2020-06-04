@@ -9,6 +9,9 @@ parameters:
 - name: inferencePath
   type: string
   default: ''
+- name: outputImageLocationPath
+  type: string
+  default: image_location.txt
 
 steps:
   - task: AzureCLI@1
@@ -32,8 +35,10 @@ steps:
         az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
         --model '${{ parameters.modelId }}' \
         --ic '${{ parameters.inferencePath }}' \
-        --rt python --query 'location')
+        --rt python --query 'location' -o tsv)
 
         # Set environment variable
         echo $IMAGE_LOCATION
         echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+  - script: echo $(IMAGE_LOCATION) >${{ parameters.outputImageLocationPath }}
+    displayName: "Write image location file"

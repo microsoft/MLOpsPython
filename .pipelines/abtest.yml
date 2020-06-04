@@ -40,16 +40,12 @@ stages:
       vmImage: 'ubuntu-latest'
     container: mlops
     steps:
-    - task: AzureCLI@1
-      inputs:
-        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
-        scriptLocation: inlineScript
-        inlineScript: |
-          set -e
-          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-          python -m ml_service.util.create_scoring_image --output_image_location_file image_location.txt          
-      displayName: 'Create Scoring Image'
-      name: 'buildscoringimage'
+    - template: diabetes_regression-package-model-template.yml
+      parameters:
+        modelId: $(MODEL_NAME):$(MODEL_VERSION)
+        workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
+        inferencePath: 'inference_config.yml'
+        outputImageLocationPath: 'image_location.txt'
 
     - publish: image_location.txt
       artifact: image_location
