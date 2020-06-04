@@ -41,12 +41,12 @@ stages:
     container: mlops
     steps:
     - task: AzureCLI@1
-    displayName: 'Install AzureML CLI'
-    inputs:
-      azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
-      scriptLocation: inlineScript
-      workingDirectory: $(Build.SourcesDirectory)
-      inlineScript: 'az extension add -n azure-cli-ml'
+      displayName: 'Install AzureML CLI'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: 'az extension add -n azure-cli-ml'
     - task: AzureCLI@1
       displayName: 'Create model package'
       inputs:
