@@ -25,15 +25,14 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 import os
 from azureml.pipeline.steps import ParallelRunConfig, ParallelRunStep
-from ml_service.util.manage_environment import (
-    get_environment_for_scoring,
-    get_environment_for_score_copy,
-)
+from ml_service.util.manage_environment import get_environment
+
+# from ml_service.util.manage_environment import (
+#    get_environment_for_scoring,
+#    get_environment_for_score_copy,
+# )
 from ml_service.util.env_variables import Env
-from ml_service.util.attach_compute import (
-    get_compute_for_scoring,
-    # get_compute_for_score_copy,
-)
+from ml_service.util.attach_compute import get_compute
 from azureml.core import (
     Workspace,
     Dataset,
@@ -298,8 +297,13 @@ def get_run_configs(
     """
 
     # get a conda environment for scoring
-    environment = get_environment_for_scoring(
-        ws, env.aml_env_name_scoring, create_new=env.rebuild_env_scoring
+    environment = get_environment(
+        ws,
+        env.aml_env_name_scoring,
+        conda_dependencies_file=env.aml_env_score_conda_dep_file,
+        enable_docker=True,
+        use_gpu=env.use_gpu_for_scoring,
+        create_new=env.rebuild_env_scoring,
     )
 
     score_run_config = ParallelRunConfig(
@@ -314,8 +318,13 @@ def get_run_configs(
     )
 
     copy_run_config = RunConfiguration()
-    copy_run_config.environment = get_environment_for_score_copy(
-        ws, env.aml_env_name_score_copy, create_new=env.rebuild_env_scoring
+    copy_run_config.environment = get_environment(
+        ws,
+        env.aml_env_name_score_copy,
+        conda_dependencies_file=env.aml_env_scorecopy_conda_dep_file,
+        enable_docker=True,
+        use_gpu=env.use_gpu_for_scoring,
+        create_new=env.rebuild_env_scoring,
     )
     return (score_run_config, copy_run_config)
 
@@ -417,8 +426,11 @@ def build_batchscore_pipeline():
         )
 
         # Get Azure machine learning cluster
-        aml_compute_score = get_compute_for_scoring(
-            aml_workspace, env.compute_name_scoring, env.vm_size_scoring
+        aml_compute_score = get_compute(
+            aml_workspace,
+            env.compute_name_scoring,
+            env.vm_size_scoring,
+            for_batch_scoring=True,
         )
 
         input_dataset, output_location = get_inputds_outputloc(

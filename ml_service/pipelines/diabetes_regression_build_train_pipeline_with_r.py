@@ -13,16 +13,13 @@ def main():
     aml_workspace = Workspace.get(
         name=e.workspace_name,
         subscription_id=e.subscription_id,
-        resource_group=e.resource_group
+        resource_group=e.resource_group,
     )
     print("get_workspace:")
     print(aml_workspace)
 
     # Get Azure machine learning cluster
-    aml_compute = get_compute(
-        aml_workspace,
-        e.compute_name,
-        e.vm_size)
+    aml_compute = get_compute(aml_workspace, e.compute_name, e.vm_size)
     if aml_compute is not None:
         print("aml_compute:")
         print(aml_compute)
@@ -31,7 +28,11 @@ def main():
     # Make sure to include `r-essentials'
     #   in diabetes_regression/conda_dependencies.yml
     environment = get_environment(
-        aml_workspace, e.aml_env_name, create_new=e.rebuild_env)  # NOQA: E501
+        aml_workspace,
+        e.aml_env_name,
+        conda_dependencies_file=e.aml_env_train_conda_dep_file,
+        create_new=e.rebuild_env,
+    )  # NOQA: E501
     run_config = RunConfiguration()
     run_config.environment = environment
 
@@ -52,11 +53,11 @@ def main():
     published_pipeline = train_pipeline.publish(
         name=e.pipeline_name,
         description="Model training/retraining pipeline",
-        version=e.build_id
+        version=e.build_id,
     )
-    print(f'Published pipeline: {published_pipeline.name}')
-    print(f'for build {published_pipeline.version}')
+    print(f"Published pipeline: {published_pipeline.name}")
+    print(f"for build {published_pipeline.version}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
