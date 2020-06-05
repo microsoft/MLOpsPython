@@ -26,11 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 import os
 from azureml.pipeline.steps import ParallelRunConfig, ParallelRunStep
 from ml_service.util.manage_environment import get_environment
-
-# from ml_service.util.manage_environment import (
-#    get_environment_for_scoring,
-#    get_environment_for_score_copy,
-# )
+from ml_service.pipelines.load_sample_data import create_sample_data_csv
 from ml_service.util.env_variables import Env
 from ml_service.util.attach_compute import get_compute
 from azureml.core import (
@@ -178,10 +174,9 @@ def get_input_dataset(ws: Workspace, ds: Datastore, env: Env) -> Dataset:
 def get_fallback_input_dataset(ws: Workspace, env: Env) -> Dataset:
     """
     Called when an input datastore does not exist or no input data file exists
-    at that location. Picks up an included test data file from the "data"
-    location in the source code repo named "pcamvpscoringinput.csv" and
-    returns a dataset wrapped around that file. Useful when debugging
-    this code in the absence of the input data location Azure blob.
+    at that location. Create a sample dataset using the diabetes dataset from
+    scikit-learn. Useful when debugging this code in the absence of the input
+    data location Azure blob.
 
 
     :param ws: AML Workspace
@@ -191,14 +186,18 @@ def get_fallback_input_dataset(ws: Workspace, env: Env) -> Dataset:
 
     :raises: FileNotFoundError
     """
+    # This call creates an example CSV from sklearn sample data. If you
+    # have already bootstrapped your project, you can comment this line
+    # out and use your own CSV.
+    create_sample_data_csv(
+        file_name=env.scoring_datastore_input_filename, for_scoring=True
+    )
 
-    file_path = os.path.join("data", env.scoring_datastore_input_filename)
-
-    if not os.path.exists(file_path):
+    if not os.path.exists(env.scoring_datastore_input_filename):
         error_message = (
             "Could not find CSV dataset for scoring at {}. "
             + "No alternate data store location was provided either.".format(
-                file_path
+                env.scoring_datastore_input_filename
             )  # NOQA: E501
         )
 
@@ -207,7 +206,9 @@ def get_fallback_input_dataset(ws: Workspace, env: Env) -> Dataset:
     # upload the input data to the workspace default datastore
     default_datastore = ws.get_default_datastore()
     scoreinputdataref = default_datastore.upload_files(
-        [file_path], target_path="scoringinput", overwrite=False
+        [env.scoring_datastore_input_filename],
+        target_path="scoringinput",
+        overwrite=False,
     )
 
     scoringinputds = (
@@ -392,13 +393,21 @@ def get_scoring_pipeline(
             "--output_path",
             output_loc,
             "--scoring_output_filename",
-            env.scoring_datastore_output_filename,
+            env.scoring_datastore_output_filename
+            if env.scoring_datastore_output_filename is not None
+            else "",
             "--scoring_datastore",
-            env.scoring_datastore_storage_name,
+            env.scoring_datastore_storage_name
+            if env.scoring_datastore_storage_name is not None
+            else "",
             "--score_container",
-            env.scoring_datastore_output_container,
+            env.scoring_datastore_output_container
+            if env.scoring_datastore_output_container is not None
+            else "",
             "--scoring_datastore_key",
-            env.scoring_datastore_access_key,
+            env.scoring_datastore_access_key
+            if env.scoring_datastore_access_key is not None
+            else "",
         ],
         inputs=[output_loc],
         allow_reuse=False,

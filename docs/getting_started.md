@@ -138,14 +138,17 @@ You'll need sufficient permissions to register an application with your Azure AD
 
 ## Set up Build, Release Trigger, and Release Multi-Stage Pipeline
 
-Now that you've provisioned all the required Azure resources and service connections, you can set up the pipelines for deploying your machine learning model to production. The pipelines have a sequence of stages for:
+Now that you've provisioned all the required Azure resources and service connections, you can set up the pipelines for deploying your machine learning model to production. 
+
+**There are two main Azure pipelines - one to handle model training and another to handle batch scoring of the model.** 
+
+### **Azure [pipeline](../.pipelines/diabetes_regression-ci.yml) for model training**
+This pipeline has a sequence of stages for:
 
 1. **Model Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a training pipeline.
 1. **Train Model**: invokes the Azure ML service to trigger the published training pipeline to train, evaluate, and register a model.
 1. **Release Deployment:** deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments. For simplicity, you're going to initially focus on Azure Container Instances. See [Further Exploration](#further-exploration) for other deployment types.
    1. **Note:** Edit the pipeline definition to remove unused stages. For example, if you're deploying to Azure Container Instances and Azure Kubernetes Service only, delete the unused `Deploy_Webapp` stage.
-1. **Batch Scoring Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a batch scoring pipeline.
-1. **Run Batch Scoring**: invokes the published batch scoring pipeline to score a model.
 
 ### Set up the Training Pipeline
 
@@ -197,6 +200,12 @@ After the pipeline is finished, you'll see a new model in the **ML Workspace**:
 To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci.yml` pipeline to `false`.  You can also override the variable at runtime execution of the pipeline.
 
 To skip model training and registration, and deploy a model successfully registered by a previous build (for testing changes to the score file or inference configuration), add the variable `MODEL_BUILD_ID` when the pipeline is queued, and set the value to the ID of the previous build.
+
+
+### **Azure [pipeline](../.pipelines/diabetes_regression-batchscoring-ci.yml) for batch scoring**
+This pipeline has a sequence of stages for:
+1. **Batch Scoring Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a batch scoring pipeline.
+1. **Run Batch Scoring**: invokes the published batch scoring pipeline to score a model.
 
 ### Set up the Batch Scoring Pipeline
 
