@@ -142,7 +142,7 @@ Now that you've provisioned all the required Azure resources and service connect
 
 **There are two main Azure pipelines - one to handle model training and another to handle batch scoring of the model.** 
 
-### **Azure [pipeline](../.pipelines/diabetes_regression-ci.yml) for model training**
+### **Azure [pipeline](../.pipelines/diabetes_regression-ci.yml) for model training and deployment**
 This pipeline has a sequence of stages for:
 
 1. **Model Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a training pipeline.
