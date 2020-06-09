@@ -37,4 +37,5 @@ steps:
 
         # Set environment variable
         echo $IMAGE_LOCATION
+        echo $IMAGE_LOCATION >image_location.txt
         echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
