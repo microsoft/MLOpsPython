@@ -32,6 +32,7 @@ steps:
         --model '${{ parameters.modelId }}' \
         --entry-script '${{ parameters.scoringScriptPath }}' \
         --cf '${{ parameters.condaFilePath }}' \
+        -v \
         --rt python --query 'location' -o tsv)
 
         # Set environment variable
