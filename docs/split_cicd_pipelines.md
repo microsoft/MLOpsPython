@@ -81,14 +81,14 @@ This pipeline has the following behaviors:
 
 - The pipeline will **automatically trigger** on completion of the Model-Train-Register-CI pipeline
 - The pipeline will default to using the latest successful build of the Model-Train-Register-CI pipeline. It will deploy the model produced by that build.
-  - You can specify a build ID when running the pipeline manually.
+- You can specify a `Model-Train-Register-CI` build ID when running the pipeline manually. You can find this in the url of the build, and the model registered from that build will also be tagged with the build ID.
 
 ### Set up the pipeline
 
 In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-cd-deploy.yml](../.pipelines/diabetes_regression-cd-deploy.yml)
 pipeline definition in your forked repository.
 
-Your first run will use the latest model created by the Model-Train-Register-CI pipeline.
+Your first run will use the latest model created by the `Model-Train-Register-CI` pipeline.
 
 Once the pipeline is finished, check the execution result:
 
@@ -97,6 +97,10 @@ Once the pipeline is finished, check the execution result:
 To specify a particular build's model, set the `Model Train CI Build Id` parameter to the build Id you would like to use.
 
 ![Build](./images/model-deploy-configure.png)
+
+Once your pipeline run begins, you can see the model name and version downloaded from the `Model-Train-Register-CI` pipeline.
+
+![Build](./images/model-deploy-artifact-logs.png)
 
 The pipeline has the following stage:
 
