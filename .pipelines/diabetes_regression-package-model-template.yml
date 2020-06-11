@@ -32,12 +32,13 @@ steps:
         --entry-script '${{ parameters.scoringScriptPath }}' \
         --cf '${{ parameters.condaFilePath }}' \
         -v \
-        --rt python --query 'location' -o tsv > image_creation.txt
+        --rt python --query 'location' -o tsv > logs.txt
 
-        cat image_creation.txt
+        # Show logs
+        cat logs.txt
 
-        # Set environment variable
-        IMAGE_LOCATION=$(tail -n 1 image_creation.txt)
+        # Set environment variable using the last line of logs that has the package location
+        IMAGE_LOCATION=$(tail -n 1 logs.txt)
         echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
-  - publish: image_creation.txt
+  - publish: logs.txt
     artifact: image
