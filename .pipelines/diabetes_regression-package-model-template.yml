@@ -28,7 +28,6 @@ steps:
 
         # Create model package using CLI
         az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
-        --model '${{ parameters.modelId }}' \
         --entry-script '${{ parameters.scoringScriptPath }}' \
         --cf '${{ parameters.condaFilePath }}' \
         -v \
