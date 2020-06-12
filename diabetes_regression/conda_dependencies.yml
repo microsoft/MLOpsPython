@@ -30,7 +30,7 @@ dependencies:
       - azureml-defaults==1.6.*
 
       # Training deps
-      - scikit-learn
+      - scikit-lear
 
       # Scoring deps
       - inference-schema[numpy-support]
