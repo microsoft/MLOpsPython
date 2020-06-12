@@ -57,6 +57,8 @@ stages:
         scriptLocation: inlineScript
         workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
         inlineScript: |
+          set -e # fail on error
+          
           az ml model deploy --name $(ACI_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(MODEL_VERSION)' \
           --ic inference_config.yml \
           --dc deployment_config_aci.yml \
@@ -101,6 +103,8 @@ stages:
         scriptLocation: inlineScript
         workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
         inlineScript: |
+          set -e # fail on error
+          
           az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(MODEL_VERSION)' \
           --compute-target $(AKS_COMPUTE_NAME) \
           --ic inference_config.yml \
