@@ -19,7 +19,7 @@ Take a look at the [Repo Details](code_description.md) document for a descriptio
 
 ## Bootstrap the project
 
-Bootstrapping will prepare a directory structure for your project which includes:
+Bootstrapping will prepare the directory structure to be used for your project name which includes:
 
 * renaming files and folders from the base project name `diabetes_regression` to your project name
 * fixing imports and absolute path based on your project name
