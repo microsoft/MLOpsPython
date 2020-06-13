@@ -3,11 +3,11 @@
 This document provides steps to follow when using this repository as a template to train models and deploy the models with real-time inference in Azure ML with your own scripts and data.
 
 1. Follow the MLOpsPython [Getting Started](getting_started.md) guide
-1. Follow the MLOpsPython [bootstrap instructions](../bootstrap/README.md) to create your project starting point
+1. Bootstrap the project
 1. Configure training data
 1. [If necessary] Convert your ML experimental code into production ready code
 1. Replace the training code
-1. Update the evaluation code
+1. [Optional] Update the evaluation code
 1. Customize the build agent environment
 1. [If appropriate] Replace the score code
 
@@ -17,24 +17,36 @@ Follow the [Getting Started](getting_started.md) guide to set up the infrastruct
 
 Take a look at the [Repo Details](code_description.md) document for a description of the structure of this repository.
 
-## Follow the Bootstrap instructions
+## Bootstrap the project
 
-The [Bootstrap from MLOpsPython repository](../bootstrap/README.md) guide will help you to quickly prepare the repository for your project.
+Bootstrapping will prepare a directory structure for your project which includes:
+
+* renaming files and folders from the base project name `diabetes_regression` to your project name
+* fixing imports and absolute path based on your project name
+* deleting and cleaning up some directories
 
 **Note:** Since the bootstrap script will rename the `diabetes_regression` folder to the project name of your choice, we'll refer to your project as `[project name]` when paths are involved.
+
+To bootstrap from the existing MLOpsPython repository:
+
+1. Ensure Python 3 is installed locally
+1. From a local copy of the code, run the `bootstrap.py` script in the `bootstrap` folder
+`python bootstrap.py -d [dirpath] -n [projectname]`
+    * `[dirpath]` is the absolute path to the root of the directory where MLOpsPython is cloned
+    * `[projectname]` is the name of your ML project
 
 ## Configure training data
 
 The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data.
 
-To use your own data:
+**Important** Convert the template to use your own model Azure ML Dataset for model training via these steps:
 
 1. [Create a Dataset](https://docs.microsoft.com/azure/machine-learning/how-to-create-register-datasets) in your Azure ML workspace
 1. Update the `DATASET_NAME` and `DATASTORE_NAME` variables in `.pipelines/[project name]-variables-template.yml`
 
 ## Convert your ML experimental code into production ready code
 
-The MLOpsPython template creates an Azure Machine Learning (ML) pipeline that invokes a set of [Azure ML pipeline steps](https://docs.microsoft.com/python/api/azureml-pipeline-steps/azureml.pipeline.steps) (see `ml_service/pipelines/[project name]_build_train_pipeline.py`). If your experiment is currently in a Jupyter notebook, it will need to be refactored into scripts that can be run independantly and dropped into the template which the existing Azure ML pipeline steps utilize.
+The MLOpsPython template creates an Azure Machine Learning (ML) pipeline that invokes a set of [Azure ML pipeline steps](https://docs.microsoft.com/python/api/azureml-pipeline-steps/azureml.pipeline.steps) (see `ml_service/pipelines/[project name]_build_train_pipeline.py`). If your experiment is currently in a Jupyter notebook, it will need to be refactored into scripts that can be run independently and dropped into the template which the existing Azure ML pipeline steps utilize.
 
 1. Refactor your experiment code into scripts
 1. [Recommended] Prepare unit tests
