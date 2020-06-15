@@ -39,7 +39,7 @@ To bootstrap from the existing MLOpsPython repository:
 
 The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data.
 
-**Important** Convert the template to use your own model Azure ML Dataset for model training via these steps:
+**Important** Convert the template to use your own Azure ML Dataset for model training via these steps:
 
 1. [Create a Dataset](https://docs.microsoft.com/azure/machine-learning/how-to-create-register-datasets) in your Azure ML workspace
 1. Update the `DATASET_NAME` and `DATASTORE_NAME` variables in `.pipelines/[project name]-variables-template.yml`
