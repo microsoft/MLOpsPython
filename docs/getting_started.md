@@ -218,7 +218,7 @@ Once the pipeline is finished, check the execution result:
 
 Also check the published batch scoring pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://portal.azure.com/):
 
-![Training pipeline](./images/batchscoring-pipeline.png)
+![Batch scoring pipeline](./images/batchscoring-pipeline.png)
 
 Great, you now have the build pipeline set up for batch scoring which automatically triggers every time there's a change in the master branch!
 
