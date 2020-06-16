@@ -64,7 +64,6 @@ The variable group should contain the following required variables. **Azure reso
 | AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                 |
 | ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                           |
-| WORKSPACE_SKU            | basic                     | [Workspace Basic vs Enterprise](https://docs.microsoft.com/en-us/azure/machine-learning/overview-what-is-azure-ml#sku)      |
 
 Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
