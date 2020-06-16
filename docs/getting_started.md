@@ -1,11 +1,12 @@
 
 # Getting Started with MLOpsPython <!-- omit in toc -->
 
-This guide shows how to get MLOpsPython working with a sample ML project ***diabetes_regression***. The project creates a linear regression model to predict diabetes. You can adapt this example to use with your own project.
+This guide shows how to get MLOpsPython working with a sample ML project ***diabetes_regression***. The project creates a linear regression model to predict diabetes and has CI/CD DevOps practices enabled for model training and serving when these steps are completed in this getting started guide.
 
-We recommend working through this guide completely to ensure everything is working in your environment. After the sample is working, follow the [bootstrap instructions](../bootstrap/README.md) to convert the ***diabetes_regression*** sample into a starting point for your project.
+If you would like to bring your own model code to use this template structure, follow the [custom model](custom_model.md) guide. We recommend completing this getting started guide  with the diabetes model through ACI deployment first to ensure everything is working in your environment before converting the template to use your own model code.
 
 - [Setting up Azure DevOps](#setting-up-azure-devops)
+  - [Install the Azure Machine Learning extension](#install-the-azure-machine-learning-extension)
 - [Get the code](#get-the-code)
 - [Create a Variable Group for your Pipeline](#create-a-variable-group-for-your-pipeline)
   - [Variable Descriptions](#variable-descriptions)
@@ -32,6 +33,12 @@ We recommend working through this guide completely to ensure everything is worki
 You'll use Azure DevOps for running the multi-stage pipeline with build, model training, and scoring service release stages. If you don't already have an Azure DevOps organization, create one by following the instructions at [Quickstart: Create an organization or project collection](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
 If you already have an Azure DevOps organization, create a new project using the guide at [Create a project in Azure DevOps and TFS](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
+
+### Install the Azure Machine Learning extension
+
+Install the **Azure Machine Learning** extension to your Azure DevOps organization from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml).
+
+This extension contains the Azure ML pipeline tasks and adds the ability to create Azure ML Workspace service connections.
 
 ## Get the code
 
@@ -117,8 +124,6 @@ Check that the newly created resources appear in the [Azure Portal](https://port
 ## Create an Azure DevOps Service Connection for the Azure ML Workspace
 
 At this point, you should have an Azure ML Workspace created. Similar to the Azure Resource Manager service connection, you need to create an additional one for the Azure ML Workspace.
-
-Install the **Azure Machine Learning** extension to your Azure DevOps organization from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml). The extension is required for the service connection.
 
 Create a new service connection to your Azure ML Workspace using the [Machine Learning Extension](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) instructions to enable executing the Azure ML training pipeline. The connection name needs to match `WORKSPACE_SVC_CONNECTION` that you set in the variable group above.
 
