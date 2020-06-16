@@ -30,14 +30,9 @@ variables:
   value: 'scoring/scoreB.py'
 
 steps:
-- task: AzureCLI@1
-  inputs:
-    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
-    scriptLocation: inlineScript
-    workingDirectory: $(Build.SourcesDirectory)
-    inlineScript: |
-      set -e
-      export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-      python3 -m ml_service.util.create_scoring_image
-  displayName: 'Create Scoring Image'
+- template: diabetes_regression-package-model-template.yml
+  parameters:
+    modelId: $(MODEL_NAME):$(MODEL_VERSION)
+    scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/$(SCORE_SCRIPT)'
+    condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
 
