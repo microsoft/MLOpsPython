@@ -45,6 +45,17 @@
     "acr": {
       "type": "string",
       "defaultValue": "[concat(toLower(parameters('baseName')),'amlcr')]"
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "basic",
+      "allowedValues": [
+        "basic",
+        "enterprise"
+      ],
+      "metadata": {
+        "description": "Specifies the sku, also referred as 'edition' of the Azure Machine Learning workspace."
+      }
     }
   },
   "variables": {
@@ -92,7 +103,8 @@
           "name": "standard",
           "family": "A"
         },
-        "accessPolicies": []
+        "accessPolicies": [
+        ]
       }
     },
     {
@@ -131,6 +143,10 @@
       "identity": {
         "type": "systemAssigned"
       },
+      "sku": {
+        "tier": "[parameters('sku')]",
+        "name": "[parameters('sku')]"
+      },
       "properties": {
         "friendlyName": "[variables('amlWorkspaceName')]",
         "keyVault": "[resourceId('Microsoft.KeyVault/vaults',variables('keyVaultName'))]",
@@ -138,6 +154,6 @@
         "containerRegistry": "[resourceId('Microsoft.ContainerRegistry/registries',variables('containerRegistryName'))]",
         "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]"
       }
-    }    
+    }
   ]
 }
