@@ -1,8 +1,7 @@
 # Pipeline template that defines common runtime environment variables.
 variables:
-
   # Source Config
-    # The directory containing the scripts for training, evaluating, and registering the model
+  # The directory containing the scripts for training, evaluating, and registering the model
   - name: SOURCES_DIR_TRAIN
     value: diabetes_regression
     # The path to the model training script under SOURCES_DIR_TRAIN
@@ -23,7 +22,7 @@ variables:
     value: mlopspython
   - name: DATASET_NAME
     value: diabetes_ds
-  # Uncomment DATASTORE_NAME if you have configured non default datastore to point to your data   
+  # Uncomment DATASTORE_NAME if you have configured non default datastore to point to your data
   # - name: DATASTORE_NAME
   #   value: datablobstore
   - name: DATASET_VERSION
@@ -50,16 +49,16 @@ variables:
   # The name for the (docker/webapp) scoring image
   - name: IMAGE_NAME
     value: "diabetestrained"
- 
+
     # Optional. Used by a training pipeline with R on Databricks
   - name: DB_CLUSTER_ID
     value: ""
 
   # These are the default values set in ml_service\util\env_variables.py. Uncomment and override if desired.
-    # Set to false to disable the evaluation step in the ML pipeline and register the newly trained model unconditionally.
+  # Set to false to disable the evaluation step in the ML pipeline and register the newly trained model unconditionally.
   # - name: RUN_EVALUATION
   #   value: "true"
-    # Set to false to register the model regardless of the outcome of the evaluation step in the ML pipeline.
+  # Set to false to register the model regardless of the outcome of the evaluation step in the ML pipeline.
   # - name: ALLOW_RUN_CANCEL
   #   value: "true"
 

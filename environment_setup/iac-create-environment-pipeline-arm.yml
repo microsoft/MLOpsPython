@@ -2,36 +2,35 @@
 trigger:
   branches:
     include:
-    - master
+      - master
   paths:
     include:
-    - environment_setup/arm-templates/*
+      - environment_setup/arm-templates/*
 pr:
   branches:
     include:
-    - master
+      - master
   paths:
     include:
-    - environment_setup/arm-templates/*
+      - environment_setup/arm-templates/*
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 variables:
-- group: devopsforai-aml-vg
-
+  - group: devopsforai-aml-vg
+  - name: WORKSPACE_SKU # https://docs.microsoft.com/en-us/azure/machine-learning/overview-what-is-azure-ml#sku
+    value: basic
 
 steps:
-- task: AzureResourceGroupDeployment@2
-  inputs:
-    azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: '$(RESOURCE_GROUP)'
-    location: $(LOCATION)
-    templateLocation: 'Linked artifact'
-    csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/cloud-environment.json'
-    overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION) -workspace $(WORKSPACE_NAME)'
-    deploymentMode: 'Incremental'
-  displayName: 'Deploy MLOps resources to Azure'
-
-  
+  - task: AzureResourceGroupDeployment@2
+    inputs:
+      azureSubscription: "$(AZURE_RM_SVC_CONNECTION)"
+      action: "Create Or Update Resource Group"
+      resourceGroupName: "$(RESOURCE_GROUP)"
+      location: $(LOCATION)
+      templateLocation: "Linked artifact"
+      csmFile: "$(Build.SourcesDirectory)/environment_setup/arm-templates/cloud-environment.json"
+      overrideParameters: "-baseName $(BASE_NAME) -location $(LOCATION) -workspace $(WORKSPACE_NAME) -sku $(WORKSPACE_SKU)"
+      deploymentMode: "Incremental"
+    displayName: "Deploy MLOps resources to Azure"
