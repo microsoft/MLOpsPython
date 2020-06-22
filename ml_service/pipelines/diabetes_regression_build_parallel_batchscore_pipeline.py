@@ -33,33 +33,13 @@ from azureml.core import (
     Workspace,
     Dataset,
     Datastore,
-    Model,
     RunConfiguration,
 )
 from azureml.pipeline.core import Pipeline, PipelineData, PipelineParameter
 from azureml.core.compute import ComputeTarget
 from azureml.data.datapath import DataPath
 from azureml.pipeline.steps import PythonScriptStep
-from argparse import ArgumentParser, Namespace
 from typing import Tuple
-
-
-def parse_args() -> Namespace:
-    """
-    Parse arguments supplied to the pipeline creation script.
-    The only allowed arguments are model_tag_name and model_tag_value
-    specifying a custom tag/value pair to help locate a specific model.
-
-
-    :returns: Namespace with two attributes model_tag_name and model_tag_value
-    and corresponding values
-
-    """
-    parser = ArgumentParser()
-    parser.add_argument("--model_tag_name", default=None, type=str)
-    parser.add_argument("--model_tag_value", default=None, type=str)
-    args = parser.parse_args()
-    return args
 
 
 def get_or_create_datastore(
@@ -312,7 +292,6 @@ def get_scoring_pipeline(
     """
     Creates the scoring pipeline.
 
-    :param model: The model to use for scoring
     :param scoring_dataset: Data to score
     :param output_loc: Location to save the scoring results
     :param score_run_config: Parallel Run configuration to support
@@ -398,8 +377,6 @@ def build_batchscore_pipeline():
 
     try:
         env = Env()
-
-        args = parse_args()
 
         # Get Azure machine learning workspace
         aml_workspace = Workspace.get(

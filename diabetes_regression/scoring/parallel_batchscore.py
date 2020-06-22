@@ -30,6 +30,7 @@ import joblib
 import sys
 from typing import List
 from util.model_helper import get_model
+from azureml.core import Model
 
 model = None
 
@@ -64,13 +65,12 @@ def parse_args() -> List[str]:
         for idx, itm in enumerate(sys.argv)
         if itm == "--model_version"
     ]
-
-    if len(model_version_param) == 0:
-        raise ValueError(
-            "Model name is required but no model name parameter was passed to the script"  # NOQA: E501
-        )
-
-    model_version = model_version_param[0][1]
+    model_version = (
+        None
+        if len(model_version_param) < 1
+        or len(model_version_param[0][1].strip()) == 0  # NOQA: E501
+        else model_version_param[0][1]
+    )
 
     model_tag_name_param = [
         (sys.argv[idx], sys.argv[idx + 1])
@@ -107,6 +107,7 @@ def init():
     try:
         print("Initializing batch scoring script...")
 
+        # Get the model using name/version/tags filter
         model_filter = parse_args()
         amlmodel = get_model(
             model_name=model_filter[0],
@@ -114,8 +115,10 @@ def init():
             tag_name=model_filter[2],
             tag_value=model_filter[3])
 
+        # Load the model using name/version found
         global model
-        modelpath = Model.get_model_path(model_name=model_filter[0])
+        modelpath = Model.get_model_path(
+            model_name=amlmodel.name, version=amlmodel.version)
         model = joblib.load(modelpath)
         print("Loaded model {}".format(model_filter[0]))
     except Exception as ex:
