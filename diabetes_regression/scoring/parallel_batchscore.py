@@ -117,7 +117,8 @@ def init():
 
         # Load the model using name/version found
         global model
-        modelpath = Model.get_model_path(model_name=amlmodel.name, version=amlmodel.version)
+        modelpath = Model.get_model_path(
+            model_name=amlmodel.name, version=amlmodel.version)
         model = joblib.load(modelpath)
         print("Loaded model {}".format(model_filter[0]))
     except Exception as ex:

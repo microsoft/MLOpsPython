@@ -1,3 +1,5 @@
+# Pipeline template that gets the model name and version from a previous build's artifact
+
 parameters:
 - name: projectId
   type: string
@@ -26,6 +28,7 @@ steps:
       runBranch: '$(Build.SourceBranch)'
       path: $(Build.SourcesDirectory)/bin
   - task: Bash@3
+    name: get_model
     displayName: Parse Json for Model Name and Version
     inputs:
       targetType: 'inline'

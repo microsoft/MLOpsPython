@@ -39,7 +39,6 @@ from azureml.pipeline.core import Pipeline, PipelineData, PipelineParameter
 from azureml.core.compute import ComputeTarget
 from azureml.data.datapath import DataPath
 from azureml.pipeline.steps import PythonScriptStep
-from argparse import ArgumentParser, Namespace
 from typing import Tuple
 
 
