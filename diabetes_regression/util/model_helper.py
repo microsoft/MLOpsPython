@@ -46,19 +46,19 @@ def get_model(
         print("No workspace defined - using current experiment workspace.")
         aml_workspace = get_current_workspace()
 
-    if tagname is not None and tagvalue is not None:
+    if tag_name is not None and tag_value is not None:
         model = AMLModel(
             aml_workspace,
             name=model_name,
             version=model_version,
             tags=[[tag_name, tag_value]])
-    elif (tagname is None and tagvalue is not None) or (
-        tagvalue is None and tagname is not None
+    elif (tag_name is None and tag_value is not None) or (
+        tag_value is None and tag_name is not None
     ):
         raise ValueError(
             "model_tag_name and model_tag_value should both be supplied"
             + "or excluded"  # NOQA: E501
         )
     else:
-        model = AMLModel(aml_workspace, name=env.model_name, version=env.model_version) # NOQA: E501
+        model = AMLModel(aml_workspace, name=model_name, version=model_version)  # NOQA: E501
     return model
