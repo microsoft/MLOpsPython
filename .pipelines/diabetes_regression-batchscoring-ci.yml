@@ -48,8 +48,12 @@ stages:
     container: mlops
     timeoutInMinutes: 0
     steps:
-    - download: none
     - template: code-quality-template.yml
+    - template: diabetes_regression-get-model-id-artifact-template.yml
+      parameters:
+        projectId: '$(resources.pipeline.model-train-ci.projectID)'
+        pipelineId: '$(resources.pipeline.model-train-ci.pipelineID)'
+        artifactBuildId: ${{ parameters.artifactBuildId }}
     - task: AzureCLI@1
       name: publish_batchscore
       inputs:
@@ -70,12 +74,6 @@ stages:
     variables:
       pipeline_id: $[ dependencies.Build_Batch_Scoring_Pipeline.outputs['publish_batchscore.pipeline_id']]
     steps:
-    - download: none
-    - template: diabetes_regression-get-model-id-artifact-template.yml
-      parameters:
-        projectId: '$(resources.pipeline.model-train-ci.projectID)'
-        pipelineId: '$(resources.pipeline.model-train-ci.pipelineID)'
-        artifactBuildId: ${{ parameters.artifactBuildId }}
     - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
       displayName: 'Invoke Batch Scoring pipeline'
       inputs:
