@@ -54,7 +54,11 @@ def main():
     try:
         tag_name = 'BuildId'
         model = get_model(
-            model_name=model_name, tag_name=tag_name, tag_value=build_id, aml_workspace=exp.workspace)
+            model_name=model_name,
+            tag_name=tag_name,
+            tag_value=build_id,
+            aml_workspace=exp.workspace)
+
         if (model is not None):
             print("Model was registered for this build.")
         if (model is None):

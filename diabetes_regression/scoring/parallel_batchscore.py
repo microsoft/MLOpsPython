@@ -60,9 +60,9 @@ def parse_args() -> List[str]:
     model_name = model_name_param[0][1]
 
     model_version_param = [
-    (sys.argv[idx], sys.argv[idx + 1])
-    for idx, itm in enumerate(sys.argv)
-    if itm == "--model_version"
+        (sys.argv[idx], sys.argv[idx + 1])
+        for idx, itm in enumerate(sys.argv)
+        if itm == "--model_version"
     ]
 
     if len(model_version_param) == 0:
@@ -109,7 +109,7 @@ def init():
 
         model_filter = parse_args()
         amlmodel = get_model(
-            model_name=env.model_filter[0],
+            model_name=model_filter[0],
             model_version=model_filter[1],
             tag_name=model_filter[2],
             tag_value=model_filter[3])

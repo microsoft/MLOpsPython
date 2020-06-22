@@ -24,7 +24,7 @@ def get_current_workspace() -> Workspace:
 
 def get_model(
     model_name: str,
-    model_version: int = None, # If none, return latest model
+    model_version: int = None,  # If none, return latest model
     tag_name: str = None,
     tag_value: str = None,
     aml_workspace: Workspace = None
@@ -36,18 +36,22 @@ def get_model(
     Parameters:
     aml_workspace (Workspace): aml.core Workspace that the model lives.
     model_name (str): name of the model we are looking for
-    (optional) model_version (str): version of the model. Returns latest if not provided.
+    (optional) model_version (str): model version. Latest if not provided.
     (optional) tag (str): the tag value & name the model was registered under.
 
     Return:
     A single aml model from the workspace that matches the name and tag.
     """
     if aml_workspace is None:
-            print("No workspace defined - using current experiment workspace.")
-            aml_workspace = get_current_workspace()
+        print("No workspace defined - using current experiment workspace.")
+        aml_workspace = get_current_workspace()
 
     if tagname is not None and tagvalue is not None:
-        model = Model(aml_workspace, name=model_name, version=model_version, tags=[[tag_name, tag_value]])
+        model = AMLModel(
+            aml_workspace,
+            name=model_name,
+            version=model_version,
+            tags=[[tag_name, tag_value]])
     elif (tagname is None and tagvalue is not None) or (
         tagvalue is None and tagname is not None
     ):
@@ -56,5 +60,5 @@ def get_model(
             + "or excluded"  # NOQA: E501
         )
     else:
-        model = Model(aml_workspace, name=env.model_name, version=env.model_version)
+        model = AMLModel(aml_workspace, name=env.model_name, version=env.model_version) # NOQA: E501
     return model
