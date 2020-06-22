@@ -61,37 +61,6 @@ def parse_args() -> Namespace:
     args = parser.parse_args()
     return args
 
-
-def get_model(
-    ws: Workspace, env: Env, tagname: str = None, tagvalue: str = None
-) -> Model:
-    """
-    Gets a model from the models registered with the AML workspace.
-    If a tag/value pair is supplied, uses it to filter.
-
-    :param ws: Current AML workspace
-    :param env: Environment variables
-    :param tagname: Optional tag name, default is None
-    :param tagvalue: Optional tag value, default is None
-
-    :returns: Model
-
-    :raises: ValueError
-    """
-    if tagname is not None and tagvalue is not None:
-        model = Model(ws, name=env.model_name, tags=[[tagname, tagvalue]])
-    elif (tagname is None and tagvalue is not None) or (
-        tagvalue is None and tagname is not None
-    ):
-        raise ValueError(
-            "model_tag_name and model_tag_value should both be supplied"
-            + "or excluded"  # NOQA: E501
-        )
-    else:
-        model = Model(ws, name=env.model_name)
-    return model
-
-
 def get_or_create_datastore(
     datastorename: str, ws: Workspace, env: Env, input: bool = True
 ) -> Datastore:
@@ -331,7 +300,6 @@ def get_run_configs(
 
 
 def get_scoring_pipeline(
-    model: Model,
     scoring_dataset: Dataset,
     output_loc: PipelineData,
     score_run_config: ParallelRunConfig,
@@ -362,6 +330,9 @@ def get_scoring_pipeline(
     model_name_param = PipelineParameter(
         "model_name", default_value=env.model_name
     )  # NOQA: E501
+    model_version_param = PipelineParameter(
+        "model_version", default_value=env.model_version
+    )  # NOQA: E501
     model_tag_name_param = PipelineParameter(
         "model_tag_name", default_value=" "
     )  # NOQA: E501
@@ -376,6 +347,8 @@ def get_scoring_pipeline(
         arguments=[
             "--model_name",
             model_name_param,
+            "--model_version",
+            model_version_param,
             "--model_tag_name",
             model_tag_name_param,
             "--model_tag_value",
@@ -450,12 +423,7 @@ def build_batchscore_pipeline():
             aml_workspace, aml_compute_score, env
         )
 
-        trained_model = get_model(
-            aml_workspace, env, args.model_tag_name, args.model_tag_value
-        )
-
         scoring_pipeline = get_scoring_pipeline(
-            trained_model,
             input_dataset,
             output_location,
             scoring_runconfig,

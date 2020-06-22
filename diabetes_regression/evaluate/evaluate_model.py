@@ -109,7 +109,10 @@ try:
     tag_name = 'experiment_name'
 
     model = get_latest_model(
-        model_name, tag_name, exp.name, ws)
+                model_name=model_name,
+                tag_name=tag_name,
+                tag_value=exp.name,
+                aml_workspace=ws)
 
     if (model is not None):
         production_model_mse = 10000

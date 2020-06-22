@@ -80,5 +80,5 @@ stages:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         PipelineId: '$(pipeline_id)'
         ExperimentName: '$(EXPERIMENT_NAME)'
-        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)"}'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)", "model_version": "$(MODEL_VERSION)"}'
       
