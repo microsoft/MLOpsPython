@@ -44,5 +44,5 @@ steps:
         echo "Model Version: $MODEL_VERSION"
 
         # Set environment variables
-        echo "##vso[task.setvariable variable=MODEL_VERSION]$MODEL_VERSION"
-        echo "##vso[task.setvariable variable=MODEL_NAME]$MODEL_NAME"
+        echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true]$MODEL_VERSION"
+        echo "##vso[task.setvariable variable=MODEL_NAME;isOutput=true]$MODEL_NAME"
