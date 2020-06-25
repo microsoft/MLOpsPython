@@ -54,6 +54,11 @@ stages:
         projectId: '$(resources.pipeline.model-train-ci.projectID)'
         pipelineId: '$(resources.pipeline.model-train-ci.pipelineID)'
         artifactBuildId: ${{ parameters.artifactBuildId }}
+    # Map the datastore access secret to an environment variable
+    - script: |
+        echo ##vso[task.setvariable variable=SCORING_DATASTORE_ACCESS_KEY]$(SCORING_DATASTORE_ACCESS_KEY)
+      env:
+        SCORING_DATASTORE_ACCESS_KEY: $(SCORING_DATASTORE_ACCESS_KEY)
     - task: AzureCLI@1
       name: publish_batchscore
       inputs:
