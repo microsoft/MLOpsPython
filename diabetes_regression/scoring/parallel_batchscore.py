@@ -29,7 +29,8 @@ import pandas as pd
 import joblib
 import sys
 from typing import List
-from util.model_helper import get_latest_model
+from util.model_helper import get_model
+from azureml.core import Model
 
 model = None
 
@@ -59,6 +60,18 @@ def parse_args() -> List[str]:
 
     model_name = model_name_param[0][1]
 
+    model_version_param = [
+        (sys.argv[idx], sys.argv[idx + 1])
+        for idx, itm in enumerate(sys.argv)
+        if itm == "--model_version"
+    ]
+    model_version = (
+        None
+        if len(model_version_param) < 1
+        or len(model_version_param[0][1].strip()) == 0  # NOQA: E501
+        else model_version_param[0][1]
+    )
+
     model_tag_name_param = [
         (sys.argv[idx], sys.argv[idx + 1])
         for idx, itm in enumerate(sys.argv)
@@ -83,7 +96,7 @@ def parse_args() -> List[str]:
         else model_tag_value_param[0][1]
     )
 
-    return [model_name, model_tag_name, model_tag_value]
+    return [model_name, model_version, model_tag_name, model_tag_value]
 
 
 def init():
@@ -94,13 +107,18 @@ def init():
     try:
         print("Initializing batch scoring script...")
 
+        # Get the model using name/version/tags filter
         model_filter = parse_args()
-        amlmodel = get_latest_model(
-            model_filter[0], model_filter[1], model_filter[2]
-        )  # NOQA: E501
+        amlmodel = get_model(
+            model_name=model_filter[0],
+            model_version=model_filter[1],
+            tag_name=model_filter[2],
+            tag_value=model_filter[3])
 
+        # Load the model using name/version found
         global model
-        modelpath = amlmodel.get_model_path(model_name=model_filter[0])
+        modelpath = Model.get_model_path(
+            model_name=amlmodel.name, version=amlmodel.version)
         model = joblib.load(modelpath)
         print("Loaded model {}".format(model_filter[0]))
     except Exception as ex:

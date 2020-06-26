@@ -84,11 +84,13 @@ def replace_project_name(project_dir, project_name, rename_name):
     files = [r".env.example",
             r".pipelines/code-quality-template.yml",
             r".pipelines/pr.yml",
+            r".pipelines/diabetes_regression-cd.yml",
             r".pipelines/diabetes_regression-ci.yml",
             r".pipelines/abtest.yml",
             r".pipelines/diabetes_regression-ci-image.yml",
+            r".pipelines/diabetes_regression-publish-model-artifact-template.yml",  # NOQA: E501
+            r".pipelines/diabetes_regression-get-model-id-artifact-template.yml",  # NOQA: E501
             r".pipelines/diabetes_regression-batchscoring-ci.yml",
-            r".pipelines/diabetes_regression-get-model-version-template.yml",  # NOQA: E501
             r".pipelines/diabetes_regression-variables-template.yml",
             r"environment_setup/Dockerfile",
             r"environment_setup/install_requirements.sh",

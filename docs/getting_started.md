@@ -140,36 +140,43 @@ Create a new service connection to your Azure ML Workspace using the [Machine Le
 **Note:** Similar to the Azure Resource Manager service connection you created earlier, creating a service connection with Azure Machine Learning workspace scope requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
 You'll need sufficient permissions to register an application with your Azure AD tenant, or you can get the ID and secret of a service principal from your Azure AD Administrator. That principal must have Contributor permissions on the Azure ML Workspace.
 
-## Set up Build, Release Trigger, and Release Multi-Stage Pipeline
+## Set up Build, Release Trigger, and Release Multi-Stage Pipelines
 
-Now that you've provisioned all the required Azure resources and service connections, you can set up the pipelines for deploying your machine learning model to production. 
+Now that you've provisioned all the required Azure resources and service connections, you can set up the pipelines for training (CI) and deploying (CD) your machine learning model to production. Additionally, you can set up a pipeline for batch scoring.
 
-**There are two main Azure pipelines - one to handle model training and another to handle batch scoring of the model.** 
-
-### **Azure [pipeline](../.pipelines/diabetes_regression-ci.yml) for model training and deployment**
-This pipeline has a sequence of stages for:
-
-1. **Model Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a training pipeline.
-1. **Train Model**: invokes the Azure ML service to trigger the published training pipeline to train, evaluate, and register a model.
-1. **Release Deployment:** deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments. For simplicity, you're going to initially focus on Azure Container Instances. See [Further Exploration](#further-exploration) for other deployment types.
+1. **Model CI, training, evaluation, and registration** - triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage, and publishes and runs the training pipeline. If a new model is registered after evaluation, it creates a build artifact containing the JSON metadata of the model. Definition: [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml).
+1. **Release deployment** - consumes the artifact of the previous pipeline and deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments. See [Further Exploration](#further-exploration) for other deployment types. Definition: [diabetes_regression-cd.yml](../.pipelines/diabetes_regression-cd.yml).
    1. **Note:** Edit the pipeline definition to remove unused stages. For example, if you're deploying to Azure Container Instances and Azure Kubernetes Service only, delete the unused `Deploy_Webapp` stage.
+1. **Batch Scoring Code Continuous Integration** - consumes the artifact of the model training pipeline. Runs linting, unit tests, code coverage, publishes a batch scoring pipeline, and invokes the published batch scoring pipeline to score a model.
 
-### Set up the Training Pipeline
+These pipelines use a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The container image ***mcr.microsoft.com/mlops/python:latest*** is built with [this Dockerfile](../environment_setup/Dockerfile) and has all the necessary dependencies installed for MLOpsPython and ***diabetes_regression***. This image is an example of a custom Docker image with a pre-baked environment. The environment is guaranteed to be the same on any building agent, VM, or local machine. In your project, you'll want to build your own Docker image that only contains the dependencies and tools required for your use case. Your image will probably be smaller and faster, and it will be maintained by your team.
+
+### Set up the Model CI, training, evaluation, and registration pipeline
 
 In your Azure DevOps project, create and run a new build pipeline based on the [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml)
 pipeline definition in your forked repository.
 
-![Configure CI build pipeline](./images/ci-build-pipeline-configure.png)
+If you plan to use the release deployment pipeline (in the next section), you will need to rename this pipeline to `Model-Train-Register-CI`.
 
 Once the pipeline is finished, check the execution result:
 
-![Build](./images/multi-stage-aci.png)
+![Build](./images/model-train-register.png)
+
+And the pipeline artifacts:
+
+![Build](./images/model-train-register-artifacts.png)
 
 Also check the published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://portal.azure.com/):
 
 ![Training pipeline](./images/training-pipeline.png)
 
 Great, you now have the build pipeline for training set up which automatically triggers every time there's a change in the master branch!
+
+After the pipeline is finished, you'll see a new model in the **ML Workspace**:
+
+![Trained model](./images/trained-model.png)
+
+To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci.yml` pipeline to `false`.  You can also override the variable at runtime execution of the pipeline.
 
 The pipeline stages are summarized below:
 
@@ -186,8 +193,54 @@ The pipeline stages are summarized below:
   - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
 - Determine if a new model was registered by the _ML Training Pipeline_.
   - If the model evaluation determines that the new model doesn't perform any better than the previous one, the new model won't register and the _ML Training Pipeline_ will be **canceled**. In this case, you'll see a message in the 'Train Model' job under the 'Determine if evaluation succeeded and new model is registered' step saying '**Model was not registered for this run.**'
-  - See [evaluate_model.py](../diabetes_regression/evaluate/evaluate_model.py#L118) for the evaluation logic and [diabetes_regression_verify_train_pipeline.py](../ml_service/pipelines/diabetes_regression_verify_train_pipeline.py#L54) for the ML pipeline reporting logic.
+  - See [evaluate_model.py](../diabetes_regression/evaluate/evaluate_model.py#L118) for the evaluation logic.
   - [Additional Variables and Configuration](#additional-variables-and-configuration) for configuring this and other behavior.
+
+#### Create pipeline artifact
+
+- Get the info about the registered model
+- Create a pipeline artifact called `model` that contains a `model.json` file containing the model information.
+
+### Set up the Release Deployment and/or Batch Scoring pipelines
+
+---
+**PREREQUISITE**
+
+In order to use these pipelines:
+
+1. Follow the steps to set up the Model CI, training, evaluation, and registration pipeline.
+1. You **must** rename your model CI/train/eval/register pipeline to `Model-Train-Register-CI`.
+
+These pipelines rely on the model CI pipeline and reference it by name.
+
+---
+
+These pipelines have the following behaviors:
+
+- The pipeline will **automatically trigger** on completion of the Model-Train-Register-CI pipeline for the master branch.
+- The pipeline will default to using the latest successful build of the Model-Train-Register-CI pipeline. It will deploy the model produced by that build.
+- You can specify a `Model-Train-Register-CI` build ID when running the pipeline manually. You can find this in the url of the build, and the model registered from that build will also be tagged with the build ID. This is useful to skip model training and registration, and deploy/score a model successfully registered by a `Model-Train-Register-CI` build.
+
+### Set up the Release Deployment pipeline
+
+In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-cd.yml](../.pipelines/diabetes_regression-cd.yml)
+pipeline definition in your forked repository.
+
+Your first run will use the latest model created by the `Model-Train-Register-CI` pipeline.
+
+Once the pipeline is finished, check the execution result:
+
+![Build](./images/model-deploy-result.png)
+
+To specify a particular build's model, set the `Model Train CI Build Id` parameter to the build Id you would like to use.
+
+![Build](./images/model-deploy-configure.png)
+
+Once your pipeline run begins, you can see the model name and version downloaded from the `Model-Train-Register-CI` pipeline.
+
+![Build](./images/model-deploy-artifact-logs.png)
+
+The pipeline has the following stage:
 
 #### Deploy to ACI
 
@@ -195,23 +248,7 @@ The pipeline stages are summarized below:
 - Smoke test
   - The test sends a sample query to the scoring web service and verifies that it returns the expected response. Have a look at the [smoke test code](../ml_service/util/smoke_test_scoring_service.py) for an example.
 
-The pipeline uses a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The container image **_mcr.microsoft.com/mlops/python:latest_** is built with [this Dockerfile](../environment_setup/Dockerfile) and has all the necessary dependencies installed for MLOpsPython and **_diabetes_regression_**. This image is an example of a custom Docker image with a pre-baked environment. The environment is guaranteed to be the same on any building agent, VM, or local machine. In your project, you'll want to build your own Docker image that only contains the dependencies and tools required for your use case. Your image will probably be smaller and faster, and it will be maintained by your team.
-
-After the pipeline is finished, you'll see a new model in the **ML Workspace**:
-
-![Trained model](./images/trained-model.png)
-
-To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci.yml` pipeline to `false`. You can also override the variable at runtime execution of the pipeline.
-
-To skip model training and registration, and deploy a model successfully registered by a previous build (for testing changes to the score file or inference configuration), add the variable `MODEL_BUILD_ID` when the pipeline is queued, and set the value to the ID of the previous build.
-
-
-### **Azure [pipeline](../.pipelines/diabetes_regression-batchscoring-ci.yml) for batch scoring**
-This pipeline has a sequence of stages for:
-1. **Batch Scoring Code Continuous Integration:** triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage and publishes a batch scoring pipeline.
-1. **Run Batch Scoring**: invokes the published batch scoring pipeline to score a model.
-
-### Set up the Batch Scoring Pipeline
+### Set up the Batch Scoring pipeline
 
 In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-batchscoring-ci.yml](../.pipelines/diabetes_regression-batchscoring-ci.yml)
 pipeline definition in your forked repository. 
@@ -247,7 +284,7 @@ The pipeline stages are summarized below:
 
 ## Further Exploration
 
-You should now have a working pipeline that can get you started with MLOpsPython. Below are some additional features offered that might suit your scenario.
+You should now have a working set of pipelines that can get you started with MLOpsPython. Below are some additional features offered that might suit your scenario.
 
 ### Deploy the model to Azure Kubernetes Service
 

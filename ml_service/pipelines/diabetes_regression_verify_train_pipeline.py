@@ -3,7 +3,7 @@ import sys
 import os
 from azureml.core import Run, Experiment, Workspace
 from ml_service.util.env_variables import Env
-from diabetes_regression.util.model_helper import get_latest_model
+from diabetes_regression.util.model_helper import get_model
 
 
 def main():
@@ -53,8 +53,12 @@ def main():
 
     try:
         tag_name = 'BuildId'
-        model = get_latest_model(
-            model_name, tag_name, build_id, exp.workspace)
+        model = get_model(
+            model_name=model_name,
+            tag_name=tag_name,
+            tag_value=build_id,
+            aml_workspace=exp.workspace)
+
         if (model is not None):
             print("Model was registered for this build.")
         if (model is None):

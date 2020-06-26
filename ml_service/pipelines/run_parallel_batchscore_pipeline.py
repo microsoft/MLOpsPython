@@ -115,6 +115,7 @@ def run_batchscore_pipeline():
             scoringpipeline,
             pipeline_parameters={
                 "model_name": env.model_name,
+                "model_version": env.model_version,
                 "model_tag_name": " ",
                 "model_tag_value": " ",
             },

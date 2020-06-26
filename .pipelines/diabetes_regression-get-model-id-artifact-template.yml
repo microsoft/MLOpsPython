@@ -1,0 +1,48 @@
+# Pipeline template that gets the model name and version from a previous build's artifact
+
+parameters:
+- name: projectId
+  type: string
+  default: ''
+- name: pipelineId
+  type: string
+  default: ''
+- name: artifactBuildId
+  type: string
+  default: latest
+  
+steps:
+  - download: none
+  - task: DownloadPipelineArtifact@2
+    displayName: Download Pipeline Artifacts
+    inputs:
+      source: 'specific'
+      project: '${{ parameters.projectId }}'
+      pipeline: '${{ parameters.pipelineId }}'
+      preferTriggeringPipeline: true
+      ${{ if eq(parameters.artifactBuildId, 'latest') }}:
+        buildVersionToDownload: 'latestFromBranch'
+      ${{ if ne(parameters.artifactBuildId, 'latest') }}:
+        buildVersionToDownload: 'specific'
+        runId: '${{ parameters.artifactBuildId }}'
+      runBranch: '$(Build.SourceBranch)'
+      path: $(Build.SourcesDirectory)/bin
+  - task: Bash@3
+    name: get_model
+    displayName: Parse Json for Model Name and Version
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Print JSON
+        cat $(Build.SourcesDirectory)/bin/model/model.json | jq '.'
+
+        # Set model name and version variables
+        MODEL_NAME=$(jq -r '.name' <$(Build.SourcesDirectory)/bin/model/model.json)
+        MODEL_VERSION=$(jq -r '.version' <$(Build.SourcesDirectory)/bin/model/model.json)
+
+        echo "Model Name: $MODEL_NAME"
+        echo "Model Version: $MODEL_VERSION"
+
+        # Set environment variables
+        echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true]$MODEL_VERSION"
+        echo "##vso[task.setvariable variable=MODEL_NAME;isOutput=true]$MODEL_NAME"
