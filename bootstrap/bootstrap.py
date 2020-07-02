@@ -111,7 +111,7 @@ def replace_project_name(project_dir, project_name, rename_name):
             with open(path, "rt") as f_in:
                 data = f_in.read()
             data = data.replace(rename_name, project_name)
-            with open(os.path.join(project_dir, file), "wt", encoding="utf8") as f_out:  # NOQA: E501
+            with open(os.path.join(project_dir, file), "wt") as f_out:  # NOQA: E501
                 f_out.write(data)
         except IOError as e:
             print("Could not modify \"%s\". Is the MLOpsPython repo already cloned at \"%s\"?" % (path, project_dir))  # NOQA: E501
