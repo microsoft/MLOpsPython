@@ -213,9 +213,25 @@ In order to use these pipelines:
 
 These pipelines rely on the model CI pipeline and reference it by name.
 
+If you would like to change the name of your model CI pipeline, you must edit this section of yml for the CD and batch scoring pipeline, where it says `source: Model-Train-Register-CI` to use your own name.
+```
+trigger: none
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+  pipelines:
+  - pipeline: model-train-ci
+    source: Model-Train-Register-CI # Name of the triggering pipeline
+    trigger:
+      branches:
+        include:
+        - master
+```
+
 ---
 
-These pipelines have the following behaviors:
+The release deployment and batch scoring pipelines have the following behaviors:
 
 - The pipeline will **automatically trigger** on completion of the Model-Train-Register-CI pipeline for the master branch.
 - The pipeline will default to using the latest successful build of the Model-Train-Register-CI pipeline. It will deploy the model produced by that build.
