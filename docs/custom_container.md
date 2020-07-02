@@ -61,7 +61,11 @@ Edit the [environment_setup/docker-image-pipeline.yml](../environment_setup/dock
 and modify the string `'public/mlops/python'` with an name suitable to describe your environment,
 e.g. `'mlops/diabetes_regression'`.
 
-Save and run the pipeline. This will build and push a container image to your Azure Container Registry with
+Save and run the pipeline, making sure to set the these runtime variables: `amlsdkversion` and `githubrelease`. The values are up to you to set depending on your environment. These will show as tags on your image.
+
+![Custom Container Vars](./images/custom-container-variables.png)
+
+This will build and push a container image to your Azure Container Registry with
 the name you have just edited. The next step is to modify the build pipeline to run the CI job on a container
 run from that image.
 
