@@ -1,0 +1,89 @@
+# Continuous Integration (CI) pipeline that orchestrates the batch scoring of the diabetes_regression model.
+
+# Runtime parameters to select artifacts
+parameters:
+- name : artifactBuildId
+  displayName: Model Train CI Build ID. Default is 'latest'.
+  type: string
+  default: latest
+
+pr: none
+
+# Trigger this pipeline on model-train pipeline completion
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+  pipelines:
+  - pipeline: model-train-ci
+    source: Model-Train-Register-CI # Name of the triggering pipeline
+    trigger:
+      branches:
+        include:
+        - master
+
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - diabetes_regression/scoring/parallel_batchscore.py
+    - ml_service/pipelines/diabetes_regression_build_parallel_batchscore_pipeline.py
+    - ml_service/pipelines/run_parallel_batchscore_pipeline.py
+
+variables:
+- template: diabetes_regression-variables-template.yml
+- group: devopsforai-aml-vg
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: 'Batch_Scoring_Pipeline_CI'
+  displayName: 'Batch Scoring Pipeline CI'
+  jobs:
+  - job: "Build_Batch_Scoring_Pipeline"
+    displayName: "Build Batch Scoring Pipeline"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: code-quality-template.yml
+    - template: diabetes_regression-get-model-id-artifact-template.yml
+      parameters:
+        projectId: '$(resources.pipeline.model-train-ci.projectID)'
+        pipelineId: '$(resources.pipeline.model-train-ci.pipelineID)'
+        artifactBuildId: ${{ parameters.artifactBuildId }}
+    - task: AzureCLI@1
+      displayName: "Publish Batch Scoring Pipeline"
+      name: publish_batchscore
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'        
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          # Invoke the Python building and publishing a training pipeline
+          python -m ml_service.pipelines.diabetes_regression_build_parallel_batchscore_pipeline
+      env:
+        SCORING_DATASTORE_ACCESS_KEY: $(SCORING_DATASTORE_ACCESS_KEY)
+
+  - job: "Run_Batch_Score_Pipeline"
+    displayName: "Run Batch Scoring Pipeline"
+    dependsOn: ["Build_Batch_Scoring_Pipeline"]
+    timeoutInMinutes: 240
+    pool: server
+    variables:
+      pipeline_id: $[ dependencies.Build_Batch_Scoring_Pipeline.outputs['publish_batchscore.pipeline_id']]
+      model_name: $[ dependencies.Build_Batch_Scoring_Pipeline.outputs['get_model.MODEL_NAME']]
+      model_version: $[ dependencies.Build_Batch_Scoring_Pipeline.outputs['get_model.MODEL_VERSION']]
+    steps:
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke Batch Scoring pipeline'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        PipelineId: '$(pipeline_id)'
+        ExperimentName: '$(EXPERIMENT_NAME)'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(model_name)", "model_version": "$(model_version)"}'
+      

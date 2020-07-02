@@ -1,3 +1,10 @@
+# Pipeline for the canary deployment workflow.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
 pr: none
 trigger:
   branches:
@@ -11,9 +18,10 @@ trigger:
     - ml_service/util/smoke_test_scoring_service.py
 
 variables:
+- template: diabetes_regression-variables-template.yml
 - group: 'devopsforai-aml-vg'
 - name: 'helmVersion'
-  value: 'v3.0.1'
+  value: 'v3.1.1'
 - name: 'helmDownloadURL'
   value: 'https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz'
 - name: 'blueReleaseName'
@@ -21,8 +29,7 @@ variables:
 - name: 'greenReleaseName'
   value: 'model-green'
 - name: 'SCORE_SCRIPT'
-  value: 'scoreA.py'
-
+  value: 'scoring/scoreA.py'
 
 stages:
 - stage: 'Building'
@@ -31,7 +38,7 @@ stages:
     timeoutInMinutes: 0
     pool:
       vmImage: 'ubuntu-latest'
-    container: mcr.microsoft.com/mlops/python:latest
+    container: mlops
     steps:
     - task: AzureCLI@1
       inputs:
@@ -50,7 +57,6 @@ stages:
     - publish: $(System.DefaultWorkingDirectory)/charts
       artifact: allcharts
 
-
 - stage: 'Blue_Staging'
   jobs:
   - deployment: "Deploy_to_Staging"
@@ -64,7 +70,7 @@ stages:
               IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
               echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
             displayName: 'Get Image Location'
-          - template: azdo-helm-upgrade.yml
+          - template: helm-upgrade-template.yml
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(blueReleaseName) 
@@ -76,7 +82,7 @@ stages:
     displayName: 50 50 rollout to blue environment
     timeoutInMinutes: 0
     steps:
-    - template: azdo-helm-upgrade.yml
+    - template: helm-upgrade-template.yml
       parameters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
         releaseName: 'abtest-istio' 
@@ -91,7 +97,7 @@ stages:
       runOnce:
         deploy:
           steps:
-          - template: azdo-helm-upgrade.yml
+          - template: helm-upgrade-template.yml
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
               releaseName: 'abtest-istio' 
@@ -108,7 +114,7 @@ stages:
       runOnce:
         deploy:
           steps:
-          - template: azdo-helm-upgrade.yml
+          - template: helm-upgrade-template.yml
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-istio'
               releaseName: 'abtest-istio' 
@@ -129,7 +135,7 @@ stages:
               IMAGE_LOCATION="$(cat $(Pipeline.Workspace)/image_location/image_location.txt)"
               echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
             displayName: 'Get Image Location'
-          - template: azdo-helm-upgrade.yml
+          - template: helm-upgrade-template.yml
             parameters:
               chartPath: '$(Pipeline.Workspace)/allcharts/abtest-model'
               releaseName: $(greenReleaseName) 
@@ -140,7 +146,7 @@ stages:
   - job: 'Prod_Rollout_100'
     timeoutInMinutes: 0
     steps:
-    - template: azdo-helm-upgrade.yml
+    - template: helm-upgrade-template.yml
       parameters:
         chartPath: '$(System.DefaultWorkingDirectory)/charts/abtest-istio'
         releaseName: 'abtest-istio' 
@@ -152,7 +158,7 @@ stages:
   - job: 'blue_disable'
     timeoutInMinutes: 0
     steps:
-    - template: azdo-helm-install.yml
+    - template: helm-install-template.yml
     - task: HelmDeploy@0
       displayName: 'helm uninstall blue'
       inputs:

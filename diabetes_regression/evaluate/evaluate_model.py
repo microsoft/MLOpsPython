@@ -23,11 +23,10 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THE SOFTWARE CODE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
-import os
 from azureml.core import Run
 import argparse
 import traceback
-from util.model_helper import get_model_by_tag
+from util.model_helper import get_model
 
 run = Run.get_context()
 
@@ -46,7 +45,7 @@ run = Run.get_context()
 #         sources_dir = 'diabetes_regression'
 #     path_to_util = os.path.join(".", sources_dir, "util")
 #     sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
-#     from model_helper import get_model_by_tag
+#     from model_helper import get_model
 #     workspace_name = os.environ.get("WORKSPACE_NAME")
 #     experiment_name = os.environ.get("EXPERIMENT_NAME")
 #     resource_group = os.environ.get("RESOURCE_GROUP")
@@ -74,11 +73,7 @@ ws = run.experiment.workspace
 run_id = 'amlcompute'
 
 parser = argparse.ArgumentParser("evaluate")
-parser.add_argument(
-    "--build_id",
-    type=str,
-    help="The Build ID of the build triggering this pipeline run",
-)
+
 parser.add_argument(
     "--run_id",
     type=str,
@@ -88,7 +83,7 @@ parser.add_argument(
     "--model_name",
     type=str,
     help="Name of the Model",
-    default="sklearn_regression_model.pkl",
+    default="diabetes_model.pkl",
 )
 
 parser.add_argument(
@@ -99,19 +94,13 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-if (args.build_id is not None):
-    build_id = args.build_id
 if (args.run_id is not None):
     run_id = args.run_id
 if (run_id == 'amlcompute'):
     run_id = run.parent.id
 model_name = args.model_name
 metric_eval = "mse"
-run.tag("BuildId", value=build_id)
-builduri_base = os.environ.get("BUILDURI_BASE")
-if (builduri_base is not None):
-    build_uri = builduri_base + build_id
-    run.tag("BuildUri", value=build_uri)
+
 allow_run_cancel = args.allow_run_cancel
 # Parameterize the matrices on which the models should be compared
 # Add golden data set on which all the model performance can be evaluated
@@ -119,8 +108,11 @@ try:
     firstRegistration = False
     tag_name = 'experiment_name'
 
-    model = get_model_by_tag(
-        model_name, tag_name, exp.name, ws)
+    model = get_model(
+                model_name=model_name,
+                tag_name=tag_name,
+                tag_value=exp.name,
+                aml_workspace=ws)
 
     if (model is not None):
         production_model_mse = 10000

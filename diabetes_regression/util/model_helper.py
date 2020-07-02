@@ -22,59 +22,43 @@ def get_current_workspace() -> Workspace:
     return experiment.workspace
 
 
-def get_model_by_tag(
+def get_model(
     model_name: str,
-    tag_name: str,
-    tag_value: str,
+    model_version: int = None,  # If none, return latest model
+    tag_name: str = None,
+    tag_value: str = None,
     aml_workspace: Workspace = None
 ) -> AMLModel:
     """
     Retrieves and returns the latest model from the workspace
-    by its name and tag.
+    by its name and (optional) tag.
 
     Parameters:
     aml_workspace (Workspace): aml.core Workspace that the model lives.
     model_name (str): name of the model we are looking for
-    tag (str): the tag value the model was registered under.
+    (optional) model_version (str): model version. Latest if not provided.
+    (optional) tag (str): the tag value & name the model was registered under.
 
     Return:
     A single aml model from the workspace that matches the name and tag.
     """
-    try:
-        # Validate params. cannot be None.
-        if model_name is None:
-            raise ValueError("model_name[:str] is required")
-        if tag_name is None:
-            raise ValueError("tag_name[:str] is required")
-        if tag_value is None:
-            raise ValueError("tag[:str] is required")
-        if aml_workspace is None:
-            aml_workspace = get_current_workspace()
+    if aml_workspace is None:
+        print("No workspace defined - using current experiment workspace.")
+        aml_workspace = get_current_workspace()
 
-        # get model by tag.
-        model_list = AMLModel.list(
-            aml_workspace, name=model_name,
-            tags=[[tag_name, tag_value]], latest=True
+    if tag_name is not None and tag_value is not None:
+        model = AMLModel(
+            aml_workspace,
+            name=model_name,
+            version=model_version,
+            tags=[[tag_name, tag_value]])
+    elif (tag_name is None and tag_value is not None) or (
+        tag_value is None and tag_name is not None
+    ):
+        raise ValueError(
+            "model_tag_name and model_tag_value should both be supplied"
+            + "or excluded"  # NOQA: E501
         )
-
-        # latest should only return 1 model, but if it does,
-        # then maybe sdk or source code changed.
-        should_not_happen = ("Found more than one model "
-                             "for the latest with {{tag_name: {tag_name},"
-                             "tag_value: {tag_value}. "
-                             "Models found: {model_list}}}")\
-            .format(tag_name=tag_name, tag_value=tag_value,
-                    model_list=model_list)
-        no_model_found = ("No Model found with {{tag_name: {tag_name} ,"
-                          "tag_value: {tag_value}.}}")\
-            .format(tag_name=tag_name, tag_value=tag_value)
-
-        if len(model_list) > 1:
-            raise ValueError(should_not_happen)
-        if len(model_list) == 1:
-            return model_list[0]
-        else:
-            print(no_model_found)
-            return None
-    except Exception:
-        raise
+    else:
+        model = AMLModel(aml_workspace, name=model_name, version=model_version)  # NOQA: E501
+    return model

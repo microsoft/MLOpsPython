@@ -2,8 +2,7 @@ import os
 import sys
 import platform
 import argparse
-# import shutil
-# from git import Repo
+import re
 
 
 class Helper:
@@ -25,13 +24,7 @@ class Helper:
     def git_repo(self):
         return self._git_repo
 
-    # def clonerepo(self):
-    #     # Download MLOpsPython repo from git
-    #     Repo.clone_from(
-    #         self._git_repo, self._project_directory, branch="master", depth=1) # NOQA: E501
-    #     print(self._project_directory)
-
-    def renamefiles(self):
+    def rename_files(self):
         # Rename all files starting with diabetes_regression with project name
         strtoreplace = "diabetes_regression"
         dirs = [".pipelines", r"ml_service/pipelines"]
@@ -42,10 +35,11 @@ class Helper:
                 if(filename.find(strtoreplace) != -1):
                     src = os.path.join(self._project_directory, normDir, filename)  # NOQA: E501
                     dst = os.path.join(self._project_directory,
-                                       normDir, filename.replace(strtoreplace, self._project_name, 1))  # NOQA: E501
+                                       normDir,
+                                       filename.replace(strtoreplace, self._project_name, 1))  # NOQA: E501
                     os.rename(src, dst)
 
-    def renamedir(self):
+    def rename_dir(self):
         dir = "diabetes_regression"
         src = os.path.join(self._project_directory, dir)
         for path, subdirs, files in os.walk(src):
@@ -57,7 +51,7 @@ class Helper:
                 new_name = os.path.join(newPath, name)
                 os.rename(file_path, new_name)
 
-    def deletedir(self):
+    def delete_dir(self):
         # Delete unwanted directories
         dirs = ["docs", r"diabetes_regression"]
         if (platform.system() == "Windows"):
@@ -65,10 +59,9 @@ class Helper:
         else:
             cmd = 'rm -r "{}"'
         for dir in dirs:
-            os.system(
-                cmd.format(os.path.join(self._project_directory, os.path.normpath(dir))))  # NOQA: E501
+            os.system(cmd.format(os.path.join(self._project_directory, os.path.normpath(dir))))  # NOQA: E501
 
-    def cleandir(self):
+    def clean_dir(self):
         # Clean up directories
         dirs = ["data", "experimentation"]
         for dir in dirs:
@@ -76,73 +69,86 @@ class Helper:
                 for file in files:
                     os.remove(os.path.join(root, file))
 
-    def validateargs(self):
+    def validate_args(self):
         # Validate arguments
         if (os.path.isdir(self._project_directory) is False):
-            raise Exception(
-                "Not a valid directory. Please provide absolute directory path")  # NOQA: E501
-        # if (len(os.listdir(self._project_directory)) > 0):
-        #     raise Exception("Directory not empty. PLease empty directory")
-        if(len(self._project_name) < 3 or len(self._project_name) > 15):
-            raise Exception("Project name should be 3 to 15 chars long")
+            raise Exception("Not a valid directory. Please provide an absolute directory path.")  # NOQA: E501
+        if (len(self._project_name) < 3 or len(self._project_name) > 15):
+            raise Exception("Invalid project name length. Project name should be 3 to 15 chars long, letters and underscores only.")  # NOQA: E501
+        if (not re.search("^[\\w_]+$", self._project_name)):
+            raise Exception("Invalid characters in project name. Project name should be 3 to 15 chars long, letters and underscores only.")  # NOQA: E501
 
 
-def replaceprojectname(project_dir, project_name, rename_name):
+def replace_project_name(project_dir, project_name, rename_name):
     # Replace instances of rename_name within files with project_name
-    dirs = [r".env.example",
-            r".pipelines/azdo-base-pipeline.yml",
-            r".pipelines/azdo-pr-build-train.yml",
-            r".pipelines/diabetes_regression-ci-build-train.yml",
+    files = [r".env.example",
+            r".pipelines/code-quality-template.yml",
+            r".pipelines/pr.yml",
+            r".pipelines/diabetes_regression-cd.yml",
+            r".pipelines/diabetes_regression-ci.yml",
+            r".pipelines/abtest.yml",
             r".pipelines/diabetes_regression-ci-image.yml",
-            r".pipelines/diabetes_regression-template-get-model-version.yml",  # NOQA: E501
-            r".pipelines/diabetes_regression-variables.yml",
+            r".pipelines/diabetes_regression-publish-model-artifact-template.yml",  # NOQA: E501
+            r".pipelines/diabetes_regression-get-model-id-artifact-template.yml",  # NOQA: E501
+            r".pipelines/diabetes_regression-batchscoring-ci.yml",
+            r".pipelines/diabetes_regression-variables-template.yml",
             r"environment_setup/Dockerfile",
             r"environment_setup/install_requirements.sh",
+            r"ml_service/pipelines/diabetes_regression_build_parallel_batchscore_pipeline.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_verify_train_pipeline.py",  # NOQA: E501
             r"ml_service/util/create_scoring_image.py",
-            r"diabetes_regression/azureml_environment.json",
             r"diabetes_regression/conda_dependencies.yml",
             r"diabetes_regression/evaluate/evaluate_model.py",
             r"diabetes_regression/register/register_model.py",
-            r"diabetes_regression/training/test_train.py"]  # NOQA: E501
+            r"diabetes_regression/training/test_train.py"]
 
-    for dir in dirs:
-        file = os.path.join(project_dir, os.path.normpath(dir))
-        fin = open(file,
-                   "rt", encoding="utf8")
-        data = fin.read()
-        data = data.replace(rename_name, project_name)
-        fin.close()
-        fin = open(os.path.join(project_dir, file), "wt", encoding="utf8")  # NOQA: E501
-        fin.write(data)
-        fin.close()
+    for file in files:
+        path = os.path.join(project_dir, os.path.normpath(file))
+        try:
+            with open(path, "rt", encoding="utf8") as f_in:
+                data = f_in.read()
+            data = data.replace(rename_name, project_name)
+            with open(os.path.join(project_dir, file), "wt", encoding="utf8") as f_out:  # NOQA: E501
+                f_out.write(data)
+        except IOError as e:
+            print("Could not modify \"%s\". Is the MLOpsPython repo already cloned at \"%s\"?" % (path, project_dir))  # NOQA: E501
+            raise e
 
 
 def main(args):
     parser = argparse.ArgumentParser(description='New Template')
-    parser.add_argument("--d", type=str,
+    parser.add_argument("-d",
+                        "--directory",
+                        type=str,
+                        required=True,
                         help="Absolute path to new project direcory")
-    parser.add_argument(
-        "--n", type=str, help="Name of the project[3-15 chars] ")
+    parser.add_argument("-n",
+                        "--name",
+                        type=str,
+                        required=True,
+                        help="Name of the project [3-15 chars, letters and underscores only]")  # NOQA: E501
     try:
         args = parser.parse_args()
-        project_directory = args.d
-        project_name = args.n
+
+        project_directory = args.directory
+        project_name = args.name
+
         helper = Helper(project_directory, project_name)
-        helper.validateargs()
-        # helper.clonerepo()
-        helper.cleandir()
-        replaceprojectname(project_directory, project_name,
-                           "diabetes_regression")
-        replaceprojectname(project_directory, project_name, "diabetes")
-        helper.renamefiles()
-        helper.renamedir()
-        helper.deletedir()
+        helper.validate_args()
+        helper.clean_dir()
+
+        replace_project_name(project_directory, project_name, "diabetes_regression")  # NOQA: E501
+        replace_project_name(project_directory, project_name, "diabetes")
+
+        helper.rename_files()
+        helper.rename_dir()
+        helper.delete_dir()
     except Exception as e:
         print(e)
+
     return 0
 
 

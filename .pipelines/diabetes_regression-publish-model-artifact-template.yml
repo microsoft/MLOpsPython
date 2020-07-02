@@ -1,0 +1,29 @@
+# Pipeline template to check if a model was registered for the build and publishes an artifact with the model JSON
+steps:
+- task: AzureCLI@1
+  displayName: 'Install AzureML CLI'
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    workingDirectory: $(Build.SourcesDirectory)
+    inlineScript: 'az extension add -n azure-cli-ml'
+- task: AzureCLI@1
+  inputs:
+    azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+    scriptLocation: inlineScript
+    workingDirectory: $(Build.SourcesDirectory)
+    inlineScript: |
+      set -e # fail on error
+
+      # Get the model using the build ID tag
+      FOUND_MODEL=$(az ml model list -g $(RESOURCE_GROUP) --workspace-name $(WORKSPACE_NAME) --tag BuildId=$(Build.BuildId) --query '[0]')
+      
+      # If the variable is empty, print and fail
+      [[ -z "$FOUND_MODEL" ]] && { echo "Model was not registered for this run." ; exit 1; }
+
+      # Write to a file
+      echo $FOUND_MODEL >model.json
+  name: 'getversion'
+  displayName: "Determine if evaluation succeeded and new model is registered (CLI)"
+- publish: model.json
+  artifact: model

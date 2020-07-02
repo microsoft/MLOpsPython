@@ -1,32 +1,39 @@
+# Conda environment specification. The dependencies defined in this file will
+# be automatically provisioned for managed runs. These include runs against
+# the localdocker, remotedocker, and cluster compute targets.
+
+# Note that this file is NOT used to automatically manage dependencies for the
+# local compute target. To provision these dependencies locally, run:
+# conda env update --file conda_dependencies.yml
+
 # Details about the Conda environment file format:
 # https://conda.io/docs/using/envs.html#create-environment-file-by-hand
 
-name: diabetes_regression_sklearn
+# For managing Spark packages and configuration, see spark_dependencies.yml.
+# Version of this configuration file's structure and semantics in AzureML.
+# This directive is stored in a comment to preserve the Conda file structure.
+# [AzureMlVersion] = 2
 
+name: diabetes_regression_training_env
 dependencies:
   # The python interpreter version.
-  - python=3.7.5
+  # Currently Azure ML Workbench only supports 3.5.2 and later.
+  - python=3.7.*
+  - pip
 
-  # Required by azureml-defaults, installed separately through Conda to
-  # get a prebuilt version and not require build tools for the install.
-  - psutil=5.6 #latest
-
-  - numpy=1.18.1
-  - pandas=1.0.0
-  - scikit-learn=0.22.1
-  #- r-essentials
-  #- tensorflow
-  #- keras
-
-  - pip=20.0.2
   - pip:
-      # Dependencies for training environment.
+      # Base AzureML SDK
+      - azureml-sdk==1.6.*
 
-      - azureml-core==1.0.85
+      # Minimum required for the scoring environment. Must match AzureML SDK version.
+      # https://docs.microsoft.com/en-us/azure/machine-learning/concept-environments
+      - azureml-defaults==1.6.*
 
-      # Dependencies for scoring environment.
+      # Training deps
+      - scikit-learn
 
-      # You must list azureml-defaults as a pip dependency
-      - azureml-defaults==1.0.85
-      - inference-schema[numpy-support]==1.0.1
-      - azureml-dataprep==1.1.38
+      # Scoring deps
+      - inference-schema[numpy-support]
+
+      # MLOps with R
+      - azure-storage-blob

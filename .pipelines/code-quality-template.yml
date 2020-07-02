@@ -1,3 +1,4 @@
+# Pipeline template to run linting, unit tests with code coverage, and publish the results.
 steps:
 - script: |   
    flake8 --output-file=lint-testresults.xml --format junit-xml
@@ -5,6 +6,7 @@ steps:
 
 - script: |   
    python -m pytest . --cov=diabetes_regression --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
+  condition: succeededOrFailed()
   displayName: 'Run unit tests'
 
 - task: PublishTestResults@2

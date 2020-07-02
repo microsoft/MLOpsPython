@@ -1,0 +1,129 @@
+# Pipeline template that defines common runtime environment variables.
+variables:
+  # Source Config
+  # The directory containing the scripts for training, evaluating, and registering the model
+  - name: SOURCES_DIR_TRAIN
+    value: diabetes_regression
+    # The path to the model training script under SOURCES_DIR_TRAIN
+  - name: TRAIN_SCRIPT_PATH
+    value: training/train_aml.py
+    # The path to the model evaluation script under SOURCES_DIR_TRAIN
+  - name: EVALUATE_SCRIPT_PATH
+    value: evaluate/evaluate_model.py
+    # The path to the model registration script under SOURCES_DIR_TRAIN
+  - name: REGISTER_SCRIPT_PATH
+    value: register/register_model.py
+    # The path to the model scoring script relative to SOURCES_DIR_TRAIN
+  - name: SCORE_SCRIPT
+    value: scoring/score.py
+    
+
+  # Azure ML Variables
+  - name: EXPERIMENT_NAME
+    value: mlopspython
+  - name: DATASET_NAME
+    value: diabetes_ds
+  # Uncomment DATASTORE_NAME if you have configured non default datastore to point to your data
+  # - name: DATASTORE_NAME
+  #   value: datablobstore
+  - name: DATASET_VERSION
+    value: latest
+  - name: TRAINING_PIPELINE_NAME
+    value: "diabetes-Training-Pipeline"
+  - name: MODEL_NAME
+    value: diabetes_regression_model.pkl
+
+  # AML Compute Cluster Config
+  - name: AML_ENV_NAME
+    value: diabetes_regression_training_env
+  - name: AML_ENV_TRAIN_CONDA_DEP_FILE
+    value: "conda_dependencies.yml"
+  - name: AML_COMPUTE_CLUSTER_CPU_SKU
+    value: STANDARD_DS2_V2
+  - name: AML_COMPUTE_CLUSTER_NAME
+    value: train-cluster
+  - name: AML_CLUSTER_MIN_NODES
+    value: 0
+  - name: AML_CLUSTER_MAX_NODES
+    value: 4
+  - name: AML_CLUSTER_PRIORITY
+    value: lowpriority
+
+  # The name for the (docker/webapp) scoring image
+  - name: IMAGE_NAME
+    value: "diabetestrained"
+
+    # Optional. Used by a training pipeline with R on Databricks
+  - name: DB_CLUSTER_ID
+    value: ""
+
+  # These are the default values set in ml_service\util\env_variables.py. Uncomment and override if desired.
+  # Set to false to disable the evaluation step in the ML pipeline and register the newly trained model unconditionally.
+  # - name: RUN_EVALUATION
+  #   value: "true"
+  # Set to false to register the model regardless of the outcome of the evaluation step in the ML pipeline.
+  # - name: ALLOW_RUN_CANCEL
+  #   value: "true"
+
+  # Flag to allow rebuilding the AML Environment after it was built for the first time. This enables dependency updates from conda_dependencies.yaml.
+  # - name: AML_REBUILD_ENVIRONMENT
+  #  value: "false"
+
+  # Variables below are used for controlling various aspects of batch scoring
+  - name: USE_GPU_FOR_SCORING
+    value: False
+  # Conda dependencies for the batch scoring step
+  - name: AML_ENV_SCORE_CONDA_DEP_FILE
+    value: "conda_dependencies_scoring.yml"
+  # Conda dependencies for the score copying step
+  - name: AML_ENV_SCORECOPY_CONDA_DEP_FILE
+    value: "conda_dependencies_scorecopy.yml"
+    # AML Compute Cluster Config for parallel batch scoring
+  - name: AML_ENV_NAME_SCORING
+    value: diabetes_regression_scoring_env
+  - name: AML_ENV_NAME_SCORE_COPY
+    value: diabetes_regression_score_copy_env
+  - name: AML_COMPUTE_CLUSTER_CPU_SKU_SCORING
+    value: STANDARD_DS2_V2
+  - name: AML_COMPUTE_CLUSTER_NAME_SCORING
+    value: score-cluster
+  - name: AML_CLUSTER_MIN_NODES_SCORING
+    value: 0
+  - name: AML_CLUSTER_MAX_NODES_SCORING
+    value: 4
+  - name: AML_CLUSTER_PRIORITY_SCORING
+    value: lowpriority
+  # The path to the batch scoring script relative to SOURCES_DIR_TRAIN
+  - name: BATCHSCORE_SCRIPT_PATH
+    value: scoring/parallel_batchscore.py
+  - name: BATCHSCORE_COPY_SCRIPT_PATH
+    value: scoring/parallel_batchscore_copyoutput.py
+  # Flag to allow rebuilding the AML Environment after it was built for the first time. 
+  # This enables dependency updates from the conda dependencies yaml for scoring activities.
+  - name: AML_REBUILD_ENVIRONMENT_SCORING
+    value: "true"
+
+  # Datastore config for scoring
+  # The storage account name and key are supplied as variables in a variable group 
+  # in the Azure Pipelines library for this project. Please refer to repo docs for 
+  # more details
+
+  # Blob container where the input data for scoring can be found
+  - name: SCORING_DATASTORE_INPUT_CONTAINER
+    value: "input"
+  # Blobname for the input data - include any applicable path in the string 
+  - name: SCORING_DATASTORE_INPUT_FILENAME
+    value: "diabetes_scoring_input.csv"
+  # Blob container where the output data for scoring can be found
+  - name: SCORING_DATASTORE_OUTPUT_CONTAINER
+    value: "output"
+  # Blobname for the output data - include any applicable path in the string 
+  - name: SCORING_DATASTORE_OUTPUT_FILENAME
+    value: "diabetes_scoring_output.csv"
+  # Dataset name for input data for scoring
+  - name: SCORING_DATASET_NAME
+    value: "diabetes_scoring_ds"
+  # Scoring pipeline name
+  - name: SCORING_PIPELINE_NAME
+    value: "diabetes-scoring-pipeline"
+    

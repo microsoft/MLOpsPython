@@ -1,0 +1,97 @@
+# Continuous Integration (CI) pipeline that orchestrates the training, evaluation, and registration of the diabetes_regression model.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - diabetes_regression/
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r.py
+    - ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py
+
+variables:
+- template: diabetes_regression-variables-template.yml
+- group: devopsforai-aml-vg
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: 'Model_CI'
+  displayName: 'Model CI'
+  jobs:
+  - job: "Model_CI_Pipeline"
+    displayName: "Model CI Pipeline"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: code-quality-template.yml
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          # Invoke the Python building and publishing a training pipeline
+          python -m ml_service.pipelines.diabetes_regression_build_train_pipeline
+      displayName: 'Publish Azure Machine Learning Pipeline'
+
+- stage: 'Trigger_AML_Pipeline'
+  displayName: 'Train and evaluate model'
+  condition: succeeded()
+  variables:
+    BUILD_URI: '$(SYSTEM.COLLECTIONURI)$(SYSTEM.TEAMPROJECT)/_build/results?buildId=$(BUILD.BUILDID)'
+  jobs:
+  - job: "Get_Pipeline_ID"
+    condition: and(succeeded(), eq(coalesce(variables['auto-trigger-training'], 'true'), 'true'))
+    displayName: "Get Pipeline ID for execution"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - task: AzureCLI@1
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: |
+          set -e # fail on error
+          export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+          python -m ml_service.pipelines.run_train_pipeline --output_pipeline_id_file "pipeline_id.txt" --skip_train_execution
+          # Set AMLPIPELINEID variable for next AML Pipeline task in next job
+          AMLPIPELINEID="$(cat pipeline_id.txt)"
+          echo "##vso[task.setvariable variable=AMLPIPELINEID;isOutput=true]$AMLPIPELINEID"
+      name: 'getpipelineid'
+      displayName: 'Get Pipeline ID'
+  - job: "Run_ML_Pipeline"
+    dependsOn: "Get_Pipeline_ID"
+    displayName: "Trigger ML Training Pipeline"
+    timeoutInMinutes: 0
+    pool: server
+    variables:
+      AMLPIPELINE_ID: $[ dependencies.Get_Pipeline_ID.outputs['getpipelineid.AMLPIPELINEID'] ]
+    steps:
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke ML pipeline'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        PipelineId: '$(AMLPIPELINE_ID)'
+        ExperimentName: '$(EXPERIMENT_NAME)'
+        PipelineParameters: '"ParameterAssignments": {"model_name": "$(MODEL_NAME)"}, "tags": {"BuildId": "$(Build.BuildId)", "BuildUri": "$(BUILD_URI)"}, "StepTags": {"BuildId": "$(Build.BuildId)", "BuildUri": "$(BUILD_URI)"}'
+  - job: "Training_Run_Report"
+    dependsOn: "Run_ML_Pipeline"
+    condition: always()
+    displayName: "Publish artifact if new model was registered"
+    container: mlops
+    timeoutInMinutes: 0
+    steps:
+    - template: diabetes_regression-publish-model-artifact-template.yml

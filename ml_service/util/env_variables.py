@@ -1,163 +1,126 @@
+"""Env dataclass to load and hold all environment variables
+"""
+from dataclasses import dataclass
 import os
+from typing import Optional
+
 from dotenv import load_dotenv
 
 
-class Singleton(object):
-    _instances = {}
+@dataclass(frozen=True)
+class Env:
+    """Loads all environment variables into a predefined set of properties
+    """
 
-    def __new__(class_, *args, **kwargs):
-        if class_ not in class_._instances:
-            class_._instances[class_] = super(Singleton, class_).__new__(class_, *args, **kwargs)  # noqa E501
-        return class_._instances[class_]
+    # to load .env file into environment variables for local execution
+    load_dotenv()
+    workspace_name: Optional[str] = os.environ.get("WORKSPACE_NAME")
+    resource_group: Optional[str] = os.environ.get("RESOURCE_GROUP")
+    subscription_id: Optional[str] = os.environ.get("SUBSCRIPTION_ID")
+    tenant_id: Optional[str] = os.environ.get("TENANT_ID")
+    app_id: Optional[str] = os.environ.get("SP_APP_ID")
+    app_secret: Optional[str] = os.environ.get("SP_APP_SECRET")
+    vm_size: Optional[str] = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
+    compute_name: Optional[str] = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
+    vm_priority: Optional[str] = os.environ.get(
+        "AML_CLUSTER_PRIORITY", "lowpriority"
+    )  # NOQA: E501
+    min_nodes: int = int(os.environ.get("AML_CLUSTER_MIN_NODES", 0))
+    max_nodes: int = int(os.environ.get("AML_CLUSTER_MAX_NODES", 4))
+    build_id: Optional[str] = os.environ.get("BUILD_BUILDID")
+    pipeline_name: Optional[str] = os.environ.get("TRAINING_PIPELINE_NAME")
+    sources_directory_train: Optional[str] = os.environ.get(
+        "SOURCES_DIR_TRAIN"
+    )  # NOQA: E501
+    train_script_path: Optional[str] = os.environ.get("TRAIN_SCRIPT_PATH")
+    evaluate_script_path: Optional[str] = os.environ.get(
+        "EVALUATE_SCRIPT_PATH"
+    )  # NOQA: E501
+    register_script_path: Optional[str] = os.environ.get(
+        "REGISTER_SCRIPT_PATH"
+    )  # NOQA: E501
+    model_name: Optional[str] = os.environ.get("MODEL_NAME")
+    experiment_name: Optional[str] = os.environ.get("EXPERIMENT_NAME")
+    model_version: Optional[str] = os.environ.get("MODEL_VERSION")
+    image_name: Optional[str] = os.environ.get("IMAGE_NAME")
+    db_cluster_id: Optional[str] = os.environ.get("DB_CLUSTER_ID")
+    score_script: Optional[str] = os.environ.get("SCORE_SCRIPT")
+    build_uri: Optional[str] = os.environ.get("BUILD_URI")
+    dataset_name: Optional[str] = os.environ.get("DATASET_NAME")
+    datastore_name: Optional[str] = os.environ.get("DATASTORE_NAME")
+    dataset_version: Optional[str] = os.environ.get("DATASET_VERSION")
+    run_evaluation: Optional[str] = os.environ.get("RUN_EVALUATION", "true")
+    allow_run_cancel: Optional[str] = os.environ.get(
+        "ALLOW_RUN_CANCEL", "true"
+    )  # NOQA: E501
+    aml_env_name: Optional[str] = os.environ.get("AML_ENV_NAME")
+    aml_env_train_conda_dep_file: Optional[str] = os.environ.get(
+        "AML_ENV_TRAIN_CONDA_DEP_FILE", "conda_dependencies.yml"
+    )
+    rebuild_env: Optional[bool] = os.environ.get(
+        "AML_REBUILD_ENVIRONMENT", "false"
+    ).lower().strip() == "true"
 
-
-class Env(Singleton):
-
-    def __init__(self):
-        load_dotenv()
-        self._workspace_name = os.environ.get("WORKSPACE_NAME")
-        self._resource_group = os.environ.get("RESOURCE_GROUP")
-        self._subscription_id = os.environ.get("SUBSCRIPTION_ID")
-        self._tenant_id = os.environ.get("TENANT_ID")
-        self._app_id = os.environ.get("SP_APP_ID")
-        self._app_secret = os.environ.get("SP_APP_SECRET")
-        self._vm_size = os.environ.get("AML_COMPUTE_CLUSTER_CPU_SKU")
-        self._compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME")
-        self._vm_priority = os.environ.get("AML_CLUSTER_PRIORITY", 'lowpriority')  # noqa E501
-        self._min_nodes = int(os.environ.get("AML_CLUSTER_MIN_NODES", 0))
-        self._max_nodes = int(os.environ.get("AML_CLUSTER_MAX_NODES", 4))
-        self._build_id = os.environ.get("BUILD_BUILDID")
-        self._pipeline_name = os.environ.get("TRAINING_PIPELINE_NAME")
-        self._sources_directory_train = os.environ.get("SOURCES_DIR_TRAIN")
-        self._train_script_path = os.environ.get("TRAIN_SCRIPT_PATH")
-        self._evaluate_script_path = os.environ.get("EVALUATE_SCRIPT_PATH")
-        self._register_script_path = os.environ.get("REGISTER_SCRIPT_PATH")
-        self._model_name = os.environ.get("MODEL_NAME")
-        self._experiment_name = os.environ.get("EXPERIMENT_NAME")
-        self._model_version = os.environ.get('MODEL_VERSION')
-        self._image_name = os.environ.get('IMAGE_NAME')
-        self._model_path = os.environ.get('MODEL_PATH')
-        self._db_cluster_id = os.environ.get("DB_CLUSTER_ID")
-        self._score_script = os.environ.get("SCORE_SCRIPT")
-        self._collection_uri = os.environ.get("SYSTEM_COLLECTIONURI")
-        self._teamproject_name = os.environ.get("SYSTEM_TEAMPROJECT")
-        self._dataset_name = os.environ.get("DATASET_NAME")
-        self._run_evaluation = os.environ.get("RUN_EVALUATION", "true")
-        self._allow_run_cancel = os.environ.get(
-            "ALLOW_RUN_CANCEL", "true")
-
-    @property
-    def workspace_name(self):
-        return self._workspace_name
-
-    @property
-    def resource_group(self):
-        return self._resource_group
-
-    @property
-    def subscription_id(self):
-        return self._subscription_id
-
-    @property
-    def tenant_id(self):
-        return self._tenant_id
-
-    @property
-    def app_id(self):
-        return self._app_id
-
-    @property
-    def app_secret(self):
-        return self._app_secret
-
-    @property
-    def vm_size(self):
-        return self._vm_size
-
-    @property
-    def compute_name(self):
-        return self._compute_name
-
-    @property
-    def db_cluster_id(self):
-        return self._db_cluster_id
-
-    @property
-    def build_id(self):
-        return self._build_id
-
-    @property
-    def pipeline_name(self):
-        return self._pipeline_name
-
-    @property
-    def sources_directory_train(self):
-        return self._sources_directory_train
-
-    @property
-    def train_script_path(self):
-        return self._train_script_path
-
-    @property
-    def evaluate_script_path(self):
-        return self._evaluate_script_path
-
-    @property
-    def register_script_path(self):
-        return self._register_script_path
-
-    @property
-    def model_name(self):
-        return self._model_name
-
-    @property
-    def experiment_name(self):
-        return self._experiment_name
-
-    @property
-    def vm_priority(self):
-        return self._vm_priority
-
-    @property
-    def min_nodes(self):
-        return self._min_nodes
-
-    @property
-    def max_nodes(self):
-        return self._max_nodes
-
-    @property
-    def model_version(self):
-        return self._model_version
-
-    @property
-    def image_name(self):
-        return self._image_name
-
-    @property
-    def model_path(self):
-        return self._model_path
-
-    @property
-    def score_script(self):
-        return self._score_script
-
-    @property
-    def collection_uri(self):
-        return self._collection_uri
-
-    @property
-    def teamproject_name(self):
-        return self._teamproject_name
-
-    @property
-    def dataset_name(self):
-        return self._dataset_name
-
-    @property
-    def run_evaluation(self):
-        return self._run_evaluation
-
-    @property
-    def allow_run_cancel(self):
-        return self._allow_run_cancel
+    use_gpu_for_scoring: Optional[bool] = os.environ.get(
+        "USE_GPU_FOR_SCORING", "false"
+    ).lower().strip() == "true"
+    aml_env_score_conda_dep_file: Optional[str] = os.environ.get(
+        "AML_ENV_SCORE_CONDA_DEP_FILE", "conda_dependencies_scoring.yml"
+    )
+    aml_env_scorecopy_conda_dep_file: Optional[str] = os.environ.get(
+        "AML_ENV_SCORECOPY_CONDA_DEP_FILE", "conda_dependencies_scorecopy.yml"
+    )
+    vm_size_scoring: Optional[str] = os.environ.get(
+        "AML_COMPUTE_CLUSTER_CPU_SKU_SCORING"
+    )
+    compute_name_scoring: Optional[str] = os.environ.get(
+        "AML_COMPUTE_CLUSTER_NAME_SCORING"
+    )
+    vm_priority_scoring: Optional[str] = os.environ.get(
+        "AML_CLUSTER_PRIORITY_SCORING", "lowpriority"
+    )
+    min_nodes_scoring: int = int(
+        os.environ.get("AML_CLUSTER_MIN_NODES_SCORING", 0)
+    )  # NOQA: E501
+    max_nodes_scoring: int = int(
+        os.environ.get("AML_CLUSTER_MAX_NODES_SCORING", 4)
+    )  # NOQA: E501
+    rebuild_env_scoring: Optional[bool] = os.environ.get(
+        "AML_REBUILD_ENVIRONMENT_SCORING", "false"
+    ).lower().strip() == "true"
+    scoring_datastore_storage_name: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_STORAGE_NAME"
+    )
+    scoring_datastore_access_key: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_ACCESS_KEY"
+    )
+    scoring_datastore_input_container: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_INPUT_CONTAINER"
+    )
+    scoring_datastore_input_filename: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_INPUT_FILENAME"
+    )
+    scoring_datastore_output_container: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_OUTPUT_CONTAINER"
+    )
+    scoring_datastore_output_filename: Optional[str] = os.environ.get(
+        "SCORING_DATASTORE_OUTPUT_FILENAME"
+    )
+    scoring_dataset_name: Optional[str] = os.environ.get(
+        "SCORING_DATASET_NAME"
+    )  # NOQA: E501
+    scoring_pipeline_name: Optional[str] = os.environ.get(
+        "SCORING_PIPELINE_NAME"
+    )  # NOQA: E501
+    aml_env_name_scoring: Optional[str] = os.environ.get(
+        "AML_ENV_NAME_SCORING"
+    )  # NOQA: E501
+    aml_env_name_score_copy: Optional[str] = os.environ.get(
+        "AML_ENV_NAME_SCORE_COPY"
+    )  # NOQA: E501
+    batchscore_script_path: Optional[str] = os.environ.get(
+        "BATCHSCORE_SCRIPT_PATH"
+    )  # NOQA: E501
+    batchscore_copy_script_path: Optional[str] = os.environ.get(
+        "BATCHSCORE_COPY_SCRIPT_PATH"
+    )  # NOQA: E501
