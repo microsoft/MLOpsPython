@@ -108,7 +108,7 @@ def replace_project_name(project_dir, project_name, rename_name):
     for file in files:
         path = os.path.join(project_dir, os.path.normpath(file))
         try:
-            with open(path, "rt", encoding="utf8") as f_in:
+            with open(path, "rt") as f_in:
                 data = f_in.read()
             data = data.replace(rename_name, project_name)
             with open(os.path.join(project_dir, file), "wt", encoding="utf8") as f_out:  # NOQA: E501
