@@ -66,8 +66,8 @@ variables:
   #   value: "true"
 
   # Flag to allow rebuilding the AML Environment after it was built for the first time. This enables dependency updates from conda_dependencies.yaml.
-  # - name: AML_REBUILD_ENVIRONMENT
-  #  value: "false"
+   - name: AML_REBUILD_ENVIRONMENT
+    value: "true"
 
   # Variables below are used for controlling various aspects of batch scoring
   - name: USE_GPU_FOR_SCORING
@@ -126,4 +126,7 @@ variables:
   # Scoring pipeline name
   - name: SCORING_PIPELINE_NAME
     value: "diabetes-scoring-pipeline"
-    
+
+  #Observability
+  - name: APP_INSIGHTS_CONNECTION_STRING
+    value: ""

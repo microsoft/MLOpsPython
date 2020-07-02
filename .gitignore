@@ -109,3 +109,6 @@ condaenv.*
 .mypy_cache/
 
 .DS_Store
+
+#pycharm
+.idea
