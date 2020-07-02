@@ -13,7 +13,11 @@ from opencensus.stats import view as view_module
 from opencensus.tags import tag_map as tag_map_module
 
 from ml_service.util.env_variables import Env
-from utils.logger.logger_interface import LoggerInterface, ObservabilityAbstract, Severity
+from utils.logger.logger_interface import (
+    LoggerInterface,
+    ObservabilityAbstract,
+    Severity,
+)
 
 
 class AppInsightsLogger(LoggerInterface, ObservabilityAbstract):
@@ -49,7 +53,8 @@ class AppInsightsLogger(LoggerInterface, ObservabilityAbstract):
         :param log_parent: not being used for this logger
         :return:
         """
-        measurement_map = stats_module.stats.stats_recorder.new_measurement_map()
+        measurement_map = \
+            stats_module.stats.stats_recorder.new_measurement_map()
         tag_map = tag_map_module.TagMap()
 
         measure = measure_module.MeasureFloat(name, description)
@@ -104,16 +109,22 @@ class AppInsightsLogger(LoggerInterface, ObservabilityAbstract):
         Sets the view for the custom metric
         """
         prompt_view = view_module.View(
-            metric, description, [], measure, aggregation_module.LastValueAggregation()
+            metric,
+            description,
+            [],
+            measure,
+            aggregation_module.LastValueAggregation()
         )
         stats_module.stats.view_manager.register_view(prompt_view)
 
     def callback_function(self, envelope):
         """
-        Attaches a correlation_id as a custom dimension to the exporter just before
+        Attaches a correlation_id as a custom
+        dimension to the exporter just before
         sending the logs/metrics
         :param envelope:
-        :return: Always return True (if False, it  does not export metrics/logs)
+        :return: Always return True
+        (if False, it  does not export metrics/logs)
         """
         envelope.data.baseData.properties[self.CORRELATION_ID] = self.run_id
         return True

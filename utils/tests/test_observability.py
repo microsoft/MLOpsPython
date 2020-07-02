@@ -45,8 +45,10 @@ class TestObservability(unittest.TestCase):
 
         self.observability.log("FOO", "BAZ")
 
-        self.observability._loggers.loggers[0].log.assert_called_with("FOO", "BAZ")
-        self.observability._loggers.loggers[1].log.assert_called_with("FOO", "BAZ")
+        self.observability._loggers.loggers[0].\
+            log.assert_called_with("FOO", "BAZ")
+        self.observability._loggers.loggers[1].\
+            log.assert_called_with("FOO", "BAZ")
 
 
 if __name__ == "__main__":

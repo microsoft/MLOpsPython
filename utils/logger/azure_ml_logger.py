@@ -1,7 +1,11 @@
 import datetime
 import time
 
-from utils.logger.logger_interface import LoggerInterface, ObservabilityAbstract, Severity
+from utils.logger.logger_interface import (
+    LoggerInterface,
+    ObservabilityAbstract,
+    Severity,
+)
 
 
 class AzureMlLogger(LoggerInterface, ObservabilityAbstract):
@@ -21,7 +25,8 @@ class AzureMlLogger(LoggerInterface, ObservabilityAbstract):
         if name != "" and value != "":
             self.run.log(
                 name, value, description
-            ) if log_parent is False else self.run.parent.log(name, value, description)
+            ) if log_parent is False \
+                else self.run.parent.log(name, value, description)
 
     def log(self, description="", severity=Severity.WARNING):
         """

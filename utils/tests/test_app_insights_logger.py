@@ -37,14 +37,16 @@ class TestObservability(unittest.TestCase):
     def test_get_run_id_having_online_context_using_build_id(self):
         self.concert_app_insights_logger.env.build_id = expected = "FOO"
 
-        response = self.concert_app_insights_logger.get_run_id(MockRun("OfflineRun"))
+        response = self.concert_app_insights_logger.\
+            get_run_id(MockRun("OfflineRun"))
 
         self.assertEqual(expected, response)
 
     def test_get_run_id_having_online_context_using_uuid(self):
         self.concert_app_insights_logger.env.build_id = ""
 
-        response = self.concert_app_insights_logger.get_run_id(MockRun("OfflineRun"))
+        response = self.concert_app_insights_logger.\
+            get_run_id(MockRun("OfflineRun"))
 
         self.assertIsNotNone(response)
 
@@ -62,7 +64,8 @@ class TestObservability(unittest.TestCase):
 
     def test_set_view_is_called_with_parameters(self):
         self.mock_app_insights_logger.set_view("FOO", "BAR", "BAZ")
-        self.mock_app_insights_logger.set_view.assert_called_with("FOO", "BAR", "BAZ")
+        self.mock_app_insights_logger.set_view.\
+            assert_called_with("FOO", "BAR", "BAZ")
 
 
 if __name__ == "__main__":

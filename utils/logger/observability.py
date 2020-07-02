@@ -2,7 +2,11 @@ from azureml.core import Run
 
 from utils.logger.app_insights_logger import AppInsightsLogger
 from utils.logger.azure_ml_logger import AzureMlLogger
-from utils.logger.logger_interface import ObservabilityAbstract, LoggerInterface, Severity
+from utils.logger.logger_interface import (
+    ObservabilityAbstract,
+    LoggerInterface,
+    Severity,
+)
 
 
 class Loggers(ObservabilityAbstract):
@@ -18,8 +22,10 @@ class Loggers(ObservabilityAbstract):
 
     def register_loggers(self, export_interval):
         """
-        This method is responsible to create loggers/tracers and add them to the list of loggers
-        Note: if the context of the Run object os offline, we do not create AzureMlLogger instance
+        This method is responsible to create loggers/tracers
+        and add them to the list of loggers
+        Note: if the context of the Run object os offline,
+        we do not create AzureMlLogger instance
         """
         run = Run.get_context()
         if not run.id.startswith(self.OFFLINE_RUN):
@@ -57,8 +63,10 @@ class Observability(LoggerInterface):
 
     def get_logger(self, logger_class):
         """
-        This method iterate over the loggers and it returns the logger with the same type as the provided one.
-        this is a reference that can be used in case any of the built in functions of the loggers is required
+        This method iterate over the loggers and it
+        returns the logger with the same type as the provided one.
+        this is a reference that can be used in case
+        any of the built in functions of the loggers is required
         :param logger_class:
         :return: a logger class
         """

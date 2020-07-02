@@ -21,7 +21,8 @@ class ObservabilityAbstract:
     OFFLINE_RUN = "OfflineRun"
     CORRELATION_ID = "correlation_id"
     severity = Severity()
-    severity_map = {10: "DEBUG", 20: "INFO", 30: "WARNING", 40: "ERROR", 50: "CRITICAL"}
+    severity_map = {10: "DEBUG", 20: "INFO",
+                    30: "WARNING", 40: "ERROR", 50: "CRITICAL"}
 
     @staticmethod
     def get_callee(stack_level):
