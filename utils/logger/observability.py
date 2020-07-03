@@ -12,7 +12,7 @@ from utils.logger.logger_interface import (
 class Loggers(ObservabilityAbstract):
     def __init__(self, export_interval) -> None:
         self.loggers: LoggerInterface = []
-        self.factory(export_interval)
+        self.register_loggers(export_interval)
 
     def add(self, logger) -> None:
         self.loggers.append(logger)
