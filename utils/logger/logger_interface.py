@@ -20,6 +20,7 @@ class LoggerInterface:
 class ObservabilityAbstract:
     OFFLINE_RUN = "OfflineRun"
     CORRELATION_ID = "correlation_id"
+    APP_INSIGHTS_CONNECTION_STRING = "APP_INSIGHTS_CONNECTION_STRING"
     severity = Severity()
     severity_map = {10: "DEBUG", 20: "INFO",
                     30: "WARNING", 40: "ERROR", 50: "CRITICAL"}

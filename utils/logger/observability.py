@@ -1,6 +1,7 @@
+import os
+
 from azureml.core import Run
 
-from ml_service.util.env_variables import Env
 from utils.logger.app_insights_logger import AppInsightsLogger
 from utils.logger.azure_ml_logger import AzureMlLogger
 from utils.logger.logger_interface import (
@@ -14,7 +15,6 @@ class Loggers(ObservabilityAbstract):
     def __init__(self, export_interval) -> None:
         self.loggers: LoggerInterface = []
         self.register_loggers(export_interval)
-        self.env = Env()
 
     def add(self, logger) -> None:
         self.loggers.append(logger)
@@ -32,7 +32,7 @@ class Loggers(ObservabilityAbstract):
         run = Run.get_context()
         if not run.id.startswith(self.OFFLINE_RUN):
             self.loggers.append(AzureMlLogger(run))
-        if Env().app_insights_connection_string:
+        if os.environ.get(self.APP_INSIGHTS_CONNECTION_STRING):
             self.loggers.append(AppInsightsLogger(run, export_interval))
 
 
