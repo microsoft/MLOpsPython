@@ -49,6 +49,9 @@ def main():
     run_config.environment.environment_variables[
         "DATASTORE_NAME"
     ] = datastore_name  # NOQA: E501
+    run_config.environment.environment_variables[
+        "APP_INSIGHTS_CONNECTION_STRING"
+    ] = e.app_insights_connection_string
 
     model_name_param = PipelineParameter(name="model_name", default_value=e.model_name)  # NOQA: E501
     dataset_version_param = PipelineParameter(

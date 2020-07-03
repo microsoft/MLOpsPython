@@ -124,3 +124,6 @@ class Env:
     batchscore_copy_script_path: Optional[str] = os.environ.get(
         "BATCHSCORE_COPY_SCRIPT_PATH"
     )  # NOQA: E501
+    app_insights_connection_string: Optional[str] = os.environ.get(
+        "APP_INSIGHTS_CONNECTION_STRING"
+    )  # NOQA: E501
