@@ -41,6 +41,11 @@ from azureml.data.datapath import DataPath
 from azureml.pipeline.steps import PythonScriptStep
 from typing import Tuple
 
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
+
 
 def get_or_create_datastore(
     datastorename: str, ws: Workspace, env: Env, input: bool = True
@@ -59,7 +64,9 @@ def get_or_create_datastore(
     :raises: ValueError
     """
     if datastorename is None:
-        raise ValueError("Datastore name is required.")
+        error = "Datastore name is required."
+        observability.log(description=error,severity=Severity.ERROR)
+        raise ValueError(error)
 
     containername = (
         env.scoring_datastore_input_container
@@ -85,11 +92,10 @@ def get_or_create_datastore(
             container_name=containername,
         )
     else:
-        raise ValueError(
-            "No existing datastore named {} nor was enough information supplied to create one.".format(  # NOQA: E501
-                datastorename
-            )
-        )
+        error = "No existing datastore named {} nor was enough information supplied to create one.".format(  # NOQA: E501
+                datastorename)
+        observability.log(description=error, severity=Severity.ERROR)
+        raise ValueError(error)
 
     return datastore
 
@@ -150,7 +156,7 @@ def get_fallback_input_dataset(ws: Workspace, env: Env) -> Dataset:
                 env.scoring_datastore_input_filename
             )  # NOQA: E501
         )
-
+        observability.log(description=error_message, severity=Severity.ERROR)
         raise FileNotFoundError(error_message)
 
     # upload the input data to the workspace default datastore
@@ -418,9 +424,9 @@ def build_batchscore_pipeline():
         pipeline_id_string = "##vso[task.setvariable variable=pipeline_id;isOutput=true]{}".format(  # NOQA: E501
             published_pipeline.id
         )
-        print(pipeline_id_string)
+        observability.log(pipeline_id_string)
     except Exception as e:
-        print(e)
+        observability.log(description=e,severity=Severity.ERROR)
         exit(1)
 
 

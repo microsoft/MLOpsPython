@@ -3,6 +3,11 @@ from azureml.core import Workspace, Environment
 from ml_service.util.env_variables import Env
 from azureml.core.runconfig import DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
 
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
+
 
 def get_environment(
         workspace: Workspace,
@@ -32,8 +37,8 @@ def get_environment(
             restored_environment.register(workspace)
 
         if restored_environment is not None:
-            print(restored_environment)
+            observability.log(restored_environment)
         return restored_environment
     except Exception as e:
-        print(e)
+        observability.log(description=e,severity=Severity.ERROR)
         exit(1)

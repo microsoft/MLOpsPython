@@ -5,9 +5,13 @@ from azureml.core import Run, Experiment, Workspace
 from ml_service.util.env_variables import Env
 from diabetes_regression.util.model_helper import get_model
 
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
+
 
 def main():
-
     run = Run.get_context()
 
     if (run.id.startswith('OfflineRun')):
@@ -59,14 +63,14 @@ def main():
             tag_value=build_id,
             aml_workspace=exp.workspace)
 
-        if (model is not None):
-            print("Model was registered for this build.")
-        if (model is None):
-            print("Model was not registered for this run.")
+        if model is not None:
+            observability.log("Model was registered for this build.")
+        if model is None:
+            observability.log("Model was not registered for this run.")
             sys.exit(1)
     except Exception as e:
-        print(e)
-        print("Model was not registered for this run.")
+        observability.log(description=e, severity=Severity.ERROR)
+        observability.log(description="Model was not registered for this run.", severity=Severity.ERROR)
         sys.exit(1)
 
     # Save the Model Version for other AzDO jobs after script is complete

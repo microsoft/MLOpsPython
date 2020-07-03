@@ -3,9 +3,13 @@ from azureml.core import Experiment, Workspace
 import argparse
 from ml_service.util.env_variables import Env
 
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
+
 
 def main():
-
     parser = argparse.ArgumentParser("register")
     parser.add_argument(
         "--output_pipeline_id_file",
@@ -38,22 +42,26 @@ def main():
             if p.version == e.build_id:
                 matched_pipes.append(p)
 
-    if(len(matched_pipes) > 1):
+    if (len(matched_pipes) > 1):
         published_pipeline = None
-        raise Exception(f"Multiple active pipelines are published for build {e.build_id}.")  # NOQA: E501
-    elif(len(matched_pipes) == 0):
+        error = f"Multiple active pipelines are published for build {e.build_id}."  # NOQA: E501
+        observability.log(description=error, severity=Severity.ERROR)
+        raise Exception(error)
+    elif (len(matched_pipes) == 0):
         published_pipeline = None
-        raise KeyError(f"Unable to find a published pipeline for this build {e.build_id}")  # NOQA: E501
+        error = f"Unable to find a published pipeline for this build {e.build_id}"
+        observability.log(description=error, severity=Severity.ERROR)
+        raise KeyError(error)  # NOQA: E501
     else:
         published_pipeline = matched_pipes[0]
-        print("published pipeline id is", published_pipeline.id)
+        observability.log("published pipeline id is" + str(published_pipeline.id))
 
         # Save the Pipeline ID for other AzDO jobs after script is complete
         if args.output_pipeline_id_file is not None:
             with open(args.output_pipeline_id_file, "w") as out_file:
                 out_file.write(published_pipeline.id)
 
-        if(args.skip_train_execution is False):
+        if (args.skip_train_execution is False):
             pipeline_parameters = {"model_name": e.model_name}
             tags = {"BuildId": e.build_id}
             if (e.build_uri is not None):
@@ -66,7 +74,7 @@ def main():
                 tags=tags,
                 pipeline_parameters=pipeline_parameters)
 
-            print("Pipeline run initiated ", run.id)
+            observability.log("Pipeline run initiated " + str(run.id))
 
 
 if __name__ == "__main__":
