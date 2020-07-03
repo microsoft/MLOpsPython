@@ -1,5 +1,6 @@
 from azureml.core import Run
 
+from ml_service.util.env_variables import Env
 from utils.logger.app_insights_logger import AppInsightsLogger
 from utils.logger.azure_ml_logger import AzureMlLogger
 from utils.logger.logger_interface import (
@@ -13,6 +14,7 @@ class Loggers(ObservabilityAbstract):
     def __init__(self, export_interval) -> None:
         self.loggers: LoggerInterface = []
         self.register_loggers(export_interval)
+        self.env = Env()
 
     def add(self, logger) -> None:
         self.loggers.append(logger)
@@ -30,7 +32,8 @@ class Loggers(ObservabilityAbstract):
         run = Run.get_context()
         if not run.id.startswith(self.OFFLINE_RUN):
             self.loggers.append(AzureMlLogger(run))
-        self.loggers.append(AppInsightsLogger(run, export_interval))
+        if Env().app_insights_connection_string:
+            self.loggers.append(AppInsightsLogger(run, export_interval))
 
 
 class Observability(LoggerInterface):
@@ -38,7 +41,7 @@ class Observability(LoggerInterface):
         self._loggers = Loggers(export_interval)
 
     def log_metric(
-        self, name="", value="", description="", log_parent=False,
+            self, name="", value="", description="", log_parent=False,
     ):
         """
         this method sends the metrics to all registered loggers
@@ -73,3 +76,8 @@ class Observability(LoggerInterface):
         for logger in self._loggers.loggers:
             if type(logger) is type(logger_class):
                 return logger
+
+
+if __name__ == "__main__":
+    obs = Observability()
+    print(obs)
