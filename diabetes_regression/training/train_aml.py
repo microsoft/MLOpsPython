@@ -29,14 +29,15 @@ import os
 import argparse
 import joblib
 import json
-from diabetes_regression.training.train import split_data, train_model, get_model_metrics
+from diabetes_regression.training.train import split_data, \
+    train_model, get_model_metrics
 
 
 def register_dataset(
-    aml_workspace: Workspace,
-    dataset_name: str,
-    datastore_name: str,
-    file_path: str
+        aml_workspace: Workspace,
+        dataset_name: str,
+        datastore_name: str,
+        file_path: str
 ) -> Dataset:
     datastore = Datastore.get(aml_workspace, datastore_name)
     dataset = Dataset.Tabular.from_delimited_files(path=(datastore, file_path))
