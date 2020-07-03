@@ -52,7 +52,8 @@ def get_pipeline(pipeline_id, ws: Workspace, env: Env):
         ]  # noqa E501
 
         if scoringpipelinelist.count == 0:
-            error = "No pipeline found matching name:{}".format(env.scoring_pipeline_name)
+            error = "No pipeline found matching name:{}".\
+                format(env.scoring_pipeline_name)
             observability.log(description=error, severity=Severity.ERROR)
             raise Exception(error)
         else:

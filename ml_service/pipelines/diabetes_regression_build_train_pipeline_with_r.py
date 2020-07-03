@@ -10,6 +10,7 @@ from utils.logger.observability import Observability
 
 observability = Observability()
 
+
 def main():
     e = Env()
     # Get Azure machine learning workspace

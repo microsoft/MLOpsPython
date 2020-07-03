@@ -38,5 +38,6 @@ def get_compute(workspace: Workspace, compute_name: str, vm_size: str, for_batch
         return compute_target
     except ComputeTargetException as ex:
         observability.log(ex, severity=Severity.ERROR)
-        observability.log("An error occurred trying to provision compute.", severity=Severity.ERROR)
+        observability.log("An error occurred trying to provision compute.",
+                          severity=Severity.ERROR)
         exit(1)

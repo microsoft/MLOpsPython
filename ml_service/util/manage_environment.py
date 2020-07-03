@@ -40,5 +40,5 @@ def get_environment(
             observability.log(restored_environment)
         return restored_environment
     except Exception as e:
-        observability.log(description=e,severity=Severity.ERROR)
+        observability.log(description=e, severity=Severity.ERROR)
         exit(1)

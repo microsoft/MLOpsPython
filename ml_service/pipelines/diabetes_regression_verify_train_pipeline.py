@@ -70,7 +70,9 @@ def main():
             sys.exit(1)
     except Exception as e:
         observability.log(description=e, severity=Severity.ERROR)
-        observability.log(description="Model was not registered for this run.", severity=Severity.ERROR)
+        observability.log(
+            description="Model was not registered for this run.",
+            severity=Severity.ERROR)
         sys.exit(1)
 
     # Save the Model Version for other AzDO jobs after script is complete

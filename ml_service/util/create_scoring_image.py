@@ -54,13 +54,15 @@ os.chdir(cwd)
 
 if package.state != "Succeeded":
     error = "Image creation status: {package.creation_state}"
-    observability.log(description=error,severity=Severity.ERROR)
+    observability.log(description=error, severity=Severity.ERROR)
     raise Exception(error)
 
-observability.log("Package stored at {} with build log {}".format(package.location, package.package_build_log_uri))  # NOQA: E501
+observability.log(
+    "Package stored at {} with build log {}".format(package.location, package.package_build_log_uri))  # NOQA: E501
 
 # Save the Image Location for other AzDO jobs after script is complete
 if args.output_image_location_file is not None:
-    observability.log("Writing image location to %s" % args.output_image_location_file)
+    observability.log("Writing image location to %s"
+                      % args.output_image_location_file)
     with open(args.output_image_location_file, "w") as out_file:
         out_file.write(str(package.location))
