@@ -29,7 +29,7 @@ import os
 import argparse
 import joblib
 import json
-from train import split_data, train_model, get_model_metrics
+from diabetes_regression.training.train import split_data, train_model, get_model_metrics
 
 
 def register_dataset(
@@ -111,7 +111,7 @@ def main():
     print("Getting training parameters")
 
     # Load the training parameters from the parameters file
-    with open("parameters.json") as f:
+    with open("diabetes_regression/parameters.json") as f:
         pars = json.load(f)
     try:
         train_args = pars["training"]

@@ -15,7 +15,7 @@ def main():
         load_dotenv()
         sources_dir = os.environ.get("SOURCES_DIR_TRAIN")
         if (sources_dir is None):
-            sources_dir = 'diabetes_regression'
+            sources_dir = '.'
         workspace_name = os.environ.get("WORKSPACE_NAME")
         experiment_name = os.environ.get("EXPERIMENT_NAME")
         resource_group = os.environ.get("RESOURCE_GROUP")

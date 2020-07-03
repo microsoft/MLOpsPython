@@ -55,7 +55,7 @@ stages:
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
-        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
+        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/scoring
         inlineScript: |
           set -e # fail on error
           
@@ -101,7 +101,7 @@ stages:
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
-        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
+        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/scoring
         inlineScript: |
           set -e # fail on error
           
@@ -138,8 +138,8 @@ stages:
     - template: diabetes_regression-package-model-template.yml
       parameters:
         modelId: $(MODEL_NAME):$(MODEL_VERSION)
-        scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/score.py'
-        condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
+        scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/scoring/score.py'
+        condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/conda_dependencies.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
     - task: AzureWebAppContainer@1

@@ -1,4 +1,3 @@
-
 import os
 from azureml.core import Workspace, Environment
 from ml_service.util.env_variables import Env
@@ -6,12 +5,12 @@ from azureml.core.runconfig import DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
 
 
 def get_environment(
-    workspace: Workspace,
-    environment_name: str,
-    conda_dependencies_file: str,
-    create_new: bool = False,
-    enable_docker: bool = None,
-    use_gpu: bool = False
+        workspace: Workspace,
+        environment_name: str,
+        conda_dependencies_file: str,
+        create_new: bool = False,
+        enable_docker: bool = None,
+        use_gpu: bool = False
 ):
     try:
         e = Env()
@@ -24,7 +23,7 @@ def get_environment(
         if restored_environment is None or create_new:
             new_env = Environment.from_conda_specification(
                 environment_name,
-                os.path.join(e.sources_directory_train, conda_dependencies_file),  # NOQA: E501
+                os.path.join(e.sources_directory_train, "diabetes_regression/" + conda_dependencies_file),  # NOQA: E501
             )  # NOQA: E501
             restored_environment = new_env
             if enable_docker is not None:

@@ -29,7 +29,7 @@ import pandas as pd
 import joblib
 import sys
 from typing import List
-from util.model_helper import get_model
+from diabetes_regression.util.model_helper import get_model
 from azureml.core import Model
 
 model = None

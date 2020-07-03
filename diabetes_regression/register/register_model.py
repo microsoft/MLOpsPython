@@ -90,7 +90,7 @@ def main():
     print("Getting registration parameters")
 
     # Load the registration parameters from the parameters file
-    with open("parameters.json") as f:
+    with open("diabetes_regression/parameters.json") as f:
         pars = json.load(f)
     try:
         register_args = pars["registration"]

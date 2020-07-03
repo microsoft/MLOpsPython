@@ -26,7 +26,7 @@ POSSIBILITY OF SUCH DAMAGE.
 from azureml.core import Run
 import argparse
 import traceback
-from util.model_helper import get_model
+from diabetes_regression.util.model_helper import get_model
 
 run = Run.get_context()
 
@@ -42,7 +42,7 @@ run = Run.get_context()
 #     load_dotenv()
 #     sources_dir = os.environ.get("SOURCES_DIR_TRAIN")
 #     if (sources_dir is None):
-#         sources_dir = 'diabetes_regression'
+#         sources_dir = '.'
 #     path_to_util = os.path.join(".", sources_dir, "util")
 #     sys.path.append(os.path.abspath(path_to_util))  # NOQA: E402
 #     from model_helper import get_model
