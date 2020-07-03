@@ -27,6 +27,10 @@ from azureml.core import Run
 import argparse
 import traceback
 from diabetes_regression.util.model_helper import get_model
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 run = Run.get_context()
 
@@ -89,7 +93,8 @@ parser.add_argument(
 parser.add_argument(
     "--allow_run_cancel",
     type=str,
-    help="Set this to false to avoid evaluation step from cancelling run after an unsuccessful evaluation",  # NOQA: E501
+    help="Set this to false to avoid evaluation step from cancelling "
+         "run after an unsuccessful evaluation",
     default="true",
 )
 
@@ -109,10 +114,10 @@ try:
     tag_name = 'experiment_name'
 
     model = get_model(
-                model_name=model_name,
-                tag_name=tag_name,
-                tag_value=exp.name,
-                aml_workspace=ws)
+        model_name=model_name,
+        tag_name=tag_name,
+        tag_value=exp.name,
+        aml_workspace=ws)
 
     if (model is not None):
         production_model_mse = 10000
@@ -120,12 +125,12 @@ try:
             production_model_mse = float(model.tags[metric_eval])
         new_model_mse = float(run.parent.get_metrics().get(metric_eval))
         if (production_model_mse is None or new_model_mse is None):
-            print("Unable to find", metric_eval, "metrics, "
-                  "exiting evaluation")
-            if((allow_run_cancel).lower() == 'true'):
+            observability.log("Unable to find" +
+                              metric_eval + "metrics, exiting evaluation")
+            if ((allow_run_cancel).lower() == 'true'):
                 run.parent.cancel()
         else:
-            print(
+            observability.log(
                 "Current Production model mse: {}, "
                 "New trained model mse: {}".format(
                     production_model_mse, new_model_mse
@@ -133,18 +138,23 @@ try:
             )
 
         if (new_model_mse < production_model_mse):
-            print("New trained model performs better, "
-                  "thus it should be registered")
+            observability.log("New trained model performs better, "
+                              "thus it should be registered")
         else:
-            print("New trained model metric is worse than or equal to "
-                  "production model so skipping model registration.")
-            if((allow_run_cancel).lower() == 'true'):
+            observability.log("New trained model metric is worse "
+                              "than or equal to "
+                              "production model so skipping "
+                              "model registration.")
+            if ((allow_run_cancel).lower() == 'true'):
                 run.parent.cancel()
     else:
-        print("This is the first model, "
-              "thus it should be registered")
+        observability.log("This is the first model, "
+                          "thus it should be registered")
 
 except Exception:
     traceback.print_exc(limit=None, file=None, chain=True)
-    print("Something went wrong trying to evaluate. Exiting.")
+    observability.log(
+        description="Something went wrong trying to evaluate. Exiting.",
+        severity=Severity.ERROR)
+
     raise
