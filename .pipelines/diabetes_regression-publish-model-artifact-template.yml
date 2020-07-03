@@ -25,5 +25,7 @@ steps:
       echo $FOUND_MODEL >model.json
   name: 'getversion'
   displayName: "Determine if evaluation succeeded and new model is registered (CLI)"
+  env:
+    APP_INSIGHTS_CONNECTION_STRING: $(APP_INSIGHTS_CONNECTION_STRING)
 - publish: model.json
   artifact: model
