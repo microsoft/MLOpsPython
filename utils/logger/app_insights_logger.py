@@ -22,7 +22,8 @@ from utils.logger.logger_interface import (
 class AppInsightsLogger(LoggerInterface, ObservabilityAbstract):
     def __init__(self, run, export_interval):
         # initializes log exporter
-        app_insights_connection_string = os.environ.get("APP_INSIGHTS_CONNECTION_STRING")
+        app_insights_connection_string = \
+            os.environ.get("APP_INSIGHTS_CONNECTION_STRING")
         handler = AzureLogHandler(
             connection_string=app_insights_connection_string,
             logging_sampling_rate=1.0,
