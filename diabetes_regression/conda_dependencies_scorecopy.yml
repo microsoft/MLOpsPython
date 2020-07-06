@@ -29,3 +29,6 @@ dependencies:
       
       # Score copying deps
       - azure-storage-blob
+
+      # Data Classes
+      - dataclasses
