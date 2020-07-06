@@ -59,7 +59,7 @@ stages:
         inlineScript: |
           set -e # fail on error
           
-          az ml model deploy --name $(ACI_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(MODEL_VERSION)' \
+          az ml model deploy --name $(ACI_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(get_model.MODEL_VERSION)' \
           --ic inference_config.yml \
           --dc deployment_config_aci.yml \
           -g $(RESOURCE_GROUP) --workspace-name $(WORKSPACE_NAME) \
@@ -105,7 +105,7 @@ stages:
         inlineScript: |
           set -e # fail on error
           
-          az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(MODEL_VERSION)' \
+          az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(get_model.MODEL_VERSION)' \
           --compute-target $(AKS_COMPUTE_NAME) \
           --ic inference_config.yml \
           --dc deployment_config_aks.yml \
@@ -141,7 +141,7 @@ stages:
         artifactBuildId: ${{ parameters.artifactBuildId }}
     - template: diabetes_regression-package-model-template.yml
       parameters:
-        modelId: $(MODEL_NAME):$(MODEL_VERSION)
+        modelId: $(MODEL_NAME):$(get_model.MODEL_VERSION)
         scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/scoring/score.py'
         condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/conda_dependencies.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
