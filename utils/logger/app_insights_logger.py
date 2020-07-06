@@ -1,10 +1,10 @@
 import logging
+import os
 import time
 import uuid
 
 from opencensus.ext.azure import metrics_exporter
 from opencensus.ext.azure.log_exporter import AzureLogHandler
-
 
 from opencensus.stats import aggregation as aggregation_module
 from opencensus.stats import measure as measure_module
@@ -12,7 +12,6 @@ from opencensus.stats import stats as stats_module
 from opencensus.stats import view as view_module
 from opencensus.tags import tag_map as tag_map_module
 
-from ml_service.util.env_variables import Env
 from utils.logger.logger_interface import (
     LoggerInterface,
     ObservabilityAbstract,
@@ -22,10 +21,10 @@ from utils.logger.logger_interface import (
 
 class AppInsightsLogger(LoggerInterface, ObservabilityAbstract):
     def __init__(self, run, export_interval):
-        self.env = Env()
         # initializes log exporter
+        app_insights_connection_string = os.environ.get("APP_INSIGHTS_CONNECTION_STRING")
         handler = AzureLogHandler(
-            connection_string=self.env.app_insights_connection_string,
+            connection_string=app_insights_connection_string,
             logging_sampling_rate=1.0,
         )
         handler.add_telemetry_processor(self.callback_function)
@@ -37,13 +36,13 @@ class AppInsightsLogger(LoggerInterface, ObservabilityAbstract):
         exporter = metrics_exporter.new_metrics_exporter(
             enable_standard_metrics=False,
             export_interval=self.export_interval,
-            connection_string=self.env.app_insights_connection_string,
+            connection_string=app_insights_connection_string,
         )
         exporter.add_telemetry_processor(self.callback_function)
         stats_module.stats.view_manager.register_exporter(exporter)
 
     def log_metric(
-        self, name="", value="", description="", log_parent=False,
+            self, name="", value="", description="", log_parent=False,
     ):
         """
         Sends a custom metric to appInsights
@@ -97,10 +96,11 @@ class AppInsightsLogger(LoggerInterface, ObservabilityAbstract):
         :return: correlation_id
         """
         run_id = str(uuid.uuid1())
+        build_id = os.environ.get("BUILD_BUILDID")
         if not run.id.startswith(self.OFFLINE_RUN):
             run_id = run.id
-        elif self.env.build_id:
-            run_id = self.env.build_id
+        elif build_id:
+            run_id = build_id
         return run_id
 
     @staticmethod
