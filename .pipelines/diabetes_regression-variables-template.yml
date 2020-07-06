@@ -95,9 +95,9 @@ variables:
     value: lowpriority
   # The path to the batch scoring script relative to SOURCES_DIR_TRAIN
   - name: BATCHSCORE_SCRIPT_PATH
-    value: scoring/parallel_batchscore.py
+    value: diabetes_regression/scoring/parallel_batchscore.py
   - name: BATCHSCORE_COPY_SCRIPT_PATH
-    value: scoring/parallel_batchscore_copyoutput.py
+    value: diabetes_regression/scoring/parallel_batchscore_copyoutput.py
   # Flag to allow rebuilding the AML Environment after it was built for the first time. 
   # This enables dependency updates from the conda dependencies yaml for scoring activities.
   - name: AML_REBUILD_ENVIRONMENT_SCORING
