@@ -53,7 +53,7 @@ def register_dataset(
 
 
 def main():
-    observability.log_metric("Running train_aml.py")
+    observability.log("Running train_aml.py")
 
     parser = argparse.ArgumentParser("train")
     parser.add_argument(
