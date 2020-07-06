@@ -17,7 +17,7 @@ pool:
 container: mlops
 
 variables:
-- template: diabetes_regression-variables-template.yml
+- template: app-variables-template.yml
 - group: devopsforai-aml-vg
 
 steps:

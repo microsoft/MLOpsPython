@@ -1,0 +1,9 @@
+azureml-sdk[automl,explain,interpret,notebooks,services,tensorboard]==1.7.0
+python-dotenv
+flask==1.0.3
+werkzeug==0.16.1
+azure-keyvault-secrets
+azure-keyvault-keys
+azure-keyvault-certificates
+azure-identity
+xgboost==0.90

@@ -1,0 +1,38 @@
+# Pipeline for building the container image that is used by other pipelines for scoring.
+
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - ml_service/util/create_scoring_image.py
+    - ml_service/util/Dockerfile
+    - app/scoring/
+    exclude:
+    - app/scoring/deployment_config_aci.yml
+    - app/scoring/deployment_config_aks.yml
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+container: mlops
+
+variables:
+- group: devopsforai-aml-vg
+- name: 'SCORE_SCRIPT'
+  value: 'scoring/scoreB.py'
+
+steps:
+- template: app-package-model-template.yml
+  parameters:
+    modelId: $(MODEL_NAME):$(MODEL_VERSION)
+    scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/$(SCORE_SCRIPT)'
+    condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
+

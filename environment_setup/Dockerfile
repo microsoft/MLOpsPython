@@ -4,7 +4,7 @@ LABEL org.label-schema.vendor = "Microsoft" \
     org.label-schema.url = "https://hub.docker.com/r/microsoft/mlopspython" \
     org.label-schema.vcs-url = "https://github.com/microsoft/MLOpsPython"
 
-COPY diabetes_regression/ci_dependencies.yml /setup/
+COPY app/ci_dependencies.yml /setup/
 
 # activate environment
 ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
