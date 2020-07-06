@@ -41,7 +41,7 @@ class AzureMlLogger(LoggerInterface, ObservabilityAbstract):
         )
         callee = self.get_callee(
             2
-        )  # we are interested in the script who is calling Observability
+        )  # to get the script who is calling Observability
         print(
             "{}, [{}], {}:{}".format(
                 time_stamp, self.severity_map[severity], callee, description

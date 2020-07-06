@@ -4,6 +4,10 @@ model_helper.py
 from azureml.core import Run
 from azureml.core import Workspace
 from azureml.core.model import Model as AMLModel
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 def get_current_workspace() -> Workspace:
@@ -23,11 +27,11 @@ def get_current_workspace() -> Workspace:
 
 
 def get_model(
-    model_name: str,
-    model_version: int = None,  # If none, return latest model
-    tag_name: str = None,
-    tag_value: str = None,
-    aml_workspace: Workspace = None
+        model_name: str,
+        model_version: int = None,  # If none, return latest model
+        tag_name: str = None,
+        tag_value: str = None,
+        aml_workspace: Workspace = None
 ) -> AMLModel:
     """
     Retrieves and returns the latest model from the workspace
@@ -43,7 +47,8 @@ def get_model(
     A single aml model from the workspace that matches the name and tag.
     """
     if aml_workspace is None:
-        print("No workspace defined - using current experiment workspace.")
+        observability.log("No workspace defined - "
+                          "using current experiment workspace.")
         aml_workspace = get_current_workspace()
 
     if tag_name is not None and tag_value is not None:
@@ -53,12 +58,12 @@ def get_model(
             version=model_version,
             tags=[[tag_name, tag_value]])
     elif (tag_name is None and tag_value is not None) or (
-        tag_value is None and tag_name is not None
+            tag_value is None and tag_name is not None
     ):
-        raise ValueError(
-            "model_tag_name and model_tag_value should both be supplied"
-            + "or excluded"  # NOQA: E501
-        )
+        error = "model_tag_name and model_tag_value should" \
+                " both be supplied or excluded"
+        observability.log_metric(description=error, severity=Severity.ERROR)
+        raise ValueError(error)
     else:
         model = AMLModel(aml_workspace, name=model_name, version=model_version)  # NOQA: E501
     return model

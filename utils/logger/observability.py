@@ -1,7 +1,6 @@
-import os
-
 from azureml.core import Run
 
+from ml_service.util.env_variables import Env
 from utils.logger.app_insights_logger import AppInsightsLogger
 from utils.logger.azure_ml_logger import AzureMlLogger
 from utils.logger.logger_interface import (
@@ -26,13 +25,17 @@ class Loggers(ObservabilityAbstract):
         """
         This method is responsible to create loggers/tracers
         and add them to the list of loggers
-        Note: if the context of the Run object os offline,
+        Notes:
+        - If the context of the Run object is offline,
         we do not create AzureMlLogger instance
+        - If APP_INSIGHTS_CONNECTION_STRING is notset
+        to ENV variable, we do not create AppInsightsLogger
+        instance
         """
         run = Run.get_context()
         if not run.id.startswith(self.OFFLINE_RUN):
             self.loggers.append(AzureMlLogger(run))
-        if os.environ.get(self.APP_INSIGHTS_CONNECTION_STRING):
+        if Env().app_insights_connection_string:
             self.loggers.append(AppInsightsLogger(run, export_interval))
 
 
@@ -76,8 +79,3 @@ class Observability(LoggerInterface):
         for logger in self._loggers.loggers:
             if type(logger) is type(logger_class):
                 return logger
-
-
-if __name__ == "__main__":
-    obs = Observability()
-    print(obs)
