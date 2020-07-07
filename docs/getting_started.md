@@ -73,7 +73,7 @@ More variables are available for further tweaking, but the above variables are a
 
 ### Variable Descriptions
 
-**BASE_NAME** is used as a prefix for naming Azure resources. When sharing an Azure subscription, the prefix allows you to avoid naming collisions for resources that require unique names, for example, Azure Blob Storage and Registry DNS. Make sure to set BASE_NAME to a unique name so that created resources will have unique names, for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, and so on. The length of the BASE_NAME value shouldn't exceed 10 characters and must contain letters and numbers only.
+**BASE_NAME** is used as a prefix for naming Azure resources and should be unique. When sharing an Azure subscription, the prefix allows you to avoid naming collisions for resources that require unique names, for example, Azure Blob Storage and Registry DNS. Make sure to set BASE_NAME to a unique name so that created resources will have unique names, for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, and so on. The length of the BASE_NAME value shouldn't exceed 10 characters and must contain letters and numbers only.
 
 **LOCATION** is the name of the [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/) for your resources. There should be no spaces in the name. For example, central, westus, westus2.
 
@@ -133,7 +133,7 @@ Check that the newly created resources appear in the [Azure Portal](https://port
 
 At this point, you should have an Azure ML Workspace created. Similar to the Azure Resource Manager service connection, you need to create an additional one for the Azure ML Workspace.
 
-Create a new service connection to your Azure ML Workspace using the [Machine Learning Extension](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) instructions to enable executing the Azure ML training pipeline. The connection name needs to match `WORKSPACE_SVC_CONNECTION` that you set in the variable group above.
+Create a new service connection to your Azure ML Workspace using the [Machine Learning Extension](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) instructions to enable executing the Azure ML training pipeline. The connection name needs to match `WORKSPACE_SVC_CONNECTION` that you set in the variable group above (eg. 'aml-workspace-connection').
 
 ![Created resources](./images/ml-ws-svc-connection.png)
 
@@ -213,9 +213,25 @@ In order to use these pipelines:
 
 These pipelines rely on the model CI pipeline and reference it by name.
 
+If you would like to change the name of your model CI pipeline, you must edit this section of yml for the CD and batch scoring pipeline, where it says `source: Model-Train-Register-CI` to use your own name.
+```
+trigger: none
+resources:
+  containers:
+  - container: mlops
+    image: mcr.microsoft.com/mlops/python:latest
+  pipelines:
+  - pipeline: model-train-ci
+    source: Model-Train-Register-CI # Name of the triggering pipeline
+    trigger:
+      branches:
+        include:
+        - master
+```
+
 ---
 
-These pipelines have the following behaviors:
+The release deployment and batch scoring pipelines have the following behaviors:
 
 - The pipeline will **automatically trigger** on completion of the Model-Train-Register-CI pipeline for the master branch.
 - The pipeline will default to using the latest successful build of the Model-Train-Register-CI pipeline. It will deploy the model produced by that build.
