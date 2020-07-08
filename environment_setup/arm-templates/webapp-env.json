@@ -46,9 +46,8 @@
     }
   },
   "variables": {
-    "containerRegistryName": "[parameters('acr')]",
     "webAppPortalName": "[concat(parameters('webAppName'), '-webapp')]",
-    "appServicePlanName": "[concat('AppServicePlan-', parameters('webAppName'))]"
+    "appServicePlanName": "[concat(parameters('webAppName'),'AppServicePlan')]"
 
   },
   "resources": [
@@ -87,7 +86,7 @@
             },
             {
               "name": "DOCKER_REGISTRY_SERVER_URL",
-              "value": "[concat('https://', variables('containerRegistryName'), '.azurecr.io')]"
+              "value": "[concat('https://', parameters('acr'), '.azurecr.io')]"
             },
             {
               "name": "DOCKER_REGISTRY_SERVER_USERNAME",
