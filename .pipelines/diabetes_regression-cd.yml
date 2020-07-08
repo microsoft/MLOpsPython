@@ -26,6 +26,8 @@ resources:
 variables:
 - template: diabetes_regression-variables-template.yml
 - group: devopsforai-aml-vg
+- name: "ACR_NAME"
+  value: "$(BASE_NAME)amlcr"
 
 stages:
 - stage: 'Deploy_ACI'
@@ -152,7 +154,7 @@ stages:
         scriptType: 'bash'
         inlineScript: |
           export acr_password=`az acr credential show -n $(ACR_NAME) --query passwords[0].value -g $(RESOURCE_GROUP)`
-          export acr_username=`az acr credential show -n $(ACR_NAME)  --query username -g $(RESOURCE_GROUP)`
+          export acr_username=`az acr credential show -n $(ACR_NAME) --query username -g $(RESOURCE_GROUP)`
           echo "Got username: "
           echo $acr_username
           echo "##vso[task.setvariable variable=acr_password]$acr_password"
@@ -166,7 +168,7 @@ stages:
         location: $(LOCATION)
         templateLocation: 'Linked artifact'
         csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/webapp-env.json'
-        overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION) -imagelocation $(IMAGE_TAGGED) -acr_password $(acr_password) -acr_username $(acr_username)'
+        overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION) -imagelocation $(IMAGE_TAGGED) -acr $(ACR_NAME) -acr_password $(acr_password) -acr_username $(acr_username)'
         deploymentMode: 'Incremental'
       displayName: 'Create webapp'
 
