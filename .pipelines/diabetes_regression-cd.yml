@@ -143,18 +143,20 @@ stages:
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
     
-    - task: AzureResourceGroupDeployment@2
+    - task: AzureCLI@2
+      displayName: 'Get ACR username and password'
+      continueOnError: false
       inputs:
         azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
-        action: 'Create Or Update Resource Group'
-        resourceGroupName: '$(RESOURCE_GROUP)'
-        location: $(LOCATION)
-        templateLocation: 'Linked artifact'
-        csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/aci-password.json'
-        overrideParameters: '-baseName $(BASE_NAME)'
-        deploymentMode: 'Incremental'
-        deploymentOutputs: 'ACRCREDENTIALS'
-      displayName: 'Get ACR username and password'
+        scriptLocation: inlineScript
+        scriptType: 'bash'
+        inlineScript: |
+          export acr_password=`az acr credential show -n $(ACR_NAME) --query passwords[0].value -g $(RESOURCE_GROUP)`
+          export acr_username=`az acr credential show -n $(ACR_NAME)  --query username -g $(RESOURCE_GROUP)`
+          echo "Got username: "
+          echo $acr_username
+          echo "##vso[task.setvariable variable=acr_password]$acr_password"
+          echo "##vso[task.setvariable variable=acr_username]$acr_username"
 
     - task: AzureResourceGroupDeployment@2
       inputs:
@@ -164,7 +166,7 @@ stages:
         location: $(LOCATION)
         templateLocation: 'Linked artifact'
         csmFile: '$(Build.SourcesDirectory)/environment_setup/arm-templates/webapp-env.json'
-        overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION) -imagelocation $(IMAGE_TAGGED) -acrcredentials $(ACRCREDENTIALS)'
+        overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION) -imagelocation $(IMAGE_TAGGED) -acr_password $(acr_password) -acr_username $(acr_username)'
         deploymentMode: 'Incremental'
       displayName: 'Create webapp'
 
