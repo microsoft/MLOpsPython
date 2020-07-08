@@ -36,6 +36,13 @@
         "description": "Base name of the resource such as web app name and app service plan "
       },
       "minLength": 2
+    },
+    "sku": {
+      "type": "string",
+      "metadata": {
+        "description": "SKU for the app service plan"
+      },
+      "defaultValue": "S1"
     }
   },
   "variables": {
@@ -51,7 +58,7 @@
       "name": "[variables('appServicePlanName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "S1"
+        "name": "[parameters('sku')]"
       },
       "kind": "linux",
       "properties": {
