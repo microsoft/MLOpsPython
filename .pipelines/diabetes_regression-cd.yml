@@ -59,7 +59,7 @@ stages:
         inlineScript: |
           set -e # fail on error
           
-          az ml model deploy --name $(ACI_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(get_model.MODEL_VERSION)' \
+          az ml model deploy --name $(ACI_DEPLOYMENT_NAME) --model '$(get_model.MODEL_NAME):$(get_model.MODEL_VERSION)' \
           --ic inference_config.yml \
           --dc deployment_config_aci.yml \
           -g $(RESOURCE_GROUP) --workspace-name $(WORKSPACE_NAME) \
@@ -105,7 +105,7 @@ stages:
         inlineScript: |
           set -e # fail on error
           
-          az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$(MODEL_NAME):$(get_model.MODEL_VERSION)' \
+          az ml model deploy --name $(AKS_DEPLOYMENT_NAME) --model '$(get_model.MODEL_NAME):$(get_model.MODEL_VERSION)' \
           --compute-target $(AKS_COMPUTE_NAME) \
           --ic inference_config.yml \
           --dc deployment_config_aks.yml \
@@ -137,9 +137,9 @@ stages:
         artifactBuildId: ${{ parameters.artifactBuildId }}
     - template: diabetes_regression-package-model-template.yml
       parameters:
-        modelId: $(MODEL_NAME):$(get_model.MODEL_VERSION)
+        modelId: $(get_model.MODEL_NAME):$(get_model.MODEL_VERSION)
+        workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
         scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/score.py'
-        condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
     - task: AzureWebAppContainer@1

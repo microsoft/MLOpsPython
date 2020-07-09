@@ -3,10 +3,13 @@ parameters:
 - name: modelId
   type: string
   default: ''
-- name: scoringScriptPath
+- name: workingDirectory # The working directory to run the CLI script
   type: string
   default: ''
-- name: condaFilePath
+- name: inferenceConfigPath # The references in inference config should be relative to the working directory
+  type: string
+  default: ''
+- name: entryScriptPath # Optional - will overwrite inference config entry script
   type: string
   default: ''
 
@@ -18,21 +21,49 @@ steps:
       scriptLocation: inlineScript
       workingDirectory: $(Build.SourcesDirectory)
       inlineScript: 'az extension add -n azure-cli-ml'
+
+  # Default - build using inference config only
+  - ${{ if eq(parameters.entryScriptPath, '') }}
+    - task: AzureCLI@1
+      displayName: 'Create model package and set IMAGE_LOCATION variable'
+      inputs:
+        azureSubscription: ${{ parameters.workingDirectory }}
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+
+          # Create model package using CLI
+          az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
+          --model '${{ parameters.modelId }}' \
+          --ic '${{ parameters.inferenceConfigPath }}' \
+          -v \
+          --rt python --query 'location' -o tsv > image_logs.txt
+          
+  # Option to overwrite entry script
+  - ${{ if !eq(parameters.entryScriptPath, '') }}
+    - task: AzureCLI@1
+      displayName: 'Create model package and set IMAGE_LOCATION variable'
+      inputs:
+        azureSubscription: ${{ parameters.workingDirectory }}
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e # fail on error
+
+          # Create model package using CLI
+          az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
+          --model '${{ parameters.modelId }}' \
+          --ic '${{ parameters.inferenceConfigPath }}' \
+          --entry-script '${{ parameters.entryScriptPath }}'
+          -v \
+          --rt python --query 'location' -o tsv > image_logs.txt
+
   - task: AzureCLI@1
     displayName: 'Create model package and set IMAGE_LOCATION variable'
     inputs:
-      azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+      azureSubscription: ${{ parameters.workingDirectory }}
       scriptLocation: inlineScript
       inlineScript: |
         set -e # fail on error
-
-        # Create model package using CLI
-        az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
-        --model '${{ parameters.modelId }}' \
-        --entry-script '${{ parameters.scoringScriptPath }}' \
-        --cf '${{ parameters.condaFilePath }}' \
-        -v \
-        --rt python --query 'location' -o tsv > image_logs.txt
 
         # Show logs
         cat image_logs.txt
