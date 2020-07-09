@@ -40,7 +40,7 @@ steps:
           --rt python --query 'location' -o tsv > image_logs.txt
 
   # Option to overwrite entry script
-  - ${{ if !eq(parameters.entryScriptPath, '') }}:
+  - ${{ if ne(parameters.entryScriptPath, '') }}:
     - task: AzureCLI@1
       displayName: 'Create model package and set IMAGE_LOCATION variable'
       inputs:
