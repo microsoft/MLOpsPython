@@ -44,7 +44,7 @@ stages:
       parameters:
         modelId: $(MODEL_NAME):$(MODEL_VERSION)
         workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
-        scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/$(SCORE_SCRIPT)'
+        entryScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/$(SCORE_SCRIPT)'
 
     - script: echo $(IMAGE_LOCATION) > image_location.txt
 
