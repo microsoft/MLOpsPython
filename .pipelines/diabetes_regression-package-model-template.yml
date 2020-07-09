@@ -3,7 +3,7 @@ parameters:
 - name: modelId
   type: string
   default: ''
-- name: workingDirectory # The working directory to run the CLI script
+- name: templateWorkingDirectory # The working directory to run the CLI script
   type: string
   default: ''
 - name: inferenceConfigPath # The references in inference config should be relative to the working directory
@@ -19,7 +19,7 @@ steps:
     inputs:
       azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
       scriptLocation: inlineScript
-      workingDirectory: $(Build.SourcesDirectory)
+      workingDirectory: ${{ parameters.templateWorkingDirectory }}
       inlineScript: 'az extension add -n azure-cli-ml'
 
   # Default - build using inference config only
@@ -27,7 +27,7 @@ steps:
     - task: AzureCLI@1
       displayName: 'Create model package and set IMAGE_LOCATION variable'
       inputs:
-        azureSubscription: ${{ parameters.workingDirectory }}
+        azureSubscription: ${{ parameters.templateWorkingDirectory }}
         scriptLocation: inlineScript
         inlineScript: |
           set -e # fail on error
@@ -44,7 +44,7 @@ steps:
     - task: AzureCLI@1
       displayName: 'Create model package and set IMAGE_LOCATION variable'
       inputs:
-        azureSubscription: ${{ parameters.workingDirectory }}
+        azureSubscription: ${{ parameters.templateWorkingDirectory }}
         scriptLocation: inlineScript
         inlineScript: |
           set -e # fail on error
@@ -60,7 +60,7 @@ steps:
   - task: AzureCLI@1
     displayName: 'Create model package and set IMAGE_LOCATION variable'
     inputs:
-      azureSubscription: ${{ parameters.workingDirectory }}
+      azureSubscription: ${{ parameters.templateWorkingDirectory }}
       scriptLocation: inlineScript
       inlineScript: |
         set -e # fail on error

@@ -138,7 +138,7 @@ stages:
     - template: diabetes_regression-package-model-template.yml
       parameters:
         modelId: $(get_model.MODEL_NAME):$(get_model.MODEL_VERSION)
-        workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
+        templateWorkingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
         entryScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/score.py'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
