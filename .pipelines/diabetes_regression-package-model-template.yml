@@ -23,7 +23,7 @@ steps:
       inlineScript: 'az extension add -n azure-cli-ml'
 
   # Default - build using inference config only
-  - ${{ if eq(parameters.entryScriptPath, '') }}
+  - ${{ if eq(parameters.entryScriptPath, '') }}:
     - task: AzureCLI@1
       displayName: 'Create model package and set IMAGE_LOCATION variable'
       inputs:
@@ -38,9 +38,9 @@ steps:
           --ic '${{ parameters.inferenceConfigPath }}' \
           -v \
           --rt python --query 'location' -o tsv > image_logs.txt
-          
+
   # Option to overwrite entry script
-  - ${{ if !eq(parameters.entryScriptPath, '') }}
+  - ${{ if !eq(parameters.entryScriptPath, '') }}:
     - task: AzureCLI@1
       displayName: 'Create model package and set IMAGE_LOCATION variable'
       inputs:
