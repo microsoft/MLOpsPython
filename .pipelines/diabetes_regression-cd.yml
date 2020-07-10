@@ -139,7 +139,7 @@ stages:
       parameters:
         modelId: $(get_model.MODEL_NAME):$(get_model.MODEL_VERSION)
         workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
-        entryScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/score.py'
+        inferenceConfigPath: 'inference_config.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
     - task: AzureWebAppContainer@1

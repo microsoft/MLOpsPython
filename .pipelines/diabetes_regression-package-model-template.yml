@@ -6,7 +6,7 @@ parameters:
 - name: workingDirectory # The working directory to run the CLI script
   type: string
   default: ''
-- name: inferenceConfigPath # The references in inference config should be relative to the working directory
+- name: inferenceConfigPath # Relative to working directory
   type: string
   default: ''
 - name: entryScriptPath # Optional - will overwrite inference config entry script
@@ -23,9 +23,9 @@ steps:
       inlineScript: 'az extension add -n azure-cli-ml'
 
   # Default - build using inference config only
-  - ${{ if eq(parameters.entryScriptPath, '') }}:
+  - ${{ if eq(length(parameters.entryScriptPath), 0) }}:
     - task: AzureCLI@1
-      displayName: 'Create model package and set IMAGE_LOCATION variable'
+      displayName: 'Create model package'
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
@@ -38,12 +38,15 @@ steps:
           --model '${{ parameters.modelId }}' \
           --ic '${{ parameters.inferenceConfigPath }}' \
           -v \
-          --rt python --query 'location' -o tsv > image_logs.txt
+          --query 'location' -o tsv > image_logs.txt
+          
+          # Show logs
+          cat image_logs.txt
 
   # Option to overwrite entry script
-  - ${{ if ne(parameters.entryScriptPath, '') }}:
+  - ${{ if gt(length(parameters.entryScriptPath), 0) }}:
     - task: AzureCLI@1
-      displayName: 'Create model package and set IMAGE_LOCATION variable'
+      displayName: 'Create model package w/ custom entry script'
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
@@ -57,19 +60,19 @@ steps:
           --ic '${{ parameters.inferenceConfigPath }}' \
           --entry-script '${{ parameters.entryScriptPath }}'
           -v \
-          --rt python --query 'location' -o tsv > image_logs.txt
+          --query 'location' -o tsv > image_logs.txt
+          
+          # Show logs
+          cat image_logs.txt
 
   - task: AzureCLI@1
-    displayName: 'Create model package and set IMAGE_LOCATION variable'
+    displayName: 'Set IMAGE_LOCATION variable'
     inputs:
       azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
       scriptLocation: inlineScript
       workingDirectory: ${{ parameters.workingDirectory }}
       inlineScript: |
         set -e # fail on error
-
-        # Show logs
-        cat image_logs.txt
 
         # Set environment variable using the last line of logs that has the package location
         IMAGE_LOCATION=$(tail -n 1 image_logs.txt)
