@@ -165,7 +165,7 @@ Once the pipeline is finished, check the execution result:
 
 And the pipeline artifacts:
 
-![Build](./images/model-train-register-artifact.png)
+![Build](./images/model-train-register-artifacts.png)
 
 Also check the published training pipeline in the **mlops-AML-WS** workspace in [Azure Machine Learning Studio](https://ml.azure.com/):
 
@@ -255,7 +255,7 @@ To specify a particular build's model, set the `Model Train CI Build Id` paramet
 
 Once your pipeline run begins, you can see the model name and version downloaded from the `Model-Train-Register-CI` pipeline.
 
-![Build](./images/model-deploy-artifact-logs.png)
+![Build](./images/model-deploy-get-artifact-logs.png)
 
 The pipeline has the following stage:
 
