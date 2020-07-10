@@ -13,8 +13,9 @@ If you would like to bring your own model code to use this template structure, f
   - [Create an Azure DevOps Service Connection for the Azure Resource Manager](#create-an-azure-devops-service-connection-for-the-azure-resource-manager)
   - [Create the IaC Pipeline](#create-the-iac-pipeline)
 - [Create an Azure DevOps Service Connection for the Azure ML Workspace](#create-an-azure-devops-service-connection-for-the-azure-ml-workspace)
-- [Set up Build, Release Trigger, and Release Multi-Stage Pipeline](#set-up-build-release-trigger-and-release-multi-stage-pipeline)
-  - [Set up the Pipeline](#set-up-the-pipeline)
+- [Set up Build, Release Trigger, and Release Multi-Stage Pipeline](#set-up-build-release-trigger-and-release-multi-stage-pipelines)
+  - [Set up the Model CI Training, Evaluation, and Registration Pipeline](##set-up-the-model-ci-training-evaluation-and-registration-pipeline)
+  - [Set up the Release Deployment and/or Batch Scoring Pipelines](#set-up-the-release-deployment-andor-batch-scoring-pipelines)
 - [Further Exploration](#further-exploration)
   - [Deploy the model to Azure Kubernetes Service](#deploy-the-model-to-azure-kubernetes-service)
     - [Web Service Authentication on Azure Kubernetes Service](#web-service-authentication-on-azure-kubernetes-service)
@@ -166,7 +167,7 @@ And the pipeline artifacts:
 
 ![Build](./images/model-train-register-artifacts.png)
 
-Also check the published training pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://portal.azure.com/):
+Also check the published training pipeline in the **mlops-AML-WS** workspace in [Azure Machine Learning Studio](https://ml.azure.com/):
 
 ![Training pipeline](./images/training-pipeline.png)
 
@@ -254,7 +255,7 @@ To specify a particular build's model, set the `Model Train CI Build Id` paramet
 
 Once your pipeline run begins, you can see the model name and version downloaded from the `Model-Train-Register-CI` pipeline.
 
-![Build](./images/model-deploy-artifact-logs.png)
+![Build](./images/model-deploy-get-artifact-logs.png)
 
 The pipeline has the following stage:
 
@@ -289,7 +290,9 @@ The pipeline stages are summarized below:
 
 #### Batch Score model
 
-- Determine the model to be used based on the model name, model tag name and model tag value bound pipeline parameters.
+- Determine the model to be used based on the model name (required), model version, model tag name and model tag value bound pipeline parameters.
+  - If run via Azure DevOps pipeline, the batch scoring pipeline will take the model name and version from the `Model-Train-Register-CI` build used as input.
+  - If run locally without the model version, the batch scoring pipeline will use the model's latest version.
 - Trigger the *ML Batch Scoring Pipeline* and waits for it to complete.
   - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
 - Use the scoring input data supplied via the SCORING_DATASTORE_INPUT_* configuration variables.
@@ -347,7 +350,7 @@ Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. This app must 
 
 Delete the **ACI_DEPLOYMENT_NAME** variable.
 
-The pipeline uses the [Create Image Script](../ml_service/util/create_scoring_image.py) to create a scoring image. The image will be registered under an Azure Container Registry instance that belongs to the Azure Machine Learning Service. Any dependencies that the scoring file depends on can also be packaged with the container with an image config. Learn more about how to create a container using the Azure ML SDK with the [Image class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-) API documentation.
+The pipeline uses the [Azure ML CLI](../.pipelines/diabetes_regression-package-model-template.yml) to create a scoring image. The image will be registered under an Azure Container Registry instance that belongs to the Azure Machine Learning Service. Any dependencies that the scoring file depends on can also be packaged with the container with an image config. Learn more about how to create a container using the Azure ML SDK with the [Image class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-) API documentation.
 
 Make sure your webapp has the credentials to pull the image from the Azure Container Registry created by the Infrastructure as Code pipeline. Instructions can be found on the [Configure registry credentials in web app](https://docs.microsoft.com/en-us/azure/devops/pipelines/targets/webapp-on-container-linux?view=azure-devops&tabs=dotnet-core%2Cyaml#configure-registry-credentials-in-web-app) page. You'll need to run the pipeline once (including the Deploy to Webapp stage up to the `Create scoring image` step) so an image is present in the registry. After that, you can connect the Webapp to the Azure Container Registry in the Azure Portal.
 
