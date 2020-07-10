@@ -8,7 +8,7 @@ High level directory structure for this repository:
 ├── .pipelines            <- Azure DevOps YAML pipelines for CI, PR and model training and deployment.
 ├── bootstrap             <- Python script to initialize this repository with a custom project name.
 ├── charts                <- Helm charts to deploy resources on Azure Kubernetes Service(AKS).
-├── data                  <- Initial set of data to train and evaluate model.
+├── data                  <- Initial set of data to train and evaluate model. Not for use to store data.
 ├── diabetes_regression   <- The top-level folder for the ML project.
 │   ├── evaluate          <- Python script to evaluate trained ML model.
 │   ├── register          <- Python script to register trained ML model with Azure Machine Learning Service.
@@ -52,7 +52,10 @@ The repository provides a template with folders structure suitable for maintaini
 - `.pipelines/code-quality-template.yml` : a pipeline template used by the CI and PR pipelines. It contains steps performing linting, data and unit testing.
 - `.pipelines/diabetes_regression-ci-image.yml` : a pipeline building a scoring image for the diabetes regression model.
 - `.pipelines/diabetes_regression-ci.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
-- `.pipelines/diabetes_regression-get-model-version-template.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci.yml` pipeline. It finds out if a new model was registered and retrieves a version of the new model.
+- `.pipelines/diabetes_regression-cd.yml` : a pipeline triggered when the code is merged into **master** and the `.pipelines/diabetes_regression-ci.yml` completes. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
+- `.pipelines/diabetes_regression-package-model-template.yml` : a pipeline triggered when the code is merged into **master**. It deploys the registered model to a target.
+- `.pipelines/diabetes_regression-get-model-id-artifact-template.yml` : a pipeline template used by the `.pipelines/diabetes_regression-cd.yml` pipeline. It takes the model metadata artifact published by the previous pipeline and gets the model ID.
+- `.pipelines/diabetes_regression-publish-model-artifact-template.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci.yml` pipeline. It finds out if a new model was registered and publishes a pipeline artifact containing the model metadata.
 - `.pipelines/helm-*.yml` : pipeline templates used by the `.pipelines/abtest.yml` pipeline.
 - `.pipelines/pr.yml` : a pipeline triggered when a **pull request** to the **master** branch is created. It performs linting, data integrity testing and unit testing only.
 
@@ -62,7 +65,6 @@ The repository provides a template with folders structure suitable for maintaini
 - `ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r.py` : builds and publishes an ML training pipeline. It uses R on ML Compute.
 - `ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py` : builds and publishes an ML training pipeline. It uses R on Databricks Compute.
 - `ml_service/pipelines/run_train_pipeline.py` : invokes a published ML training pipeline (Python on ML Compute) via REST API.
-- `ml_service/pipelines/diabetes_regression_verify_train_pipeline.py` : determines whether the evaluate_model.py step of the training pipeline registered a new model.
 - `ml_service/util` : contains common utility functions used to build and publish an ML training pipeline.
 
 ### Environment Definitions
