@@ -44,6 +44,7 @@ stages:
       parameters:
         modelId: $(MODEL_NAME):$(MODEL_VERSION)
         workingDirectory: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring'
+        inferenceConfigPath: 'inference_config.yml'
         entryScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/$(SCORE_SCRIPT)'
 
     - script: echo $(IMAGE_LOCATION) > image_location.txt
