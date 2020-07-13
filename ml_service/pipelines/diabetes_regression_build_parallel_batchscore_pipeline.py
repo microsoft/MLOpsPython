@@ -308,10 +308,10 @@ def get_scoring_pipeline(
     # tag/value pair bindable parameters so that they can be passed to
     # the pipeline when invoked either over REST or via the AML SDK.
     model_name_param = PipelineParameter(
-        "model_name", default_value=env.model_name
+        "model_name", default_value=" "
     )  # NOQA: E501
     model_version_param = PipelineParameter(
-        "model_version", default_value=env.model_version
+        "model_version", default_value=" "
     )  # NOQA: E501
     model_tag_name_param = PipelineParameter(
         "model_tag_name", default_value=" "

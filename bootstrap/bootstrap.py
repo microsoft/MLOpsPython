@@ -98,7 +98,6 @@ def replace_project_name(project_dir, project_name, rename_name):
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r_on_dbricks.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline_with_r.py",  # NOQA: E501
             r"ml_service/pipelines/diabetes_regression_build_train_pipeline.py",  # NOQA: E501
-            r"ml_service/pipelines/diabetes_regression_verify_train_pipeline.py",  # NOQA: E501
             r"ml_service/util/create_scoring_image.py",
             r"diabetes_regression/conda_dependencies.yml",
             r"diabetes_regression/evaluate/evaluate_model.py",
