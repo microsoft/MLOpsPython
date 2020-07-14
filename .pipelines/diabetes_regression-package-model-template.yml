@@ -58,7 +58,7 @@ steps:
           az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
           --model '${{ parameters.modelId }}' \
           --ic '${{ parameters.inferenceConfigPath }}' \
-          --entry-script '${{ parameters.entryScriptPath }}'
+          --entry-script '${{ parameters.entryScriptPath }}' \
           -v \
           --query 'location' -o tsv > image_logs.txt
           
