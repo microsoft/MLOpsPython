@@ -1,40 +1,39 @@
-## Development environment setup
+## 開発環境の設定
 
-### Setup
+### セットアップ
 
-Please be aware that the local environment also needs access to the Azure subscription so you have to have Contributor access on the Azure ML Workspace.
+ローカル環境でもAzureサブスクリプションへのアクセスが必要なので、Azure MLワークスペース上で共同作成者としてアクセスする必要があることに注意してください。
 
-In order to configure the project locally, create a copy of `.env.example` in the root directory and name it `.env`. Fill out all missing values and adjust the existing ones to suit your requirements. 
+プロジェクトをローカルで設定するためには、ルートディレクトリに `.env.example` のコピーを作成し、それに `.env` という名前を付けます。不足している値をすべて記入し、必要に応じて既存の値を調整してください。
 
-### Installation
+### インストール
 
-[Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). The Azure CLI will be used to log you in interactively.
+Azure CLIをインストールする](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)。Azure CLIを使用して対話的にログインします。
 
-Create a virtual environment using [venv](https://docs.python.org/3/library/venv.html), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) or [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv). 
+[venv](https://docs.python.org/3/library/venv.html)、[conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)、または[pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)を使用して仮想環境を作成します。
 
-Here is an example for setting up and activating a `venv` environment with Python 3:
+ここでは、Python 3で`venv`環境を設定して起動する例を示します。
 
 ```
 python3 -mvenv .venv
 source .venv/bin/activate
 ```
 
-Install the required Python modules in your virtual environment.
+仮想環境に必要なPythonモジュールをインストールします。
 
 ```
 pip install -r environment_setup/requirements.txt 
 ```
 
-### Running local code
+### ローカルコードの実行
 
-To run your local ML pipeline code on Azure ML, run a command such as the following (in bash, all on one line):
+ローカルのMLのパイプラインコードをAzure ML上で実行するには、以下のようなコマンドを実行してください（bashで、すべて一行で実行します）。
 
 ```
 export BUILD_BUILDID=$(uuidgen); python ml_service/pipelines/build_train_pipeline.py && python ml_service/pipelines/run_train_pipeline.py
 ```
 
-BUILD_BUILDID is a variable used to uniquely identify the ML pipeline between the
-`build_train_pipeline.py` and `run_train_pipeline.py` scripts. In Azure DevOps it is
-set to the current build number. In a local environment, we can use a command such as
-`uuidgen` so set a different random identifier on each run, ensuring there are 
-no collisions.
+BUILD_BUILDIDは、MLパイプラインを一意に識別するための変数です。
+`build_train_pipeline.py` と `run_train_pipeline.py` スクリプトを使用します。Azure DevOpsでは
+を現在のビルド番号に設定されます。ローカル環境では、次のようなコマンドを使用することができます。
+`uuidgen` なので、それぞれの実行で異なるランダムな識別子を設定し、不整合がないようにします。
