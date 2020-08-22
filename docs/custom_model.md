@@ -1,94 +1,95 @@
-# Bring your own code with the MLOpsPython repository template
+# MLOpsPythonのリポジトリテンプレートを使って自分のコードを持ちこむ
 
-This document provides steps to follow when using this repository as a template to train models and deploy the models with real-time inference in Azure ML with your own scripts and data.
+このドキュメントでは、このリポジトリをテンプレートとして使用して、独自のスクリプトやデータを使用してAzure MLでリアルタイム推論を用いてモデルを訓練し、デプロイする際の手順を説明しています。
 
-1. Follow the MLOpsPython [Getting Started](getting_started.md) guide
-1. Bootstrap the project
-1. Configure training data
-1. [If necessary] Convert your ML experimental code into production ready code
-1. Replace the training code
-1. [Optional] Update the evaluation code
-1. Customize the build agent environment
-1. [If appropriate] Replace the score code
+1. MLOpsPython [開始](get_started.md)ガイドに従ってください。
+1. プロジェクトのブートストラップ
+1. トレーニングデータの設定
+1. (必要に応じて）MLの実験コードを本番環境で使用可能なコードに変換します。
+1. トレーニングコードの置き換えます。
+1. (オプション)評価用コードを更新します。
+1. ビルドエージェント環境のカスタマイズします。
+1. (該当する場合)スコアコードを差し替えてください。
 
-## Follow the Getting Started guide
+## スタートアップガイドを実施する
 
-Follow the [Getting Started](getting_started.md) guide to set up the infrastructure and pipelines to execute MLOpsPython.
+MLOpsPythonを実行するためのインフラとパイプラインを設定するには、[スタートアップ](getting_started.md)ガイドに従ってください。
 
-Take a look at the [Repo Details](code_description.md) document for a description of the structure of this repository.
+このリポジトリの構造については、[レポジトリの詳細](code_description.md)を参照してください。
 
-## Bootstrap the project
+## プロジェクトのブートストラップ
 
-Bootstrapping will prepare the directory structure to be used for your project name which includes:
+ブートストラップは、プロジェクト名に使用されるディレクトリ構造を準備します。
 
-* renaming files and folders from the base project name `diabetes_regression` to your project name
-* fixing imports and absolute path based on your project name
-* deleting and cleaning up some directories
+* ベースのプロジェクト名 `diabetes_regression` から指定のプロジェクト名にファイルとフォルダの名前を変更する。
+* プロジェクト名に基づいたインポートと絶対パスの修正
+* いくつかのディレクトリの削除とクリーンアップ
 
-**Note:** Since the bootstrap script will rename the `diabetes_regression` folder to the project name of your choice, we'll refer to your project as `[project name]` when paths are involved.
+**注:**ブートストラップスクリプトは `diabetes_regression` フォルダの名前を任意のプロジェクト名に変更するので、パスが関係している場合は `[project name]` と呼びます。
 
-To bootstrap from the existing MLOpsPython repository:
+既存のMLOpsPythonリポジトリからブートストラップを実行するには、以下のようにします。
 
-1. Ensure Python 3 is installed locally
-1. From a local copy of the code, run the `bootstrap.py` script in the `bootstrap` folder
-`python bootstrap.py -d [dirpath] -n [projectname]`
-    * `[dirpath]` is the absolute path to the root of the directory where MLOpsPython is cloned
-    * `[projectname]` is the name of your ML project
+1. Python 3がローカルにインストールされていることを確認します。
+1. コードのローカルコピーから、`bootstrap` フォルダ内の `bootstrap.py` スクリプトを実行します。
+`python bootstrap.py -d [dirpath] -n [project name]`。
+    * `[dirpath]` は、MLOpsPythonがクローンされるディレクトリのルートへの絶対パスです。
+    * `[project name]` はあなたのMLプロジェクトの名前です。
 
-## Configure training data
+## トレーニングデータの設定
 
-The training ML pipeline uses a [sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html) as training data.
+トレーニングMLパイプラインでは、トレーニングデータとして[sample diabetes dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html)を使用しています。
 
-**Important** Convert the template to use your own Azure ML Dataset for model training via these steps:
+**重要** 以下の手順でモデルトレーニングに独自のAzure ML Datasetを使用するためにテンプレートを変換します。
 
-1. [Create a Dataset](https://docs.microsoft.com/azure/machine-learning/how-to-create-register-datasets) in your Azure ML workspace
-1. Update the `DATASET_NAME` and `DATASTORE_NAME` variables in `.pipelines/[project name]-variables-template.yml`
+1. Azure ML Workspaceで[データセットを作成](https://docs.microsoft.com/azure/machine-learning/how-to-create-register-datasets)します。
+1. .pipelines/[project name]-variables-template.yml` の変数 `DATASET_NAME` と `DATASTORE_NAME` を更新します。
 
-## Convert your ML experimental code into production ready code
+## MLの実験的なコードを本番を想定したコードに変換する
 
-The MLOpsPython template creates an Azure Machine Learning (ML) pipeline that invokes a set of [Azure ML pipeline steps](https://docs.microsoft.com/python/api/azureml-pipeline-steps/azureml.pipeline.steps) (see `ml_service/pipelines/[project name]_build_train_pipeline.py`). If your experiment is currently in a Jupyter notebook, it will need to be refactored into scripts that can be run independently and dropped into the template which the existing Azure ML pipeline steps utilize.
+MLOpsPythonテンプレートは、[Azure MLパイプラインステップ](https://docs.microsoft.com/python/api/azureml-pipeline-steps/azureml.pipeline.steps)のセットを呼び出すAzure Machine Learning(ML)パイプラインを作成します (`ml_service/pipelines/[project name]_build_train_pipeline.py`を参照してください)。もしあなたの実験が現在Jupyterノートブックの中にあるならば、それを独立して実行できるスクリプトにリファクタリングして、既存のAzure MLパイプラインステップが利用するテンプレートにドロップする必要があります。
 
-1. Refactor your experiment code into scripts
-1. [Recommended] Prepare unit tests
+1. 実験コードをスクリプトにリファクタリングする
+1. 【推奨】ユニットテストの準備
 
-Examples of all these scripts are provided in this repository.
-See the [Convert ML experimental code to production code tutorial](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production) for a step by step guide and additional details.
+これらのスクリプトの例はすべてこのリポジトリにあります．
+ステップ・バイ・ステップのガイドや詳細は [Convert ML experimental code to production code tutorial](https://docs.microsoft.com/azure/machine-learning/tutorial-convert-ml-experiment-to-production) を参照してください。
 
-## Replace training code
+## トレーニングコードの置き換え
 
-The template contains three scripts in the `[project name]/training` folder. Update these scripts for your experiment code.
+テンプレートには、`[project name]/training`フォルダにある3つのスクリプトが含まれています。これらのスクリプトを実験コードに合わせて更新してください。
 
-* `train.py` contains the platform-agnostic logic required to do basic data preparation and train the model. This script can be invoked against a static data file for local development.
-* `train_aml.py` is the entry script for the ML pipeline step. It invokes the functions in `train.py` in an Azure ML context and adds logging. `train_aml.py` loads parameters for training from `[project name]/parameters.json` and passes them to the training function in `train.py`. If your experiment code can be refactored to match the function signatures in `train.py`, this file shouldn't need many changes.
-* `test_train.py` contains tests that guard against functional regressions in `train.py`. Remove this file if you have no tests for your own code.
+* `train.py`は基本的なデータの準備とモデルの学習に必要なプラットフォームに依存しないロジックが含まれています。このスクリプトは、ローカル開発のために静的なデータファイルに対して起動することができます。
+* `train_aml.py` は，MLのパイプラインステップのエントリースクリプトです．train.pyの関数をAzure MLのコンテキストで呼び出し、ログを追加します。`train_aml.py` は `[project name]/parameters.json` から学習用のパラメータを読み込み、`train.py` の学習関数に渡します。実験コードを `train.py` の関数のシグネチャに合わせてリファクタリングできるのであれば、このファイルはそれほど変更する必要はないでしょう。
+* `test_train.py` には、`train.py` の関数の回帰を防ぐためのテストが含まれています。自分のコードのテストがない場合は、このファイルを削除してください。
 
-Add any dependencies required by training to `[project name]/conda_dependencies.yml]`. This file will be used to generate the environment that the pipeline steps will run in.
+トレーニングで必要な依存関係を `[プロジェクト名]/conda_dependencies.yml]` に追加します。このファイルは、パイプラインのステップが実行される環境を生成するために使用されます。
 
-## Update evaluation code
+## 評価用のコードを更新する
 
-The MLOpsPython template uses the evaluate_model script to compare the performance of the newly trained model and the current production model based on Mean Squared Error. If the performance of the newly trained model is better than the current production model, then the pipelines continue. Otherwise, the pipelines are canceled.
+MLOpsPythonのテンプレートでは、evaluate_modelスクリプトを使用して、新しく学習したモデルと現在の本番モデルの性能をMean Squared Errorに基づいて比較します。新しく訓練されたモデルの性能が現在の本番モデルよりも良い場合、パイプラインは続行され、そうでなければ，パイプラインはキャンセルされます。
 
-To keep the evaluation step, replace all instances of `mse` in `[project name]/evaluate/evaluate_model.py` with the metric that you want.
+評価ステップを維持するには、`[project name]/evaluate/evaluate_model.py` の `mse` のインスタンスをすべて必要なメトリックに置き換えてください。
 
-To disable the evaluation step, either:
+評価ステップを無効にするには、以下のいずれかを実行します。
 
-* set the DevOps pipeline variable `RUN_EVALUATION` to `false`
-* uncomment `RUN_EVALUATION` in `.pipelines/[project name]-variables-template.yml` and set the value to `false`
+* DevOpsパイプライン変数 `RUN_EVALUATION` を `false` に設定します。
+* `.pipelines/[project name]-variables-template.yml` の `RUN_EVALUATION` のコメントを外し、値を `false` に設定する。
 
-## Customize the build agent environment
+## ビルドエージェント環境のカスタマイズ
 
-The DevOps pipeline definitions in the MLOpsPython template run several steps in a Docker container that contains the dependencies required to work through the Getting Started guide. If additional dependencies are required to run your unit tests or generate your Azure ML pipeline, there are a few options:
+MLOpsPythonテンプレートのDevOpsパイプライン定義は、スターツアップガイドの作業に必要な依存関係が含まれたDockerコンテナ内でいくつかのステップを実行します。
+ユニットテストの実行やAzure MLパイプラインの生成に追加の依存関係が必要な場合、いくつかのオプションがあります。:
 
-* Add a pipeline step to install dependencies required by unit tests to `.pipelines/code-quality-template.yml`. Recommended if you only have a small number of test dependencies.
-* Create a new Docker image containing your dependencies. See [docs/custom_container.md](custom_container.md). Recommended if you have a larger number of dependencies, or if the overhead of installing additional dependencies on each run is too high.
-* Remove the container references from the pipeline definition files and run the pipelines on self hosted agents with dependencies pre-installed.
+* ユニットテストで必要な依存関係を `.pipelines/code-quality-template.yml` にインストールするパイプラインステップを追加します。テストの依存関係の数が少ない場合にお勧めします。
+* 依存関係を含む新しいDockerイメージを作成します。docs/custom_container.md](custom_container.md)を参照してください。依存関係の数が多い場合や、実行ごとに追加の依存関係をインストールするオーバーヘッドが大きすぎる場合にお勧めします。
+* パイプライン定義ファイルからコンテナ参照を削除し、依存関係がプリインストールされているセルフホストエージェント上でパイプラインを実行します。
 
-## Replace score code
+## スコアコードの置き換え
 
-For the model to provide real-time inference capabilities, the score code needs to be replaced. The MLOpsPython template uses the score code to deploy the model to do real-time scoring on ACI, AKS, or Web apps.
+モデルがリアルタイムスコアリング機能を提供するためには、スコアコードを置き換える必要があります。MLOpsPythonテンプレートはスコアコードを使用してモデルをデプロイし、ACI、AKS、またはWebアプリ上でリアルタイムスコアリングを行います。
 
-If you want to keep scoring:
+スコアリングを継続したい場合:
 
-1. Update or replace `[project name]/scoring/score.py`
-1. Add any dependencies required by scoring to `[project name]/conda_dependencies.yml`
-1. Modify the test cases in the `ml_service/util/smoke_test_scoring_service.py` script to match the schema of the training features in your data
+1. プロジェクト名]/scoring/score.py`を更新または置換してください。
+1. スコアリングで必要な依存関係を `[プロジェクト名]/conda_dependencies.yml` に追加します。
+1. ml_service/util/smoke_test_scoring_service.py` スクリプトのテストケースを、データ内の学習特徴量のスキーマと一致するように変更します。
