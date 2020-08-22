@@ -1,77 +1,66 @@
-# Customizing the Azure DevOps job container
+# Azure DevOpsジョブコンテナのカスタマイズ
 
-The Model training and deployment pipeline uses a Docker container
-on the Azure Pipelines agents to provide a reproducible environment
-to run test and deployment code.
- The image of the container
-`mcr.microsoft.com/mlops/python:latest` is built with this
-[Dockerfile](../environment_setup/Dockerfile).
+モデルのトレーニングとデプロイメントのパイプラインでは、Dockerコンテナを使用します。
+を Azure Pipelines エージェント上で使用し、テストやデプロイメントコードを実行するための再現性の高い環境を提供します。
+ コンテナのイメージ `mcr.microsoft.com/mlops/python:latest` は
+[Dockerfile](./environment_setup/Dockerfile)を使用してビルドされています。
 
-Additionally mcr.microsoft.com/mlops/python image is also tagged with below tags.
+また、mcr.microsoft.com/mlops/pythonのイメージには以下のタグが付けられています。
 
-| Image Tags                                      | Description                                                                               |
+| イメージタグ                                      | 概要                                                                               |
 | ----------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| mcr.microsoft.com/mlops/python:latest           | latest image                                                                              |
-| mcr.microsoft.com/mlops/python:build-[id]       | where [id] is Azure Devops build id e.g.  mcr.microsoft.com/mlops/python:build-20200325.1 |
-| mcr.microsoft.com/mlops/python:amlsdk-[version] | where [version] is aml sdk version e.g.  mcr.microsoft.com/mlops/python:amlsdk-1.1.5.1    |
-| mcr.microsoft.com/mlops/python:release-[id]     | where [id] is github release id e.g.  mcr.microsoft.com/mlops/python:release-3.0.0        |  |
+| mcr.microsoft.com/mlops/python:latest           | 最新のイメージ                                                                              |
+| mcr.microsoft.com/mlops/python:build-[id]       | [id]はAzure DevopsのビルドIDです。 例: mcr.microsoft.com/mlops/python:build-20200325.1 |
+| mcr.microsoft.com/mlops/python:amlsdk-[version] | [version]はaml sdkのバージョンです。例: mcr.microsoft.com/mlops/python:amlsdk-1.1.5.1    |
+| mcr.microsoft.com/mlops/python:release-[id]     | [id]はgithubのリリースIDです。例: mcr.microsoft.com/mlops/python:release-3.0.0        |  |
 
-In your project you will want to build your own
-Docker image that only contains the dependencies and tools required for your
-use case. This image will be more likely smaller and therefore faster, and it
-will be totally maintained by your team.
+プロジェクトでは、ユースケースに必要な依存関係とツールだけを含む独自のDockerイメージを構築したい場合があります。この画像は、より小さく、より高速になる可能性が高く、あなたのチームで完全にメンテナンスされます。
 
-## Provision an Azure Container Registry
+## Azure Container Registry のプロビジョニング
 
-An Azure Container Registry is deployed along your Azure ML Workspace to manage models.
-You can use that registry instance to store your MLOps container image as well, or
-provision a separate instance.
+モデルを管理するために、Azure ML ワークスペースに沿って Azure Container Registry がデプロイされます。
+そのレジストリインスタンスを使用して MLOps コンテナイメージを保存することも、別のインスタンスをプロビジョニングすることも可能です。
 
-## Create a Registry Service Connection
+## レジストリサービス接続の作成
 
-[Create a service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#sep-docreg) to your Azure Container Registry:
+Azure Container Registrへの[サービス接続を作成]((https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#sep-docreg) )します。
 
-- As *Connection type*, select *Docker Registry*
-- As *Registry type*, select *Azure Container Registry*
-- As *Azure container registry*, select your Container registry instance
-- As *Service connection name*, enter `acrconnection`
+- *Connection type*として、*Docker Registry*を選択します。
+- *Registry type*として、*Azure Container Registry*を選択します。
+- *Azure container registry*として、コンテナレジストリインスタンスを選択します。
+- *Service connection name*として `acrconnection` と入力します。
 
-## Update the environment definition
+##  環境定義を更新する
 
-Modify the [Dockerfile](../environment_setup/Dockerfile) and/or the
-[ci_dependencies.yml](../diabetes_regression/ci_dependencies.yml) CI Conda
-environment definition to tailor your environment.
-Conda provides a [reusable environment for training and deployment with Azure Machine Learning](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-use-environments).
-The Conda environment used for CI should use the same package versions as the Conda environment
-used for the Azure ML training and scoring environments (defined in [conda_dependencies.yml](../diabetes_regression/conda_dependencies.yml)).
-This enables you to run unit and integration tests using the exact same dependencies as used in the ML pipeline.
+[Dockerfile](./environment_setup/Dockerfile)や
+[ci_dependencies.yml](../diabetes_regression/ci_dependencies.yml) CI conda
+環境定義を使って環境をカスタマイズすることができます。
+Condaは[Azure Machine Learningでのトレーニングとデプロイのための再利用可能な環境](https://docs.microsoft.com/ja-jp/azure/machine-learning/how-to-use-environments)を提供しています。  
+CIに使用するConda環境は、Azure MLのトレーニング環境やスコアリング環境に使用するConda環境と同じパッケージバージョンを使用する必要があります（[conda_dependencies.yml](./diabetes_regression/conda_dependencies.yml)で定義されています）。
+これにより、MLパイプラインで使用されているものと全く同じ依存関係を使用して、ユニットテストや統合テストを実行することができます。
 
-If a package is available in a Conda package repository, then we recommend that
-you use the Conda installation rather than the pip installation. Conda packages
-typically come with prebuilt binaries that make installation more reliable.
+パッケージがCondaパッケージリポジトリで利用可能な場合は、pipインストールではなくCondaインストールを使用することをお勧めします。Conda パッケージには通常、インストールをより信頼性の高いものにするためのバイナリがあらかじめ用意されています。
 
-## Create a container build pipeline
 
-In your [Azure DevOps](https://dev.azure.com) project create a new build
-pipeline referring to the
-[environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
-pipeline definition in your forked repository.
+## コンテナビルドパイプラインの作成
 
-Edit the [environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml) file
-and modify the string `'public/mlops/python'` with an name suitable to describe your environment,
-e.g. `'mlops/diabetes_regression'`.
+[Azure DevOps](https://dev.azure.com)プロジェクトでは[environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
+パイプラインの定義をフォークしたリポジトリで編集してください。
 
-Save and run the pipeline, making sure to set the these runtime variables: `amlsdkversion` and `githubrelease`. The values are up to you to set depending on your environment. These will show as tags on your image.
+[environment_setup/docker-image-pipeline.yml](./environment_setup/docker-image-pipeline.yml)ファイルを編集します。
+を変更し、文字列 `'public/mlops/python'` をあなたの環境を表すのに適した名前に変更してください。  
+例: `'mlops/diabetes_regression'`.
+
+保存してパイプラインを実行し、`amlsdkversion` と `githubrelease` というランタイム変数を設定します。これらの値は環境に応じて設定してください。これらの値はイメージ上にタグとして表示されます。
 
 ![Custom Container Vars](./images/custom-container-variables.png)
 
-This will build and push a container image to your Azure Container Registry with
-the name you have just edited. The next step is to modify the build pipeline to run the CI job on a container
-run from that image.
+これでコンテナイメージがビルドされ、先ほど編集した名前でAzure Container Registryにプッシュされます。  
+次のステップは、そのイメージから実行されたコンテナ上でCIジョブを実行するために、ビルドパイプラインを変更することです。
 
 ## Modify the model pipeline
 
-Modify the model pipeline file [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml) by replacing this section:
+モデルパイプラインファイル[diabetes_regression-ci.yml](./.pipelines/diabetes_regression-ci.yml)のこのセクションを置き換えて修正します。
 
 ```
 resources:
@@ -80,7 +69,7 @@ resources:
     image: mcr.microsoft.com/mlops/python:latest
 ```
 
-with (using the image name previously defined):
+あわせて事前に定義したイメージ名を使用を使用します。
 
 ```
 resources:
@@ -90,24 +79,16 @@ resources:
     endpoint: acrconnection
 ```
 
-Run the pipeline and ensure your container has been used.
+パイプラインを実行し、コンテナが使用されていることを確認します。
 
-## Addressing conflicting dependencies
+## 相反する依存関係への対処
 
-Especially when working in a team, it's possible for environment changes across branches to interfere with one another.
+特にチームで作業をしていると、ブランチ間での環境変更がお互いに干渉してしまうことがあります。
 
-For example, if the master branch is using scikit-learn and you create a branch to use Tensorflow instead, and you
-decide to remove scikit-learn from the
-[ci_dependencies.yml](../diabetes_regression/ci_dependencies.yml) Conda environment definition
-and run the [docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml) Docker image,
-then the master branch will stop building.
+例えば、マスターブランチが scikit-learn を使用していて、代わりに Tensorflow を使用するブランチを作成したとします。
+もし、[ci_dependencies.yml](./diabetes_regression/ci_dependencies.yml)のConda環境定義からscikit-learnを削除することにして、[docker-image-pipeline.yml](./environment_setup/docker-image-pipeline.yml)のDockerイメージを実行すると、masterブランチのビルドが停止します。
 
-You could leave scikit-learn in addition to Tensorflow in the environment, but that is not ideal, as you would have to take an extra step to remove scikit-learn after merging your branch to master.
+Tensorflow に加えて scikit-learn を環境に残しておくこともできますが、 master ブランチをマージした後に scikit-learn を削除するための余分なステップを踏まなければならないので、理想的ではありません。
 
-A better approach would be to use a distinct name for your modified environment, such as `mlops/diabetes_regression/tensorflow`.
-By changing the name of the image in your branch in both the container build pipeline
-[environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
-and the model pipeline file
-[diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml),
-and running both pipelines in sequence on your branch,
-you avoid any branch conflicts, and the name does not have to be changed after merging to master.
+より良いアプローチは、`mlops/diabetes_regression/tensorflow`のように、変更した環境に別の名前を使うことです。  
+コンテナビルドパイプライン[environment_setup/docker-image-pipeline.yml](./environment_setup/docker-image-pipeline.yml)とモデルパイプラインファイル[diabetes_regression-ci.yml](./.pipelines/diabetes_regression-ci.yml)の両方でブランチ内のイメージの名前を変更し、ブランチ上で順番に実行することで、ブランチの競合を回避し、masterにマージした後に名前を変更する必要がありません。
