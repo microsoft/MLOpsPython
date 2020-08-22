@@ -11,10 +11,6 @@ description: "Code which demonstrates how to set up and operationalize an MLOps 
 
 # MLOps with Azure ML
 
-CI: [![Build Status](https://aidemos.visualstudio.com/MLOps/_apis/build/status/Model-Train-Register-CI?branchName=master)](https://aidemos.visualstudio.com/MLOps/_build/latest?definitionId=160&branchName=master)
-
-CD: [![Build Status](https://aidemos.visualstudio.com/MLOps/_apis/build/status/microsoft.MLOpsPython-CD?branchName=master)](https://aidemos.visualstudio.com/MLOps/_build/latest?definitionId=161&branchName=master)
-
 MLOpsでは、ML/AIプロジェクトのContinuous IntegrationとContinuous Deliveryパイプラインの構築方法を理解します。モデル再トレーニングパイプライン、モデル管理、運用化のためのAzure MLサービスとともに、ビルドおよびリリース/デプロイメントパイプラインにAzure DevOps Projectを使用します。
 
 ![ML lifecycle](/docs/images/ml-lifecycle.png)
