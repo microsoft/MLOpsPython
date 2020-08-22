@@ -1,122 +1,134 @@
-# Getting Started with MLOpsPython <!-- omit in toc -->
+# MLOpsPythonの開始 <!-- omit in toc -->
 
-This guide shows how to get MLOpsPython working with a sample ML project **_diabetes_regression_**. The project creates a linear regression model to predict diabetes and has CI/CD DevOps practices enabled for model training and serving when these steps are completed in this getting started guide.
+このガイドでは、MLプロジェクト **_diabetes_regression_** のサンプルでMLOpsPythonを動作させる方法を示します。この開始ガイド内のステップが完了したとき、このプロジェクトは糖尿病を予測する線形回帰モデルを作成し、CI/CD DevOpsのプラクティスでモデルのトレーニングと提供を可能にします。
 
-If you would like to bring your own model code to use this template structure, follow the [custom model](custom_model.md) guide. We recommend completing this getting started guide with the diabetes model through ACI deployment first to ensure everything is working in your environment before converting the template to use your own model code.
+このテンプレート構造を独自のモデルコードに利用したい場合は、[カスタムモデル](custom_model.md)ガイドに従ってください。独自のモデルコードを使用するためのテンプレート変換を実行する前に、最初にこの入門ガイドを完了し、ACIデプロイを介してデプロイされた糖尿病モデルがあなたの環境で動作していることを確認することをお勧めします。
 
-- [Setting up Azure DevOps](#setting-up-azure-devops)
-  - [Install the Azure Machine Learning extension](#install-the-azure-machine-learning-extension)
-- [Get the code](#get-the-code)
-- [Create a Variable Group for your Pipeline](#create-a-variable-group-for-your-pipeline)
-  - [Variable Descriptions](#variable-descriptions)
-- [Provisioning resources using Azure Pipelines](#provisioning-resources-using-azure-pipelines)
-  - [Create an Azure DevOps Service Connection for the Azure Resource Manager](#create-an-azure-devops-service-connection-for-the-azure-resource-manager)
-  - [Create the IaC Pipeline](#create-the-iac-pipeline)
-- [Create an Azure DevOps Service Connection for the Azure ML Workspace](#create-an-azure-devops-service-connection-for-the-azure-ml-workspace)
-- [Set up Build, Release Trigger, and Release Multi-Stage Pipeline](#set-up-build-release-trigger-and-release-multi-stage-pipelines)
-  - [Set up the Model CI Training, Evaluation, and Registration Pipeline](#set-up-the-model-ci-training-evaluation-and-registration-pipeline)
-  - [Set up the Release Deployment and/or Batch Scoring Pipelines](#set-up-the-release-deployment-andor-batch-scoring-pipelines)
-- [Further Exploration](#further-exploration)
-  - [Deploy the model to Azure Kubernetes Service](#deploy-the-model-to-azure-kubernetes-service)
-    - [Web Service Authentication on Azure Kubernetes Service](#web-service-authentication-on-azure-kubernetes-service)
-  - [Deploy the model to Azure App Service (Azure Web App for containers)](#deploy-the-model-to-azure-app-service-azure-web-app-for-containers)
-  - [Example pipelines using R](#example-pipelines-using-r)
-  - [Observability and Monitoring](#observability-and-monitoring)
-  - [Clean up the example resources](#clean-up-the-example-resources)
-- [Next Steps: Integrating your project](#next-steps-integrating-your-project)
-  - [Additional Variables and Configuration](#additional-variables-and-configuration)
-    - [More variable options](#more-variable-options)
-    - [Local configuration](#local-configuration)
+- [Azure DevOpsのセットアップ](#azure-devopsのセットアップ)
+  - [Azure Machine Learning 拡張機能のインストール](#azure-machine-learning-拡張機能のインストール)
+- [コードの入手](#コードの入手)
+- [パイプライン用の変数グループの作成](#パイプライン用の変数グループの作成)
+  - [変数の内容](#変数の内容)
+- [Azure Pipelinesを使用したリソースの構成](#azure-pipelinesを使用したリソースの構成)
+  - [Azure Resource Manager用のAzure DevOpsサービス接続を作成する](#azure-resource-manager用のazure-devopsサービス接続を作成する)
+  - [IaC パイプラインの作成](#iac-パイプラインの作成)
+- [Azure ML ワークスペース用の Azure DevOps サービス接続の作成](#azure-ml-ワークスペース用の-azure-devops-サービス接続の作成)
+- [ビルド、リリーストリガー、リリースのマルチステージパイプラインの設定](#ビルドリリーストリガーリリースのマルチステージパイプラインの設定)
+  - [モデルCI、トレーニング、評価、登録パイプラインの設定](#モデルciトレーニング評価登録パイプラインの設定)
+    - [モデル CI](#モデル-ci)
+    - [モデルトレーニング](#モデルトレーニング)
+    - [パイプラインアーティファクトの作成](#パイプラインアーティファクトの作成)
+  - [リリース デプロイメントとバッチ スコアリング パイプライン(両方、もしくは片方)を設定する](#リリース-デプロイメントとバッチ-スコアリング-パイプライン両方もしくは片方を設定する)
+  - [リリースデプロイメントパイプラインの設定](#リリースデプロイメントパイプラインの設定)
+    - [ACIへのデプロイ](#aciへのデプロイ)
+  - [バッチスコアリングパイプラインの設定](#バッチスコアリングパイプラインの設定)
+    - [バッチスコアリング CI](#バッチスコアリング-ci)
+    - [バッチスコアリングモデル](#バッチスコアリングモデル)
+- [追加シナリオ](#追加シナリオ)
+  - [モデルをAzure Kubernetes Serviceにデプロイする](#モデルをazure-kubernetes-serviceにデプロイする)
+    - [Azure Kubernetes SeriviceでのWebサービス認証](#azure-kubernetes-seriviceでのwebサービス認証)
+  - [モデルをAzure App Service（Azure Web App for containers）にデプロイする](#モデルをazure-app-serviceazure-web-app-for-containersにデプロイする)
+  - [Rを使用したパイプラインの例](#rを使用したパイプラインの例)
+  - [観測とモニタリング](#観測とモニタリング)
+  - [リソースをクリーンアップする](#リソースをクリーンアップする)
+- [次のステップ: 自身のプロジェクトとの統合](#次のステップ-自身のプロジェクトとの統合)
+  - [追加の変数と設定](#追加の変数と設定)
+    - [より多くの変数オプション](#より多くの変数オプション)
+    - [ローカルでの構成](#ローカルでの構成)
 
-## Setting up Azure DevOps
+## Azure DevOpsのセットアップ
 
-You'll use Azure DevOps for running the multi-stage pipeline with build, model training, and scoring service release stages. If you don't already have an Azure DevOps organization, create one by following the instructions at [Quickstart: Create an organization or project collection](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
+Azure DevOps を使用して、ビルド、モデルトレーニング、スコアリングサービスのリリースステージを持つ多段階パイプラインを実行します。まだAzure DevOps組織を持っていない場合は、以下の手順に従って組織を作成してください。  
+[Quickstart: Create an organization or project collection](https://docs.microsoft.com/ja-jp/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
-If you already have an Azure DevOps organization, create a new project using the guide at [Create a project in Azure DevOps and TFS](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
+すでにAzure DevOps組織を持っている場合は、以下の手順に従って新しいプロジェクトを作成してください。  
+ [Create a project in Azure DevOps and TFS](https://docs.microsoft.com/ja-jp/azure/devops/organizations/projects/create-project?view=azure-devops).
 
-### Install the Azure Machine Learning extension
+### Azure Machine Learning 拡張機能のインストール
 
-Install the **Azure Machine Learning** extension to your Azure DevOps organization from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml).
+ [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml)から、Azure DevOps組織に**Azure Machine Learning**拡張機能をインストールします。
 
 This extension contains the Azure ML pipeline tasks and adds the ability to create Azure ML Workspace service connections.
 
-## Get the code
+この拡張機能には、Azure ML のパイプラインタスクが含まれていることに加え、Azure ML Workspaceとのサービス接続を作成する機能が追加されています。
 
-We recommend using the [repository template](https://github.com/microsoft/MLOpsPython/generate), which effectively forks the repository to your own GitHub location and squashes the history. You can use the resulting repository for this guide and for your own experimentation.
+## コードの入手
+ [リポジトリテンプレート](https://github.com/microsoft/MLOpsPython/generate)を使用して、自分の GitHub リポジトリにフォークしながら履歴を消去することをお勧めします。できあがったリポジトリは、このガイドや自分の実験に使うことができます。
 
-## Create a Variable Group for your Pipeline
+## パイプライン用の変数グループの作成
 
-MLOpsPython requires some variables to be set before you can run any pipelines. You'll need to create a _variable group_ in Azure DevOps to store values that are reused across multiple pipelines or pipeline stages. Either store the values directly in [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group) or connect to an Azure Key Vault in your subscription. Check out the [Add & use variable groups](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group) documentation to learn more about how to create a variable group and link it to your pipeline.
+MLOpsPythonはパイプラインを実行する前にいくつかの変数を設定する必要があります。
+複数のパイプラインやパイプラインステージで再利用する値を保存するために、Azure DevOpsで_変数グループを作成する必要があります。
+値を [Azure DevOpsに直接格納する](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#create-a-variable-group)か、サブスクリプションでAzure Key Vaultに接続します。変数グループを作成してパイプラインにリンクする方法の詳細については、[変数グループの追加と使用](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group) のドキュメントをチェックしてください。
 
-Navigate to **Library** in the **Pipelines** section as indicated below:
+以下に示すように、**Pipelines**セクションの**Library**に移動します。
 
 ![Library Variable Groups](./images/library_variable_groups.png)
 
-Create a variable group named **`devopsforai-aml-vg`**. The YAML pipeline definitions in this repository refer to this variable group by name.
+**`devopsforai-aml-vg`**という名前の変数グループを作成します。このリポジトリのYAMLパイプライン定義は、この名前により変数グループを参照します。
 
-The variable group should contain the following required variables. **Azure resources that don't exist yet will be created in the [Provisioning resources using Azure Pipelines](#provisioning-resources-using-azure-pipelines) step below.**
+変数グループには、以下の必須変数が含まれている必要があります。**まだ存在しないAzureリソースは、後述の[Provisioning resources using Azure Pipelines](#provisioning-resources-using-azure-pipelines)の手順で作成されます。**
 
-| Variable Name            | Suggested Value           | Short description                                                                                                           |
+| 変数名            | 推奨の値           | 概要                                                                                                           |
 | ------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| BASE_NAME                | [your project name]       | Unique naming prefix for created resources - max 10 chars, letters and numbers only                                         |
-| LOCATION                 | centralus                 | [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/), no spaces                             |
-| RESOURCE_GROUP           | mlops-RG                  | Azure Resource Group name                                                                                                   |
-| WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                     |
-| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
-| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                 |
-| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                           |
-| SCORING_DATASTORE_STORAGE_NAME      | [your project name]scoredata                 | [Azure Blob Storage Account](https://docs.microsoft.com/en-us/azure/storage/blobs/) name (optional)                          |
-| SCORING_DATASTORE_ACCESS_KEY      |                  | [Azure Storage Account Key](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-requests-to-azure-storage) (optional)                          |
+| BASE_NAME                | [任意のプロジェクト名称]       | 作成されるリソースの一意の接頭辞 - 最大10文字、文字、数字のみ                                         |
+| LOCATION                 | centralus                 | [Azure location](https://azure.microsoft.com/ja-jp/global-infrastructure/locations/), スペースなし
+| RESOURCE_GROUP           | mlops-RG                  | Azure リソースグループの名前                                                                                                   |
+| WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace の名前                                                                                                     |
+| AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager サービス接続](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) の名前 |
+| WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace サービス接続ー](#create-an-azure-devops-azure-ml-workspace-service-connection) の名前                 |
+| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/ja-jp/services/container-instances/) の名前                           |
+| SCORING_DATASTORE_STORAGE_NAME      | [任意のプロジェクト名称]scoredata                 | [Azure Blob Storage Account](https://docs.microsoft.com/ja-jp/azure/storage/blobs/) の名前 (オプション)                          |
+| SCORING_DATASTORE_ACCESS_KEY      |                  | [Azure Storage Account のアクセスキー](https://docs.microsoft.com/ja-jp/rest/api/storageservices/authorize-requests-to-azure-storage) (オプション)                          |
 
-Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
+変数グループの設定で **Allow access to all pipelines** のチェックボックスを選択していることを確認してください。
 
-More variables are available for further tweaking, but the above variables are all you need to get started with this example. For more information, see the [Additional Variables and Configuration](#additional-variables-and-configuration) section.
+より多くの変数を使用して微調整することができますが、今回の例では上記の変数で十分です。詳細は、[追加の変数と設定](#追加の変数と設定)セクションを参照してください。
 
-### Variable Descriptions
+### 変数の内容
 
-**BASE_NAME** is used as a prefix for naming Azure resources and should be unique. When sharing an Azure subscription, the prefix allows you to avoid naming collisions for resources that require unique names, for example, Azure Blob Storage and Registry DNS. Make sure to set BASE_NAME to a unique name so that created resources will have unique names, for example, MyUniqueMLamlcr, MyUniqueML-AML-KV, and so on. The length of the BASE_NAME value shouldn't exceed 10 characters and must contain letters and numbers only.
+**BASE_NAME** は、Azure リソースの命名の接頭辞として使用され、一意である必要があります。Azureサブスクリプションを共有する場合、接頭辞を使用することで、Azure Blob StorageやレジストリDNSなど、一意の名前を必要とするリソース名のコンフリクトを回避することができます。作成されたリソースが一意の名前を持つように、BASE_NAMEを一意の名前に設定するようにしてください。BASE_NAMEの値の長さは10文字を超えてはならず、文字と数字のみでなければなりません。
 
-**LOCATION** is the name of the [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/) for your resources. There should be no spaces in the name. For example, central, westus, westus2.
+**LOCATION** はデプロイされるリソースの[Azure location](https://azure.microsoft.com/ja-jp/global-infrastructure/locations/)の名前です。名前にはスペースを入れてはいけません。例えば、central, westus, westus2などです。
 
-**RESOURCE_GROUP** is used as the name for the resource group that will hold the Azure resources for the solution. If providing an existing Azure ML Workspace, set this value to the corresponding resource group name.
+**RESOURCE_GROUP** は、ソリューションのためのAzureリソースを保持するリソースグループの名前として使用されます。既存の Azure ML ワークスペースを提供する場合は、この値を対応するリソース グループ名に設定します。
 
-**WORKSPACE_NAME** is used for creating the Azure Machine Learning Workspace. You can provide an existing Azure ML Workspace here if you've got one.
+**WORKSPACE_NAME** は、Azure Machine Learning ワークスペースを作成するために使用します。既存のAzure MLワークスペースがあれば、ここで入力することができます。
 
-**AZURE_RM_SVC_CONNECTION** is used by the [Azure Pipeline](../environment_setup/iac-create-environment-pipeline.yml) in Azure DevOps that creates the Azure ML workspace and associated resources through Azure Resource Manager. You'll create the connection in a [step below](#create-an-azure-devops-service-connection-for-the-azure-resource-manager).
+**AZURE_RM_SVC_CONNECTION** は、Azureリソースマネージャを介してAzure MLワークスペースと関連リソースを作成するAzure DevOpsの[Azure Pipeline](./environment_setup/iac-create-environment-pipeline.yml)で使用されます。[後述の手順](#azure-resource-manager用のazure-devopsサービス接続を作成する)で接続を作成します。
 
-**WORKSPACE_SVC_CONNECTION** is used to reference a [service connection for the Azure ML workspace](#create-an-azure-devops-azure-ml-workspace-service-connection). You'll create the connection after [provisioning the workspace](#provisioning-resources-using-azure-pipelines) in the [Create an Azure DevOps Service Connection for the Azure ML Workspace](#create-an-azure-devops-service-connection-for-the-azure-ml-workspace) section below.
+**WORKSPACE_SVC_CONNECTION** は、[Azure ML ワークスペースのサービス接続](#azure-ml-ワークスペース用の-azure-devops-サービス接続の作成)を参照するために使用します。[ワークスペースのプロビジョニング](#azure-pipelinesを使用したリソースの構成)の後に、後述の[Azure ML ワークスペース用の Azure DevOps サービス接続の作成](#azure-ml-ワークスペース用の-azure-devops-サービス接続の作成)のセクションを行って接続を作成します。
 
-**ACI_DEPLOYMENT_NAME** is used for naming the scoring service during deployment to [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/).
+**ACI_DEPLOYMENT_NAME** は、[Azure Container Instances](https://azure.microsoft.com/ja-jp/services/container-instances/)へのデプロイ時のスコアリング用サービスの命名に使用されます。
 
-**SCORING_DATASTORE_STORAGE_NAME** is the name for an Azure Blob Storage account that will contain both data used as input to batch scoring, as well as the batch scoring outputs. This variable is optional and only needed if you intend to use the batch scoring facility. Note that since this resource is optional, the resource provisioning pipelines mentioned below do not create this resource automatically, and manual creation is required before use.
+**SCORING_DATASTORE_STORAGE_NAME** は、バッチ スコアリングの入力として使用されるデータと、バッチ スコアリングの出力データの両方を格納する Azure Blob Storage アカウントの名前です。この変数はオプションで、バッチ スコアリング機能を使用する場合にのみ必要です。このリソースはオプションなので、下記のリソース プロビジョニング パイプラインではこのリソースは自動的に作成されず、使用する前に手動で作成する必要があることに注意してください。
 
-**SCORING_DATASTORE_ACCESS_KEY** is the access key for the scoring data Azure storage account mentioned above. You may want to consider linking this variable to Azure KeyVault to avoid storing the access key in plain text. This variable is optional and only needed if you intend to use the batch scoring facility. 
+**SCORING_DATASTORE_ACCESS_KEY** は、上記のスコアリングデータを格納するAzureストレージアカウントのアクセスキーです。アクセスキーをプレーンテキストで保存しないように、この変数をAzure KeyVaultにリンクすることを検討するとよいでしょう。この変数はオプションであり、バッチスコアリング機能を使用する予定がある場合にのみ必要です。
 
+## Azure Pipelinesを使用したリソースの構成
 
-## Provisioning resources using Azure Pipelines
+必要なすべてのAzureリソース（リソースグループ、Azure ML Workspace, Container Registryなど）を作成する最も簡単な方法は、[ARM templatesを利用した **Infrastructure as Code (IaC)** パイプライン](./environment_setup/iac-create-environment-pipelin-arm.yml) または[Terraform templatesを利用したパイプライン](./environment_setup/iac-create-environment-pipelin-tf.yml)を使用することです。パイプラインは、[ARM templates](./environment_setup/arm-templates/cloud-environment.json)、または [Terraform templates](./environment_setup/tf-templates) に基づいて、必要なリソースの設定を行います。
 
-The easiest way to create all required Azure resources (Resource Group, Azure ML Workspace, Container Registry, and others) is to use the **Infrastructure as Code (IaC)** [pipeline with ARM templates](../environment_setup/iac-create-environment-pipeline-arm.yml) or the [pipeline with Terraform templates](../environment_setup/iac-create-environment-pipeline-tf.yml). The pipeline takes care of setting up all required resources based on these [Azure Resource Manager templates](../environment_setup/arm-templates/cloud-environment.json), or based on these [Terraform templates](../environment_setup/tf-templates).
+**注:** バッチスコアリングに必要なAzure Blobのストレージアカウントはオプションのため、上記のリソース構成用のパイプラインでは自動的に作成されず、使用前に手動で作成する必要があります。
 
-**Note:** Since Azure Blob storage account required for batch scoring is optional, the resource provisioning pipelines mentioned above do not create this resource automatically, and manual creation is required before use.
+### Azure Resource Manager用のAzure DevOpsサービス接続を作成する
 
-### Create an Azure DevOps Service Connection for the Azure Resource Manager
-
-The [IaC provisioning pipeline](../environment_setup/iac-create-environment-pipeline.yml) requires an **Azure Resource Manager** [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
+ [IaC 構成パイプライン](../environment_setup/iac-create-environment-pipeline.yml) には **Azure Resource Manager** [サービス接続](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection)が必要です。:
 
 ![Create service connection](./images/create-rm-service-connection.png)
 
-Leave the **`Resource Group`** field empty.
+**`Resource Group`** 欄は空白のままにしてください。
 
-**Note:** Creating the Azure Resource Manager service connection scope requires 'Owner' or 'User Access Administrator' permissions on the subscription.
-You'll also need sufficient permissions to register an application with your Azure AD tenant, or you can get the ID and secret of a service principal from your Azure AD Administrator. That principal must have 'Contributor' permissions on the subscription.
+**注:**Azure Resource Manager サービス接続スコープを作成するには、サブスクリプションに「所有者」または「ユーザーアクセス管理者」の権限が必要です。
+また、Azure ADテナントにアプリケーションを登録するのに十分な権限が必要になります。そのプリンシパルは、サブスクリプションに対して「共同作成者」の権限を持っている必要があります。
 
-### Create the IaC Pipeline
+###  IaC パイプラインの作成
 
-In your Azure DevOps project, create a build pipeline from your forked repository:
+Azure DevOpsプロジェクト上で、フォークしたリポジトリからビルドパイプラインを作成します。:
 
 ![Build connect step](./images/build-connect.png)
 
-Select the **Existing Azure Pipelines YAML file** option and set the path to [/environment_setup/iac-create-environment-pipeline-arm.yml](../environment_setup/iac-create-environment-pipeline-arm.yml) or to [/environment_setup/iac-create-environment-pipeline-tf.yml](../environment_setup/iac-create-environment-pipeline-tf.yml), depending on if you want to deploy your infrastructure using ARM templates or Terraform:
+**既存のAzure Pipelines YAMLファイル** オプションを選択し、ARMテンプレートやTerraformを使用してインフラストラクチャをデプロイするかどうかに応じて、[/environment_setup/iac-create-environment-pipeline-arm.yml](../environment_setup/iac-create-environment-pipeline-arm.yml)または、[/environment_setup/iac-create-environment-pipeline-tf.yml](../environment_setup/iac-create-environment-pipeline-tf.yml)にパスを設定します。:
 
 ![Configure step](./images/select-iac-pipeline.png)
 
@@ -130,91 +142,92 @@ Check that the newly created resources appear in the [Azure Portal](https://port
 
 ![Created resources](./images/created-resources.png)
 
-## Create an Azure DevOps Service Connection for the Azure ML Workspace
+## Azure ML ワークスペース用の Azure DevOps サービス接続の作成
 
-At this point, you should have an Azure ML Workspace created. Similar to the Azure Resource Manager service connection, you need to create an additional one for the Azure ML Workspace.
+この時点で、Azure ML ワークスペースが作成されているはずです。Azure Resource Manager のサービス接続と同様に、Azure ML ワークスペース用に追加で作成する必要があります。
 
-Create a new service connection to your Azure ML Workspace using the [Machine Learning Extension](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) instructions to enable executing the Azure ML training pipeline. The connection name needs to match `WORKSPACE_SVC_CONNECTION` that you set in the variable group above (eg. 'aml-workspace-connection').
+Azure MLトレーニングパイプラインの実行を有効にするために、[Machine Learning Extension](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml)のガイドを使用して、Azure MLワークスペースに新しいサービス接続を作成します。接続名は、上記の変数グループで設定した `WORKSPACE_SVC_CONNECTION` と一致する必要があります (例: 'aml-workspace-connection' )。
 
 ![Created resources](./images/ml-ws-svc-connection.png)
 
-**Note:** Similar to the Azure Resource Manager service connection you created earlier, creating a service connection with Azure Machine Learning workspace scope requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
-You'll need sufficient permissions to register an application with your Azure AD tenant, or you can get the ID and secret of a service principal from your Azure AD Administrator. That principal must have Contributor permissions on the Azure ML Workspace.
+**注:** 先ほど作成したAzure Resource Managerのサービス接続と同様に、Azure Machine Learningのワークスペーススコープでサービス接続を作成するには、ワークスペースに「所有者」または「ユーザーアクセス管理者」の権限が必要です。
+Azure ADのテナントにアプリケーションを登録するには十分な権限が必要ですが、Azure ADの管理者からサービスプリンシパルのIDとシークレットを取得することもできます。そのプリンシパルは、Azure ML ワークスペース上で「共同作成者」権限を持っている必要があります。
 
-## Set up Build, Release Trigger, and Release Multi-Stage Pipelines
+## ビルド、リリーストリガー、リリースのマルチステージパイプラインの設定
 
-Now that you've provisioned all the required Azure resources and service connections, you can set up the pipelines for training (CI) and deploying (CD) your machine learning model to production. Additionally, you can set up a pipeline for batch scoring.
+必要なAzureリソースとサービス接続をすべてプロビジョニングしたら、機械学習モデルを本番環境にトレーニング(CI)とデプロイ(CD)するためのパイプラインを設定できます。さらに、バッチスコアリングのためのパイプラインをセットアップすることができます。
 
-1. **Model CI, training, evaluation, and registration** - triggered on code changes to master branch on GitHub. Runs linting, unit tests, code coverage, and publishes and runs the training pipeline. If a new model is registered after evaluation, it creates a build artifact containing the JSON metadata of the model. Definition: [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml).
-1. **Release deployment** - consumes the artifact of the previous pipeline and deploys a model to either [Azure Container Instances (ACI)](https://azure.microsoft.com/en-us/services/container-instances/), [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service), or [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) environments. See [Further Exploration](#further-exploration) for other deployment types. Definition: [diabetes_regression-cd.yml](../.pipelines/diabetes_regression-cd.yml).
-   1. **Note:** Edit the pipeline definition to remove unused stages. For example, if you're deploying to Azure Container Instances and Azure Kubernetes Service only, delete the unused `Deploy_Webapp` stage.
-1. **Batch Scoring Code Continuous Integration** - consumes the artifact of the model training pipeline. Runs linting, unit tests, code coverage, publishes a batch scoring pipeline, and invokes the published batch scoring pipeline to score a model.
+1. **モデル CI, トレーニング, 評価, 登録** - GitHub上のマスターブランチへのコード変更時にトリガーされます。リンティング、ユニットテスト、コードカバレッジを実行し、トレーニングパイプラインを公開して実行します。評価後に新しいモデルが登録された場合、モデルのJSONメタデータを含むビルドアーティファクトを作成します。定義:[diabetes_regression-ci.yml](./.pipelines/diabetes_regression-ci.yml)
+2. **リリースデプロイメント** - 前段のパイプラインのアーティファクトを消費し、モデルを [Azure Container Instances (ACI)](https://azure.microsoft.com/ja-jp/services/container-instances/)、[Azure Kubernetes Service (AKS)](https://azure.microsoft.com/ja-jp/services/kubernetes-service)、または [Azure App Service](https://docs.microsoft.com/ja-jp/azure/machine-learning/service/how-to-deploy-app-service) 環境のいずれかにデプロイします。その他のデプロイメントタイプについては、[追加シナリオ](#追加シナリオ)を参照してください。
+定義: [diabetes_regression-cd.yml](./.pipelines/diabetes_regression-cd.yml)
+   - **注意:** パイプライン定義を編集して、使用されていないステージを削除します。例えば、Azure Container Instances と Azure Kubernetes Service のみにデプロイする場合は、未使用の `Deploy_Webapp` ステージを削除します。
+3. **バッチスコアリングコードの継続的インテグレーション** - は、モデル学習パイプラインのアーティファクトを消費します。リンティング、ユニットテスト、コードカバレッジを実行し、バッチスコアリングパイプラインを公開し、公開されたバッチスコアリングパイプラインを呼び出してモデルをスコアリングします。
 
-These pipelines use a Docker container on the Azure Pipelines agents to accomplish the pipeline steps. The container image ***mcr.microsoft.com/mlops/python:latest*** is built with [this Dockerfile](../environment_setup/Dockerfile) and has all the necessary dependencies installed for MLOpsPython and ***diabetes_regression***. This image is an example of a custom Docker image with a pre-baked environment. The environment is guaranteed to be the same on any building agent, VM, or local machine. In your project, you'll want to build your own Docker image that only contains the dependencies and tools required for your use case. Your image will probably be smaller and faster, and it will be maintained by your team.
+これらのパイプラインは、パイプラインのステップを達成するためにAzure Pipelinesエージェント上のDockerコンテナを使用します。コンテナイメージ ***mcr.microsoft.com/mlops/python:latest*** は [ このDockerfile](../environment_setup/Dockerfile) でビルドされ、MLOpsPython と ***diabetes_regression*** に必要なすべての依存関係がインストールされています。このイメージは、カスタムDockerイメージに事前作成された環境を追加した例です。この環境は、どのビルドエージェント、VM、ローカルマシンでも同じ環境であることが保証されています。プロジェクトでは、ユースケースに必要な依存関係とツールだけを含む独自のDockerイメージを構築したい場合があり、イメージはより小さく、より速く、チームがメンテナンス可能です。
 
-### Set up the Model CI, training, evaluation, and registration pipeline
+### モデルCI、トレーニング、評価、登録パイプラインの設定
 
-In your Azure DevOps project, create and run a new build pipeline based on the [diabetes_regression-ci.yml](../.pipelines/diabetes_regression-ci.yml)
-pipeline definition in your forked repository.
+Azure DevOpsプロジェクトで、[diabetes_regression-ci.yml](./.pipelines/diabetes_regression-ci.yml)をベースにした新しいビルドパイプラインを作成して実行します。
+フォークしたリポジトリでパイプラインの定義を確認してください。
 
-If you plan to use the release deployment pipeline (in the next section), you will need to rename this pipeline to `Model-Train-Register-CI`.
+(次のセクションの) リリースデプロイメントパイプラインを使用する場合、このパイプラインの名前を `Model-Train-Register-CI` に変更する必要があります。
 
-Once the pipeline is finished, check the execution result:
+パイプラインが終了したら、実行結果を確認します。:
 
 ![Build](./images/model-train-register.png)
 
-And the pipeline artifacts:
+パイプラインのアーティファクトについても同様です。:
 
 ![Build](./images/model-train-register-artifacts.png)
 
-Also check the published training pipeline in the **mlops-AML-WS** workspace in [Azure Machine Learning Studio](https://ml.azure.com/):
+また、[Azure Machine Learning Studio](https://ml.azure.com/)の**mlops-AML-WS**ワークスペースで公開されているトレーニングパイプラインを確認してください。:
 
-![Training pipeline](./images/training-pipeline.png)
+![トレーニングパイプライン](./images/training-pipeline.png)
 
-Great, you now have the build pipeline for training set up which automatically triggers every time there's a change in the master branch!
+これで、マスターブランチに変更があるたびに自動的にトリガーされるトレーニング用のビルドパイプラインがセットアップされました。
 
-After the pipeline is finished, you'll see a new model in the **ML Workspace**:
+パイプラインが完了すると、**MLワークスペース**に新しいモデルが表示されます。:
 
-![Trained model](./images/trained-model.png)
+![学習済みモデル](./images/trained-model.png)
 
-To disable the automatic trigger of the training pipeline, change the `auto-trigger-training` variable as listed in the `.pipelines\diabetes_regression-ci.yml` pipeline to `false`.  You can also override the variable at runtime execution of the pipeline.
+トレーニングパイプラインの自動トリガーを無効にするには、`.pipelines\diabetes_regression-ci.yml` パイプライン内の `auto-trigger-training` 変数を `false` に変更してください。 また、パイプラインの実行時に変数をオーバーライドすることもできます。
 
-The pipeline stages are summarized below:
+パイプラインのステージは以下のようにまとめられています。:
 
-#### Model CI
+#### モデル CI
 
-- Linting (code quality analysis)
-- Unit tests and code coverage analysis
-- Build and publish _ML Training Pipeline_ in an _ML Workspace_
+- リンティング（コード品質分析)
+- ユニットテストとコードカバレッジ分析
+- _ML Workspace_ に _ML Training Pipeline_ を構築して公開します。
 
-#### Train model
+#### モデルトレーニング
 
-- Determine the ID of the _ML Training Pipeline_ published in the previous stage.
-- Trigger the _ML Training Pipeline_ and waits for it to complete.
-  - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
-- Determine if a new model was registered by the _ML Training Pipeline_.
-  - If the model evaluation determines that the new model doesn't perform any better than the previous one, the new model won't register and the _ML Training Pipeline_ will be **canceled**. In this case, you'll see a message in the 'Train Model' job under the 'Determine if evaluation succeeded and new model is registered' step saying '**Model was not registered for this run.**'
-  - See [evaluate_model.py](../diabetes_regression/evaluate/evaluate_model.py#L118) for the evaluation logic.
-  - [Additional Variables and Configuration](#additional-variables-and-configuration) for configuring this and other behavior.
+- 前ステージで公開した_ML Training Pipeline_のIDを決定します。
+- _ML Training Pipeline_ をトリガーにして、完了を待機します。
+  - これは **エージェントレス** のジョブです。CIパイプラインは、エージェントリソースを使用せずに何時間、あるいは何日もMLパイプラインの完了を待つことができます。
+- _MLトレーニングパイプライン_ によって新しいモデルが登録されたかどうかを判断します。
+  - モデルの評価で、新しいモデルが以前のモデルよりも良いパフォーマンスを発揮しないと判断された場合、新しいモデルは登録されず、_MLトレーニングパイプライン_ は**キャンセル**されます。この場合、'Determine if evaluation succeeded and new model is registered' stepの下の'Train Model' jobで'**Model was not registered for this run.**'というメッセージが表示されます。
+  - 評価ロジックは [evaluate_model.py](./diabetes_regression/evaluate/evaluate_model.py#L118) を参照してください。
+  - この動作やその他の動作を設定するには、[追加の変数と設定](#追加の変数と設定)を参照してください。
 
-#### Create pipeline artifact
+#### パイプラインアーティファクトの作成
 
-- Get the info about the registered model
-- Create a pipeline artifact called `model` that contains a `model.json` file containing the model information.
+- 登録されているモデルの情報を取得する
+- モデル情報を含む `model.json` ファイルを含む `model` という名前のパイプラインアーティファクトを作成する。
 
-### Set up the Release Deployment and/or Batch Scoring pipelines
+### リリース デプロイメントとバッチ スコアリング パイプライン(両方、もしくは片方)を設定する
 
 ---
-**PREREQUISITE**
+**前提条件**
 
-In order to use these pipelines:
+これらのパイプラインを使用するには
 
-1. Follow the steps to set up the Model CI, training, evaluation, and registration pipeline.
-1. You **must** rename your model CI/train/eval/register pipeline to `Model-Train-Register-CI`.
+1. モデルCI、トレーニング、評価、および登録パイプラインをセットアップするための手順に従います。
+1. モデルCI/トレーニング/評価/登録パイプラインの名前を `Model-Train-Register-CI` に変更する必要があります。
 
-These pipelines rely on the model CI pipeline and reference it by name.
+これらのパイプラインはモデルCIパイプラインに依存しており、名前を参照しています。
 
-If you would like to change the name of your model CI pipeline, you must edit this section of yml for the CD and batch scoring pipeline, where it says `source: Model-Train-Register-CI` to use your own name.
+モデルCIパイプラインの名前を変更したい場合は、CDとバッチスコアリングパイプライン用のymlのこのセクションを編集しなければなりません。ここでは、`source: Model-Train-Register-CI`と書かれているので、この設定を変更後の名前を使うように編集する必要があります。
 ```
 trigger: none
 resources:
@@ -223,7 +236,7 @@ resources:
     image: mcr.microsoft.com/mlops/python:latest
   pipelines:
   - pipeline: model-train-ci
-    source: Model-Train-Register-CI # Name of the triggering pipeline
+    source: Model-Train-Register-CI # トリガーとなるパイプラインの名前
     trigger:
       branches:
         include:
@@ -232,144 +245,143 @@ resources:
 
 ---
 
-The release deployment and batch scoring pipelines have the following behaviors:
+リリースデプロイメントとバッチスコアリングのパイプラインには、次のような動作があります。
 
-- The pipeline will **automatically trigger** on completion of the Model-Train-Register-CI pipeline for the master branch.
-- The pipeline will default to using the latest successful build of the Model-Train-Register-CI pipeline. It will deploy the model produced by that build.
-- You can specify a `Model-Train-Register-CI` build ID when running the pipeline manually. You can find this in the url of the build, and the model registered from that build will also be tagged with the build ID. This is useful to skip model training and registration, and deploy/score a model successfully registered by a `Model-Train-Register-CI` build.
+- パイプラインは、マスターブランチの Model-Train-Register-CI パイプラインが完了すると、**自動的に**トリガーされます。
+- パイプラインは、Model-Train-Register-CI パイプラインの最新の成功したビルドを使用するようにデフォルト設定されます。そのビルドで生成されたモデルをデプロイします。
+- パイプラインを手動で実行する際に `Model-Train-Register-CI` ビルド ID を指定することができます。これはビルドのURLで見つけることができ、そのビルドから登録されたモデルもビルドIDでタグ付けされます。これはモデルのトレーニングや登録をスキップし、`Model-Train-Register-CI` ビルドで正常に登録されたモデルをデプロイ/スコアするのに便利です。
 
-### Set up the Release Deployment pipeline
+### リリースデプロイメントパイプラインの設定
 
-In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-cd.yml](../.pipelines/diabetes_regression-cd.yml)
-pipeline definition in your forked repository.
+Azure DevOpsプロジェクトで、[diabetes_regression-cd.yml](./.pipelines/diabetes_regression-cd.yml)をベースにした新しいビルドパイプラインを作成して実行します。
+パイプライン定義をフォークしてください。
 
-Your first run will use the latest model created by the `Model-Train-Register-CI` pipeline.
+最初の実行では、`Model-Train-Register-CI` パイプラインによって作成された最新のモデルを使用します。
 
-Once the pipeline is finished, check the execution result:
+パイプラインが終了したら、実行結果を確認してください。:
 
 ![Build](./images/model-deploy-result.png)
 
-To specify a particular build's model, set the `Model Train CI Build Id` parameter to the build Id you would like to use.
+特定のビルドのモデルを指定するには、`Model Train CI Build Id`パラメータに使用したいビルドIDを設定します。:
 
 ![Build](./images/model-deploy-configure.png)
 
-Once your pipeline run begins, you can see the model name and version downloaded from the `Model-Train-Register-CI` pipeline.
+パイプラインの実行が始まると、`Model-Train-Register-CI` パイプラインからダウンロードしたモデル名とバージョンが表示されます。:
 
 ![Build](./images/model-deploy-get-artifact-logs.png)
 
-The pipeline has the following stage:
+パイプラインには以下のようなステージがあります。:
 
-#### Deploy to ACI
+#### ACIへのデプロイ
 
-- Deploy the model to the QA environment in [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/).
-- Smoke test
-  - The test sends a sample query to the scoring web service and verifies that it returns the expected response. Have a look at the [smoke test code](../ml_service/util/smoke_test_scoring_service.py) for an example.
+- [Azure Container Instances](https://azure.microsoft.com/ja-jp/services/container-instances/)のQA環境にモデルをデプロイします。
+- スモークテスト
+  - このテストでは、サンプルのクエリをスコアリングウェブサービスに送信し、それが期待されるレスポンスを返すかどうかを検証します。例としては、[スモークテストコード](./ml_service/util/smoke_test_scoring_service.py)を参照してください。
 
-### Set up the Batch Scoring pipeline
+### バッチスコアリングパイプラインの設定
 
-In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-batchscoring-ci.yml](../.pipelines/diabetes_regression-batchscoring-ci.yml)
-pipeline definition in your forked repository. 
+Azure DevOpsプロジェクトで、[diabetes_regression-batchscoring-ci.yml](./.pipelines/diabetes_regression-batchscoring-ci.yml)に基づいた新しいビルドパイプラインを作成して実行します。
+パイプラインの定義をフォークしたリポジトリで確認してください。
 
-Once the pipeline is finished, check the execution result:
+パイプラインが終了したら、実行結果を確認します。:
 
 ![Build](./images/batchscoring-ci-result.png)
 
-Also check the published batch scoring pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://portal.azure.com/):
+また、[Azure Portal](https://portal.azure.com/)の**mlops-AML-WS**ワークスペースで公開されているバッチスコアリングパイプラインを確認してください。:
 
-![Batch scoring pipeline](./images/batchscoring-pipeline.png)
+![バッチ スコアリング パイプライン](./images/batchscoring-pipeline.png)
 
-Great, you now have the build pipeline set up for batch scoring which automatically triggers every time there's a change in the master branch!
+これでバッチスコアリング用のビルドパイプラインが設定され、マスターブランチに変更があるたびに自動的にトリガーされるようになりました。
 
-The pipeline stages are summarized below:
+パイプラインのステージは以下のようにまとめられています。:
 
-#### Batch Scoring CI
+#### バッチスコアリング CI
 
-- Linting (code quality analysis)
-- Unit tests and code coverage analysis
-- Build and publish *ML Batch Scoring Pipeline* in an *ML Workspace*
+- リンティング（コード品質分析
+- ユニットテストとコードカバレッジ分析
+- *ML Workspace* に *ML Batch Scoring Pipeline*を構築して公開します。
 
-#### Batch Score model
+#### バッチスコアリングモデル
 
-- Determine the model to be used based on the model name (required), model version, model tag name and model tag value bound pipeline parameters.
-  - If run via Azure DevOps pipeline, the batch scoring pipeline will take the model name and version from the `Model-Train-Register-CI` build used as input.
-  - If run locally without the model version, the batch scoring pipeline will use the model's latest version.
-- Trigger the *ML Batch Scoring Pipeline* and waits for it to complete.
-  - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
-- Use the scoring input data supplied via the SCORING_DATASTORE_INPUT_* configuration variables.
-- Once scoring is completed, the scores are made available in the same blob storage at the locations specified via the SCORING_DATASTORE_OUTPUT_* configuration variables.
+- モデル名（必須）、モデルバージョン、モデルタグ名、モデルタグ値のバインドされたパイプラインパラメータに基づいて、使用するモデルを決定します。
+  - Azure DevOps パイプライン経由で実行する場合、バッチスコアリングパイプラインは入力として使用される `Model-Train-Register-CI` ビルドからモデル名とバージョンを取得します。
+  - モデルのバージョンなしでローカルで実行された場合、バッチスコアリングパイプラインはモデルの最新バージョンを使用します。
+- *ML バッチスコアリングパイプライン* をトリガーし、完了を待機します。
+  - これは**エージェントレス**ジョブです。CIパイプラインは、エージェントリソースを使用せずに、MLパイプラインの完了を何時間も、あるいは何日も待つことができます。
+- *SCORING_DATASTORE_INPUT_* 設定変数で指定されるスコアリング入力データを使用します。
+- スコアリングが完了すると、*SCORING_DATASTORE_OUTPUT_* 設定変数で指定した場所の同じブロブストレージでスコアが利用可能になります。
 
-**Note** In the event a scoring data store is not yet configured, you can still try out batch scoring by supplying a scoring input data file within the data folder. Do make sure to set the SCORING_DATASTORE_INPUT_FILENAME variable to the name of the file. This approach will cause the score output to be written to the ML workspace's default datastore. 
+**注:** スコアリングデータストアがまだ設定されていない場合でも、データフォルダ内のスコアリング入力データファイルを指定することで、バッチスコアリングを試すことができます。SCORING_DATASTORE_INPUT_FILENAME変数にファイル名を設定してください。この方法では、スコア出力はMLワークスペースのデフォルトのデータストアに書き込まれます。
 
+## 追加シナリオ
 
-## Further Exploration
+これで、MLOpsPythonを使い始めるためのパイプラインが完成しました。以下に、あなたのシナリオに適した機能をいくつか紹介します。
 
-You should now have a working set of pipelines that can get you started with MLOpsPython. Below are some additional features offered that might suit your scenario.
+### モデルをAzure Kubernetes Serviceにデプロイする
 
-### Deploy the model to Azure Kubernetes Service
+MLOpsPythonは[Azure Kubernetes Service](https://azure.microsoft.com/ja-jp/services/kubernetes-service)にもデプロイできます。
 
-MLOpsPython also can deploy to [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service).
+Azure Kubernetes Service上にクラスタを作成することはこのチュートリアルの範囲外ですが、セットアップ情報は[Quickstart: Deploy an Azure Kubernetes Service (AKS) cluster using the Azure portal](https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough-portal#create-an-aks-cluster) ページに掲載されています。
 
-Creating a cluster on Azure Kubernetes Service is out of scope of this tutorial, but you can find set up information on the [Quickstart: Deploy an Azure Kubernetes Service (AKS) cluster using the Azure portal](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough-portal#create-an-aks-cluster) page.
-
-> **_Note_**
+> **_注_**
 >
-> If your target deployment environment is a Kubernetes cluster and you want to implement Canary and/or A/B testing deployment strategies, check out this [tutorial](./canary_ab_deployment.md).
+> 対象のデプロイ環境がKubernetesクラスタで、カナリアリリースやA/Bテストのデプロイ戦略を実装したい場合は、この[チュートリアル]をチェックしてください(./canary_ab_deployment.md)。
 
-Keep the Azure Container Instances deployment active because it's a lightweight way to validate changes before deploying to Azure Kubernetes Service.
+Azure Kubernetes Service にデプロイする前に変更を検証するために可能な簡単な方法なので、Azure Container Instances のデプロイをアクティブにしておきます。
 
-In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add these variables:
+変数タブで、変数グループ (`devopsforai-aml-vg`) を編集します。変数グループの定義で、これらの変数を追加します。
 
-| Variable Name       | Suggested Value |
+| 変数名       | 推奨値  |
 | ------------------- | --------------- |
 | AKS_COMPUTE_NAME    | aks             |
 | AKS_DEPLOYMENT_NAME | mlops-aks       |
 
-Set **AKS_COMPUTE_NAME** to the _Compute name_ of the Inference Cluster that references the Azure Kubernetes Service cluster in your Azure ML Workspace.
+Azure ML ワークスペースの Azure Kubernetes Service クラスタを参照する推論クラスタの  _Compute name_  に **AKS_COMPUTE_NAME** を設定します。
 
-After successfully deploying to Azure Container Instances, the next stage will deploy the model to Kubernetes and run a smoke test.
+Azure Container Instancesへのデプロイに成功したら、次はモデルをKubernetesにデプロイしてスモークテストを実行します。
 
 ![build](./images/multi-stage-aci-aks.png)
 
-Consider enabling [manual approvals](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/approvals) before the deployment stages.
+デプロイ前に[手動の承認](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/process/approvals)を有効にすることを検討してください。
 
-#### Web Service Authentication on Azure Kubernetes Service
+#### Azure Kubernetes SeriviceでのWebサービス認証
 
-When deploying to Azure Kubernetes Service, key-based authentication is enabled by default. You can also enable token-based authentication. Token-based authentication requires clients to use an Azure Active Directory account to request an authentication token, which is used to make requests to the deployed service. For more details on how to authenticate with ML web service deployed on the AKS service please follow [Smoke Test](../ml_service/util/smoke_test_scoring_service.py) or the Azure documentation on [web service authentication](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-deploy-azure-kubernetes-service#web-service-authentication).
+Azure Kubernetes Service にデプロイする場合、デフォルトではキーベース認証が有効になっています。また、トークンベースの認証を有効にすることもできます。トークンベース認証では、クライアントが Azure Active Directory アカウントを使用して認証トークンを要求する必要があり、トークンはデプロイされたサービスへのリクエストに使用されます。AKSサービス上に配置されたMLのWebサービスで認証を行う方法の詳細については、[Smoke Test](./ml_service/util/smoke_test_scoring_service.py)またはAzureのドキュメントの[Webサービス認証](https://docs.microsoft.com/ja-jp/azure/machine-learning/how-to-deploy-azure-kubernetes-service#web-service-authentication)を参照してください。
 
-### Deploy the model to Azure App Service (Azure Web App for containers)
+### モデルをAzure App Service（Azure Web App for containers）にデプロイする
 
-If you want to deploy your scoring service as an [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) instead of Azure Container Instances and Azure Kubernetes Service, follow these additional steps.
+スコアリングサービスをAzure Container InstancesとAzure Kubernetes Serviceの代わりに[Azure App Service](https://docs.microsoft.com/ja-jp/azure/machine-learning/service/how-to-deploy-app-service)としてデプロイする場合は、以下の追加手順に従ってください。
 
-In the Variables tab, edit your variable group (`devopsforai-aml-vg`) and add a variable:
+変数タブで、変数グループ(`devopsforai-aml-vg`)を編集し、変数を追加します。
 
-| Variable Name          | Suggested Value        |
-| ---------------------- | ---------------------- |
+| 変数名                    | 推奨値                    |
+|------------------------|------------------------|
 | WEBAPP_DEPLOYMENT_NAME | _name of your web app_ |
 
-Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. This app must exist before you can deploy the model to it.
+**WEBAPP_DEPLOYMENT_NAME** をAzure Web Appの名前に設定します。このアプリにモデルをデプロイする前に、このアプリが存在している必要があります。
 
-Delete the **ACI_DEPLOYMENT_NAME** variable.
+変数 **ACI_DEPLOYMENT_NAME**  を削除します。
 
-The pipeline uses the [Azure ML CLI](../.pipelines/diabetes_regression-package-model-template.yml) to create a scoring image. The image will be registered under an Azure Container Registry instance that belongs to the Azure Machine Learning Service. Any dependencies that the scoring file depends on can also be packaged with the container with an image config. Learn more about how to create a container using the Azure ML SDK with the [Image class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-) API documentation.
+パイプラインでは、[Azure ML CLI](./.pipelines/diabetes_regression-package-model-template.yml)を使用してスコアリングイメージを作成します。イメージは、Azure Machine Learning Serviceに属するAzure Container Registryインスタンスの下に登録されます。スコアリングファイルが依存する依存関係は、イメージのコンフィグ設定でコンテナと一緒にパッケージ化することもできます。Azure ML SDKを使用したコンテナの作成方法については、[Image class](https://docs.microsoft.com/ja-jp/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-)を参照してください。API ドキュメントを参照してください。
 
-Make sure your webapp has the credentials to pull the image from the Azure Container Registry created by the Infrastructure as Code pipeline. Instructions can be found on the [Configure registry credentials in web app](https://docs.microsoft.com/en-us/azure/devops/pipelines/targets/webapp-on-container-linux?view=azure-devops&tabs=dotnet-core%2Cyaml#configure-registry-credentials-in-web-app) page. You'll need to run the pipeline once (including the Deploy to Webapp stage up to the `Create scoring image` step) so an image is present in the registry. After that, you can connect the Webapp to the Azure Container Registry in the Azure Portal.
+Web アプリが Infrastructure as Code パイプラインによって作成された Azure Container Registry からイメージを引き出すための資格情報を持っていることを確認してください。手順は、[Configure registry credentials in web app](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/targets/webapp-on-container-linux?view=azure-devops&tabs=dotnet-core%2Cyaml#configure-registry-credentials-in-web-app) ページに記載されています。レジストリにイメージが存在するように、パイプラインを一度実行する必要があります (Deploy to Webapp ステージから `Create scoring image` ステップまでを含む)。その後、AzureポータルのAzure Container RegistryにWebアプリを接続することができます。
 
 ![build](./images/multi-stage-webapp.png)
 
-### Example pipelines using R
+### Rを使用したパイプラインの例
 
-The build pipeline also supports building and publishing Azure ML pipelines using R to train a model. You can enable it by changing the `build-train-script` pipeline variable to either of the following values:
+ビルドパイプラインは、モデルを訓練するためにRを使ってAzure MLパイプラインをビルドして公開することもサポートしています。これを有効にするには、`build-train-script`パイプライン変数を以下のいずれかの値に変更します。
 
-- `diabetes_regression_build_train_pipeline_with_r.py` to train a model with R on Azure ML Compute. You'll also need to uncomment (include) the `r-essentials` Conda packages in the environment definition YAML `diabetes_regression/conda_dependencies.yml`.
-- `diabetes_regression_build_train_pipeline_with_r_on_dbricks.py` to train a model with R on Databricks. You'll need to manually create a Databricks cluster and attach it to the Azure ML Workspace as a compute resource. Set the DB_CLUSTER_ID and DATABRICKS_COMPUTE_NAME variables in your variable group.
+- Diabetes_regression_build_train_pipeline_with_r.py` を変更することで、Azure ML Compute上でRを使ってモデルを学習することができます。また、環境定義YAML `diabetes_regression/conda_dependencies.yml` の中の `r-essentials` Conda パッケージをアンコメント（コードに含める）必要があります。
+- `diabetes_regression_build_train_pipeline_with_r_on_dbricks.py` を使うと、Rを使ってDatabricks上でモデルを学習させることができます。手動でDatabricksクラスタを作成し、計算リソースとしてAzure ML Workspaceにアタッチする必要があります。変数グループにDB_CLUSTER_IDとDATABRICKS_COMPUTE_NAMEを設定します。
 
-Example ML pipelines using R have a single step to train a model. They don't demonstrate how to evaluate and register a model. The evaluation and registering techniques are shown only in the Python implementation.
+Rを使用したMLパイプラインの例では、モデルを訓練するための単一のステップがあります。モデルを評価して登録する方法は示されていません．評価と登録の方法はPythonの実装でのみ示されています．
 
-### Observability and Monitoring
+### 観測とモニタリング
 
-You can explore aspects of model observability in the solution, such as:
+以下のようにソリューションのモデルの観測の側面を探ることができます。
 
-- **Logging**: Navigate to the Application Insights instance linked to the Azure ML Portal, then go to the Logs (Analytics) pane. The following sample query correlates HTTP requests with custom logs generated in `score.py`. This can be used, for example, to analyze query duration vs. scoring batch size:
+- **ログ**。Azure MLポータルにリンクされたApplication Insightsインスタンスに移動し、Logs (Analytics) ペインに移動します。次のサンプルクエリは、HTTPリクエストを `score.py` で生成されたカスタムログと相関させます。これは、例えば、クエリの持続時間とスコアリングのバッチサイズを分析するために使用することができます。
 
   ```sql
   let Traceinfo=traces
@@ -385,28 +397,28 @@ You can explore aspects of model observability in the solution, such as:
   | project-away id1
   ```
 
-- **Distributed tracing**: The smoke test client code sets an HTTP `traceparent` header (per the [W3C Trace Context proposed specification](https://www.w3.org/TR/trace-context-1)), and the `score.py` code logs the header. The query above shows how to surface this value. You can adapt it to your tracing framework.
-- **Monitoring**: You can use [Azure Monitor for containers](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-overview) to monitor the Azure ML scoring containers' performance.
+- **分散トレース**: スモークテストクライアントのコードはHTTP `traceparent` ヘッダを設定し（[W3C Trace Context proposed specification](https://www.w3.org/TR/trace-context-1)）、`score.py` コードはそのヘッダをログに記録します。上のクエリは、この値をどのようにして表面化するかを示しています。これをトレースフレームワークに適応させることができます。
+- **モニタリング** :Azure ML のスコアリングコンテナのパフォーマンスを監視するために、[Azure Monitor for containers](https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-overview)を利用することができます。
 
-### Clean up the example resources
+### リソースをクリーンアップする
 
-To remove the resources created for this project, use the [/environment_setup/iac-remove-environment-pipeline.yml](../environment_setup/iac-remove-environment-pipeline.yml) definition or you can just delete the resource group in the [Azure Portal](https://portal.azure.com).
+このプロジェクトに作成されたリソースを削除するには、[/environment_setup/iac-remove-environment-pipeline.yml](./environment_setup/iac-remove-environment-pipeline.yml)の定義を使用するか、[Azure Portal](https://portal.azure.com)でリソースグループを削除するだけです。
 
-## Next Steps: Integrating your project
+## 次のステップ: 自身のプロジェクトとの統合
 
-- The [custom model](custom_model.md) guide includes information on bringing your own code to this repository template.
-- Consider using [Azure Pipelines self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your Azure ML pipeline execution. The Docker container image for the Azure ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
+- [カスタムモデル](custom_model.md)ガイドには、このリポジトリテンプレートに自分のコードを適用するための情報がが含まれています。
+- Azure MLパイプラインの実行を高速化するために、[Azure Pipelines selfhosted agents](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install)の使用を検討してみてください。Azure MLパイプライン用のDockerコンテナイメージはサイズが大きく、実行の間にエージェント上にキャッシュされているので、実行から数分を短縮することができます。
 
-### Additional Variables and Configuration
+### 追加の変数と設定
 
-#### More variable options
+#### より多くの変数オプション
 
-There are more variables used in the project. They're defined in two places: one for local execution and one for using Azure DevOps Pipelines.
+プロジェクトで使用される変数はさらにあります。1つはローカルで実行するためのもので、もう1つはAzure DevOps Pipelinesを使用するためのものです。
 
-For using Azure Pipelines, all other variables are stored in the file `.pipelines/diabetes_regression-variables-template.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
+Azure Pipelinesを使用する場合、他のすべての変数はファイル `.pipelines/diabetes_regression-variables-template.yml` に保存されます。デフォルト値を出発点として使用し、必要に応じて変数を調整してください。
 
-In that folder, you'll also find the `parameters.json` file that we recommend using to provide parameters for training, evaluation, and scoring scripts. The sample parameter that `diabetes_regression` uses is the ridge regression [_alpha_ hyperparameter](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We don't provide any serializers for this config file.
+このフォルダには、トレーニング、評価、スコアリングスクリプトのパラメータを提供するために使用することを推奨する `parameters.json` ファイルもあります。diabetes_regression`が使用しているサンプルパラメータは、リッジ回帰[_α_ハイパーパラメータ](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html)です。この設定ファイルにはシリアライザは提供していません。
 
-#### Local configuration
+#### ローカルでの構成
 
-For instructions on how to set up a local development environment, refer to the [Development environment setup instructions](development_setup.md).
+ローカル開発環境の設定方法については、[開発環境設定手順]（development_setup.md）を参照してください。
