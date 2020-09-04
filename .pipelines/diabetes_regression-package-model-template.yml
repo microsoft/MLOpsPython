@@ -21,8 +21,8 @@ steps:
       scriptLocation: inlineScript
       workingDirectory: ${{ parameters.workingDirectory }}
       inlineScript: |
+        pip install azureml-sdk
         az extension add -n azure-cli-ml
-        pip freeze
 
   # Default - build using inference config only
   - ${{ if eq(length(parameters.entryScriptPath), 0) }}:
