@@ -20,7 +20,9 @@ steps:
       azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
       scriptLocation: inlineScript
       workingDirectory: ${{ parameters.workingDirectory }}
-      inlineScript: 'az extension add -n azure-cli-ml'
+      inlineScript: |
+        az extension add -n azure-cli-ml
+        pip freeze
 
   # Default - build using inference config only
   - ${{ if eq(length(parameters.entryScriptPath), 0) }}:
