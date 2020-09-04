@@ -23,11 +23,11 @@ dependencies:
 
   - pip:
       # Base AzureML SDK
-      - azureml-sdk==1.6.*
+      - azureml-sdk==1.13.*
 
       # Minimum required for the scoring environment. Must match AzureML SDK version.
       # https://docs.microsoft.com/en-us/azure/machine-learning/concept-environments
-      - azureml-defaults==1.6.*
+      - azureml-defaults==1.13.*
 
       # Training deps
       - scikit-learn
