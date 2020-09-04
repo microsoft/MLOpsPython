@@ -26,6 +26,8 @@ steps:
       inlineScript: |
         set -e # fail on error
 
+        pip freeze
+
         # Create model package using CLI
         az ml model package --workspace-name $(WORKSPACE_NAME) -g $(RESOURCE_GROUP) \
         --model '${{ parameters.modelId }}' \
