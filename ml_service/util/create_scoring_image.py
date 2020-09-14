@@ -40,8 +40,9 @@ os.chdir(path_to_scoring)
 scoring_env = Environment.from_conda_specification(name="scoringenv", file_path="conda_dependencies.yml")  # NOQA: E501
 inference_config = InferenceConfig(
     entry_script=score_file, environment=scoring_env)
-package = Model.package(ws, [model], inference_config)
+package = Model.package(ws, [model], inference_config, generate_dockerfile=True)
 package.wait_for_creation(show_output=True)
+package.save("./imagefiles")
 # Display the package location/ACR path
 print(package.location)
 
