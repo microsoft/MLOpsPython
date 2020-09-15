@@ -2,14 +2,13 @@ pipeline {
     agent { label 'master' }
     environment {
         ML_IMAGE_FOLDER         = 'imagefiles'
-        ML_CONTAINER_REGISTRY   = 'b8becdb6f4794d62a5a153653ba7bcdc'
         IMAGE_NAME              = 'mlmodelimage'
-        RESOURCE_GROUP = 'upskill_devops_rg'
         MODEL_NAME = 'diabetes_regression_model.pkl'
         MODEL_VERSION = '1'
         SCORE_SCRIPT = 'scoring/score.py'
+        RESOURCE_GROUP = 'upskill_devops_rg'
         WORKSPACE_NAME = 'mlops-upskill'
-        SUBSCRIPTION_ID = '6c49a293-8733-477c-a12f-df2d12565703'
+        ML_CONTAINER_REGISTRY   = 'b8becdb6f4794d62a5a153653ba7bcdc'
     }
     stages {
         stage('initialize') {
@@ -28,10 +27,8 @@ pipeline {
                 /*checkout scm*/
                 checkout([$class: 'GitSCM', branches: [[name: '*/ml_model_uc76']],
                     userRemoteConfigs: [[url: 'https://github.com/Merlion-Crew/MLOpsPython.git/']]])
-                /*sh 'az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET -t $ARM_TENANT_ID'
-                sh 'az account set -s $ARM_SUBSCRIPTION_ID'*/
 
-                azureCLI commands: [[exportVariablesString: '', script: "az account set -s ${SUBSCRIPTION_ID}"]], principalCredentialId: "${AZURE_SP}"
+                azureCLI commands: [[exportVariablesString: '/id|SUBSCRIPTION_ID', script: "az account show"]], principalCredentialId: "${AZURE_SP}"
                 
                 sh '''#!/bin/bash -ex
                     source /home/azureuser/anaconda3/bin/activate mlopspython_ci
@@ -39,7 +36,7 @@ pipeline {
                 '''
             }
         }
-        stage('build') {
+        stage('build_and_push') {
             steps {
                 echo "Build docker images"
 
