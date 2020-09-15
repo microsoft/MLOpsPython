@@ -42,9 +42,9 @@ inference_config = InferenceConfig(
     entry_script=score_file, environment=scoring_env)
 
 saved_package = os.environ.get("ML_IMAGE_FOLDER")
-saved_dockerfile = False
+saved_dockerfile = True
 if (saved_package is None):
-    saved_dockerfile = True
+    saved_dockerfile = False
 package = Model.package(ws, [model], inference_config, generate_dockerfile=saved_dockerfile)
 
 
