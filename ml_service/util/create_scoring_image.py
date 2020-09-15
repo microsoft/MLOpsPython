@@ -43,14 +43,14 @@ inference_config = InferenceConfig(
 
 saved_package = os.environ.get("ML_IMAGE_FOLDER")
 saved_dockerfile = False
-if (saved_package is None)
+if (saved_package is None):
     saved_dockerfile = True
 package = Model.package(ws, [model], inference_config, generate_dockerfile=saved_dockerfile)
 
 
 package.wait_for_creation(show_output=True)
 
-if(saved_dockerfile)
+if(saved_dockerfile):
     package.save(saved_package)
     
 # Display the package location/ACR path
