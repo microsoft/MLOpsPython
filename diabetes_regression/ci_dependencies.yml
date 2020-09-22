@@ -17,7 +17,7 @@ dependencies:
 
   - pip:
       # dependencies with versions aligned with conda_dependencies.yml.
-      - azureml-sdk==1.13.*
+      - azureml-sdk
 
       # Additional pip dependencies for the CI environment.
       - pytest==5.4.*
