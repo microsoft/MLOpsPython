@@ -295,11 +295,10 @@ The pipeline stages are summarized below:
   - If run locally without the model version, the batch scoring pipeline will use the model's latest version.
 - Trigger the *ML Batch Scoring Pipeline* and waits for it to complete.
   - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
-- Use the scoring input data supplied via the SCORING_DATASTORE_INPUT_* configuration variables.
+- Use the scoring input data supplied via the SCORING_DATASTORE_INPUT_* configuration variables, or uses the default datastore and sample data.
 - Once scoring is completed, the scores are made available in the same blob storage at the locations specified via the SCORING_DATASTORE_OUTPUT_* configuration variables.
 
-**Note** In the event a scoring data store is not yet configured, you can still try out batch scoring by supplying a scoring input data file within the data folder. Do make sure to set the SCORING_DATASTORE_INPUT_FILENAME variable to the name of the file. This approach will cause the score output to be written to the ML workspace's default datastore. 
-
+To configure your own custom scoring data, see [Configure Custom Batch Scoring](custom_model.md#Configure-Custom-Batch-Scoring).
 
 ## Further Exploration
 
