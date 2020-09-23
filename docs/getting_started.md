@@ -64,9 +64,8 @@ The variable group should contain the following required variables. **Azure reso
 | WORKSPACE_NAME           | mlops-AML-WS              | Azure ML Workspace name                                                                                                     |
 | AZURE_RM_SVC_CONNECTION  | azure-resource-connection | [Azure Resource Manager Service Connection](#create-an-azure-devops-service-connection-for-the-azure-resource-manager) name |
 | WORKSPACE_SVC_CONNECTION | aml-workspace-connection  | [Azure ML Workspace Service Connection](#create-an-azure-devops-azure-ml-workspace-service-connection) name                 |
-| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                           |
-| SCORING_DATASTORE_STORAGE_NAME      | [your project name]scoredata                 | [Azure Blob Storage Account](https://docs.microsoft.com/en-us/azure/storage/blobs/) name (optional)                          |
-| SCORING_DATASTORE_ACCESS_KEY      |                  | [Azure Storage Account Key](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-requests-to-azure-storage) (optional)                          |
+| ACI_DEPLOYMENT_NAME      | mlops-aci                 | [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) name                           |                 |
+
 
 Make sure you select the **Allow access to all pipelines** checkbox in the variable group configuration.
 
@@ -87,10 +86,6 @@ More variables are available for further tweaking, but the above variables are a
 **WORKSPACE_SVC_CONNECTION** is used to reference a [service connection for the Azure ML workspace](#create-an-azure-devops-azure-ml-workspace-service-connection). You'll create the connection after [provisioning the workspace](#provisioning-resources-using-azure-pipelines) in the [Create an Azure DevOps Service Connection for the Azure ML Workspace](#create-an-azure-devops-service-connection-for-the-azure-ml-workspace) section below.
 
 **ACI_DEPLOYMENT_NAME** is used for naming the scoring service during deployment to [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/).
-
-**SCORING_DATASTORE_STORAGE_NAME** is the name for an Azure Blob Storage account that will contain both data used as input to batch scoring, as well as the batch scoring outputs. This variable is optional and only needed if you intend to use the batch scoring facility. Note that since this resource is optional, the resource provisioning pipelines mentioned below do not create this resource automatically, and manual creation is required before use.
-
-**SCORING_DATASTORE_ACCESS_KEY** is the access key for the scoring data Azure storage account mentioned above. You may want to consider linking this variable to Azure KeyVault to avoid storing the access key in plain text. This variable is optional and only needed if you intend to use the batch scoring facility. 
 
 
 ## Provisioning resources using Azure Pipelines

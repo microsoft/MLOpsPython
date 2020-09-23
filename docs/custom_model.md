@@ -107,14 +107,17 @@ The batch scoring pipeline is configured to use the default datastore for input 
 In order to configure your own input datastore and output datastores, you will need to specify an Azure Blob Storage Account and set up input and output containers.
 
 Configure the variables below in your variable group. 
-Make sure that you have created your input and output containers, and placed your scoring data in your input container with the proper name.
+
+**Note: The datastore storage resource, input/output containers, and scoring data is not created automatically. Make sure that you have manually provisioned these resources and placed your scoring data in your input container with the proper name.**
+
 
 | Variable Name            | Suggested Value           | Short description                                                                                                           |
 | ------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| SCORING_DATASTORE_STORAGE_NAME    |                  | [Azure Blob Storage Account](https://docs.microsoft.com/en-us/azure/storage/blobs/) name                                    |
-| SCORING_DATASTORE_ACCESS_KEY      |                  | [Azure Storage Account Key](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-requests-to-azure-storage)  |
+| SCORING_DATASTORE_STORAGE_NAME    |                  | [Azure Blob Storage Account](https://docs.microsoft.com/en-us/azure/storage/blobs/) name.                                     |
+| SCORING_DATASTORE_ACCESS_KEY      |                  | [Azure Storage Account Key](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-requests-to-azure-storage). You may want to consider linking this variable to Azure KeyVault to avoid storing the access key in plain text. |
 | SCORING_DATASTORE_INPUT_CONTAINER |                  | The name of the container for input data. Defaults to `input` if not set.  |
 | SCORING_DATASTORE_OUTPUT_CONTAINER|                  | The name of the container for output data. Defaults to `output` if not set.  |
 | SCORING_DATASTORE_INPUT_FILENAME  |                  | The filename of the input data in your container Defaults to `diabetes_scoring_input.csv` if not set.  |
 | SCORING_DATASET_NAME              |                  | The AzureML Dataset name to use. Defaults to `diabetes_scoring_ds` if not set (optional).  |
 | SCORING_DATASTORE_OUTPUT_FILENAME |                  | The filename to use for the output data. The pipeline will create this file. Defaults to `diabetes_scoring_output.csv` if not set (optional).  |
+
