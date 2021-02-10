@@ -10,19 +10,20 @@ In order to configure the project locally, create a copy of `.env.example` in th
 
 [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli). The Azure CLI will be used to log you in interactively.
 
-Create a virtual environment using [venv](https://docs.python.org/3/library/venv.html), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) or [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv). 
+Install [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). 
 
-Here is an example for setting up and activating a `venv` environment with Python 3:
-
-```
-python3 -mvenv .venv
-source .venv/bin/activate
-```
-
-Install the required Python modules in your virtual environment.
+Install the required Python modules. 
 
 ```
-pip install -r environment_setup/requirements.txt 
+. environment_setup/install_requirements.sh 
+```
+
+`install_requirements.sh` create and activate a new conda environment with required Python modules.
+
+```
+conda env create -f diabetes_regression/ci_dependencies.yml
+
+conda activate mlopspython_ci
 ```
 
 ### Running local code
