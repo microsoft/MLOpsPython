@@ -12,18 +12,10 @@ In order to configure the project locally, create a copy of `.env.example` in th
 
 Install [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). 
 
-Install the required Python modules. 
+Install the required Python modules. [`install_requirements.sh`](https://github.com/microsoft/MLOpsPython/blob/master/environment_setup/install_requirements.sh) creates and activates a new conda environment with required Python modules.
 
 ```
 . environment_setup/install_requirements.sh 
-```
-
-`install_requirements.sh` create and activate a new conda environment with required Python modules.
-
-```
-conda env create -f diabetes_regression/ci_dependencies.yml
-
-conda activate mlopspython_ci
 ```
 
 ### Running local code
