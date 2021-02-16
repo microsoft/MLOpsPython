@@ -27,7 +27,7 @@ export BUILD_BUILDID=$(uuidgen); python ml_service/pipelines/diabetes_regression
 ```
 
 BUILD_BUILDID is a variable used to uniquely identify the ML pipeline between the
-`build_train_pipeline.py` and `run_train_pipeline.py` scripts. In Azure DevOps it is
+`diabetes_regression_build_train_pipeline.py` and `run_train_pipeline.py` scripts. In Azure DevOps it is
 set to the current build number. In a local environment, we can use a command such as
 `uuidgen` so set a different random identifier on each run, ensuring there are 
 no collisions.
