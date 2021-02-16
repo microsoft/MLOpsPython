@@ -6,7 +6,7 @@ variables:
     value: diabetes_regression
     # The path to the model training script under SOURCES_DIR_TRAIN
   - name: TRAIN_SCRIPT_PATH
-    value: training/train_aml.py
+    value: training/train.py
     # The path to the model evaluation script under SOURCES_DIR_TRAIN
   - name: EVALUATE_SCRIPT_PATH
     value: evaluate/evaluate_model.py
