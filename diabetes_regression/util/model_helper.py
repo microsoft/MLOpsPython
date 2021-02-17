@@ -4,6 +4,10 @@ model_helper.py
 from azureml.core import Run
 from azureml.core import Workspace
 from azureml.core.model import Model as AMLModel
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 def get_current_workspace() -> Workspace:
@@ -44,17 +48,19 @@ def get_model(
     None.
     """
     if aml_workspace is None:
-        print("No workspace defined - using current experiment workspace.")
+        observability.log("No workspace defined - "
+                          "using current experiment workspace.")
         aml_workspace = get_current_workspace()
 
     tags = None
     if tag_name is not None or tag_value is not None:
         # Both a name and value must be specified to use tags.
         if tag_name is None or tag_value is None:
-            raise ValueError(
-                "model_tag_name and model_tag_value should both be supplied"
-                + "or excluded"  # NOQA: E501
-            )
+
+            error = "model_tag_name and model_tag_value should " \
+                     "both be supplied or excluded"
+            observability.log(description=error, severity=Severity.ERROR)
+            raise ValueError(error)
         tags = [[tag_name, tag_value]]
 
     model = None
@@ -74,6 +80,8 @@ def get_model(
         if len(models) == 1:
             model = models[0]
         elif len(models) > 1:
-            raise Exception("Expected only one model")
+            error = "Expected only one model"
+            observability.log(description=error, severity=Severity.ERROR)
+            raise Exception(error)
 
     return model

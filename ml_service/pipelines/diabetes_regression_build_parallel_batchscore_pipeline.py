@@ -41,9 +41,14 @@ from azureml.data.datapath import DataPath
 from azureml.pipeline.steps import PythonScriptStep
 from typing import Tuple
 
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
+
 
 def get_or_create_datastore(
-    datastorename: str, ws: Workspace, env: Env, input: bool = True
+        datastorename: str, ws: Workspace, env: Env, input: bool = True
 ) -> Datastore:
     """
     Obtains a datastore with matching name. Creates it if none exists.
@@ -59,7 +64,9 @@ def get_or_create_datastore(
     :raises: ValueError
     """
     if datastorename is None:
-        raise ValueError("Datastore name is required.")
+        error = "Datastore name is required."
+        observability.log(description=error, severity=Severity.ERROR)
+        raise ValueError(error)
 
     containername = (
         env.scoring_datastore_input_container
@@ -73,8 +80,8 @@ def get_or_create_datastore(
 
     # the datastore is not registered but we have all details to register it
     elif (
-        env.scoring_datastore_access_key is not None
-        and containername is not None  # NOQA: E501
+            env.scoring_datastore_access_key is not None
+            and containername is not None  # NOQA: E501
     ):  # NOQA:E501
 
         datastore = Datastore.register_azure_blob_container(
@@ -85,11 +92,10 @@ def get_or_create_datastore(
             container_name=containername,
         )
     else:
-        raise ValueError(
-            "No existing datastore named {} nor was enough information supplied to create one.".format(  # NOQA: E501
-                datastorename
-            )
-        )
+        error = "No existing datastore named {} nor was enough " \
+                "information supplied to create one.".format(datastorename)
+        observability.log(description=error, severity=Severity.ERROR)
+        raise ValueError(error)
 
     return datastore
 
@@ -145,12 +151,11 @@ def get_fallback_input_dataset(ws: Workspace, env: Env) -> Dataset:
 
     if not os.path.exists(env.scoring_datastore_input_filename):
         error_message = (
-            "Could not find CSV dataset for scoring at {}. "
-            + "No alternate data store location was provided either.".format(
-                env.scoring_datastore_input_filename
-            )  # NOQA: E501
+                "Could not find CSV dataset for scoring at {}. "
+                + "No alternate data store location was provided either."
+                .format(env.scoring_datastore_input_filename)
         )
-
+        observability.log(description=error_message, severity=Severity.ERROR)
         raise FileNotFoundError(error_message)
 
     # upload the input data to the workspace default datastore
@@ -162,16 +167,18 @@ def get_fallback_input_dataset(ws: Workspace, env: Env) -> Dataset:
     )
 
     scoringinputds = (
-        Dataset.Tabular.from_delimited_files(scoreinputdataref)
-        .register(ws, env.scoring_dataset_name, create_new_version=True)
-        .as_named_input(env.scoring_dataset_name)
+        Dataset.Tabular.from_delimited_files(scoreinputdataref).register(
+            ws,
+            env.scoring_dataset_name,
+            create_new_version=True).as_named_input(
+            env.scoring_dataset_name)
     )
 
     return scoringinputds
 
 
 def get_output_location(
-    ws: Workspace, env: Env, outputdatastore: Datastore = None
+        ws: Workspace, env: Env, outputdatastore: Datastore = None
 ) -> PipelineData:
     """
     Returns a Datastore wrapped as a PipelineData instance suitable
@@ -200,7 +207,7 @@ def get_output_location(
 
 
 def get_inputds_outputloc(
-    ws: Workspace, env: Env
+        ws: Workspace, env: Env
 ) -> Tuple[Dataset, PipelineData]:  # NOQA: E501
     """
     Prepare the input and output for the scoring step. Input is a tabular
@@ -234,7 +241,7 @@ def get_inputds_outputloc(
 
 
 def get_run_configs(
-    ws: Workspace, computetarget: ComputeTarget, env: Env
+        ws: Workspace, computetarget: ComputeTarget, env: Env
 ) -> Tuple[ParallelRunConfig, RunConfiguration]:
     """
     Creates the necessary run configurations required by the
@@ -281,13 +288,13 @@ def get_run_configs(
 
 
 def get_scoring_pipeline(
-    scoring_dataset: Dataset,
-    output_loc: PipelineData,
-    score_run_config: ParallelRunConfig,
-    copy_run_config: RunConfiguration,
-    computetarget: ComputeTarget,
-    ws: Workspace,
-    env: Env,
+        scoring_dataset: Dataset,
+        output_loc: PipelineData,
+        score_run_config: ParallelRunConfig,
+        copy_run_config: RunConfiguration,
+        computetarget: ComputeTarget,
+        ws: Workspace,
+        env: Env,
 ) -> Pipeline:
     """
     Creates the scoring pipeline.
@@ -418,9 +425,9 @@ def build_batchscore_pipeline():
         pipeline_id_string = "##vso[task.setvariable variable=pipeline_id;isOutput=true]{}".format(  # NOQA: E501
             published_pipeline.id
         )
-        print(pipeline_id_string)
+        observability.log(pipeline_id_string)
     except Exception as e:
-        print(e)
+        observability.log(description=e, severity=Severity.ERROR)
         exit(1)
 
 

@@ -30,6 +30,11 @@ from azureml.core import Experiment, Workspace
 from azureml.pipeline.core import PublishedPipeline
 import argparse
 
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -47,9 +52,10 @@ def get_pipeline(pipeline_id, ws: Workspace, env: Env):
         ]  # noqa E501
 
         if scoringpipelinelist.count == 0:
-            raise Exception(
-                "No pipeline found matching name:{}".format(env.scoring_pipeline_name)  # NOQA: E501
-            )
+            error = "No pipeline found matching name:{}".\
+                format(env.scoring_pipeline_name)
+            observability.log(description=error, severity=Severity.ERROR)
+            raise Exception(error)
         else:
             # latest published
             scoringpipeline = scoringpipelinelist[0]
@@ -127,7 +133,7 @@ def run_batchscore_pipeline():
             copy_output(list(run.get_steps())[0].id, env)
 
     except Exception as ex:
-        print("Error: {}".format(ex))
+        observability.log(description=ex, severity=Severity.ERROR)
 
 
 if __name__ == "__main__":

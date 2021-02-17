@@ -29,14 +29,19 @@ import os
 import argparse
 import joblib
 import json
-from train import split_data, train_model, get_model_metrics
+from diabetes_regression.training.train import split_data, \
+    train_model, get_model_metrics
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 def register_dataset(
-    aml_workspace: Workspace,
-    dataset_name: str,
-    datastore_name: str,
-    file_path: str
+        aml_workspace: Workspace,
+        dataset_name: str,
+        datastore_name: str,
+        file_path: str
 ) -> Dataset:
     datastore = Datastore.get(aml_workspace, datastore_name)
     dataset = Dataset.Tabular.from_delimited_files(path=(datastore, file_path))
@@ -48,7 +53,7 @@ def register_dataset(
 
 
 def main():
-    print("Running train_aml.py")
+    observability.log("Running train_aml.py")
 
     parser = argparse.ArgumentParser("train")
     parser.add_argument(
@@ -93,12 +98,12 @@ def main():
 
     args = parser.parse_args()
 
-    print("Argument [model_name]: %s" % args.model_name)
-    print("Argument [step_output]: %s" % args.step_output)
-    print("Argument [dataset_version]: %s" % args.dataset_version)
-    print("Argument [data_file_path]: %s" % args.data_file_path)
-    print("Argument [caller_run_id]: %s" % args.caller_run_id)
-    print("Argument [dataset_name]: %s" % args.dataset_name)
+    observability.log("Argument [model_name]: %s" % args.model_name)
+    observability.log("Argument [step_output]: %s" % args.step_output)
+    observability.log("Argument [dataset_version]: %s" % args.dataset_version)
+    observability.log("Argument [data_file_path]: %s" % args.data_file_path)
+    observability.log("Argument [caller_run_id]: %s" % args.caller_run_id)
+    observability.log("Argument [dataset_name]: %s" % args.dataset_name)
 
     model_name = args.model_name
     step_output_path = args.step_output
@@ -108,19 +113,21 @@ def main():
 
     run = Run.get_context()
 
-    print("Getting training parameters")
+    observability.log("Getting training parameters")
 
     # Load the training parameters from the parameters file
-    with open("parameters.json") as f:
+    with open("diabetes_regression/parameters.json") as f:
         pars = json.load(f)
     try:
         train_args = pars["training"]
     except KeyError:
-        print("Could not load training values from file")
+        observability.log(
+            description="Could not load training values from file",
+            severity=Severity.ERROR)
         train_args = {}
 
     # Log the training parameters
-    print(f"Parameters: {train_args}")
+    observability.log(f"Parameters: {train_args}")
     for (k, v) in train_args.items():
         run.log(k, v)
         run.parent.log(k, v)
@@ -136,7 +143,7 @@ def main():
                                        data_file_path)
     else:
         e = ("No dataset provided")
-        print(e)
+        observability.log(description=e, severity=Severity.ERROR)
         raise Exception(e)
 
     # Link dataset to the step run so it is trackable in the UI
@@ -153,8 +160,8 @@ def main():
     # Evaluate and log the metrics returned from the train function
     metrics = get_model_metrics(model, data)
     for (k, v) in metrics.items():
-        run.log(k, v)
-        run.parent.log(k, v)
+        observability.log_metric(name=k, value=v)
+        observability.log_metric(name=k, value=v, log_parent=True)
 
     # Pass model file to next step
     os.makedirs(step_output_path, exist_ok=True)
@@ -167,7 +174,7 @@ def main():
     joblib.dump(value=model, filename=output_path)
 
     run.tag("run_type", value="train")
-    print(f"tags now present for run: {run.tags}")
+    observability.log(f"tags now present for run: {run.tags}")
 
     run.complete()
 

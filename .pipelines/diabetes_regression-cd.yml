@@ -55,7 +55,7 @@ stages:
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
-        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
+        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/scoring
         inlineScript: |
           set -e # fail on error
           
@@ -101,7 +101,7 @@ stages:
       inputs:
         azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
         scriptLocation: inlineScript
-        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring
+        workingDirectory: $(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/scoring
         inlineScript: |
           set -e # fail on error
           
@@ -111,6 +111,8 @@ stages:
           --dc deployment_config_aks.yml \
           -g $(RESOURCE_GROUP) --workspace-name $(WORKSPACE_NAME) \
           --overwrite -v
+      env:
+        APP_INSIGHTS_CONNECTION_STRING: $(APP_INSIGHTS_CONNECTION_STRING)
     - task: AzureCLI@1
       displayName: 'Smoke test'
       inputs:
@@ -120,6 +122,8 @@ stages:
           set -e # fail on error
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
           python -m ml_service.util.smoke_test_scoring_service --type AKS --service "$(AKS_DEPLOYMENT_NAME)"
+      env:
+        APP_INSIGHTS_CONNECTION_STRING: $(APP_INSIGHTS_CONNECTION_STRING)
 
 - stage: 'Deploy_Webapp'
   displayName: 'Deploy to Webapp'
@@ -138,8 +142,8 @@ stages:
     - template: diabetes_regression-package-model-template.yml
       parameters:
         modelId: $(MODEL_NAME):$(get_model.MODEL_VERSION)
-        scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/scoring/score.py'
-        condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/conda_dependencies.yml'
+        scoringScriptPath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/scoring/score.py'
+        condaFilePath: '$(Build.SourcesDirectory)/$(SOURCES_DIR_TRAIN)/diabetes_regression/conda_dependencies.yml'
     - script: echo $(IMAGE_LOCATION) >image_location.txt
       displayName: "Write image location file"
     - task: AzureWebAppContainer@1
@@ -159,3 +163,5 @@ stages:
           set -e # fail on error
           export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
           python -m ml_service.util.smoke_test_scoring_service --type Webapp --service "$(WebAppDeploy.AppServiceApplicationUrl)/score"
+      env:
+        APP_INSIGHTS_CONNECTION_STRING: $(APP_INSIGHTS_CONNECTION_STRING)

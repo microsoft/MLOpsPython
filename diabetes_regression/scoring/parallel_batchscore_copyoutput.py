@@ -28,6 +28,9 @@ from azure.storage.blob import ContainerClient
 from datetime import datetime, date, timezone
 import argparse
 import os
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 def parse_args():
@@ -42,7 +45,7 @@ def parse_args():
 
 
 def copy_output(args):
-    print("Output : {}".format(args.output_path))
+    observability.log("Output : {}".format(args.output_path))
 
     accounturl = "https://{}.blob.core.windows.net".format(
         args.scoring_datastore
@@ -86,6 +89,6 @@ if __name__ == "__main__":
         or args.output_path is None
         or args.output_path.strip() == ""
     ):
-        print("Missing parameters")
+        observability.log("Missing parameters")
     else:
         copy_output(args)

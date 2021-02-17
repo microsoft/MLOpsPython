@@ -37,3 +37,12 @@ dependencies:
 
       # MLOps with R
       - azure-storage-blob
+
+      # Observability
+      - opencensus==0.7.7
+      - opencensus-context==0.1.1
+      - opencensus-ext-azure==1.0.2
+      - python-dotenv==0.10.3
+
+      # Data Classes
+      - dataclasses

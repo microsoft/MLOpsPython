@@ -29,6 +29,9 @@ import pandas as pd
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 # Split the dataframe into test and train data
@@ -59,7 +62,7 @@ def get_model_metrics(model, data):
 
 
 def main():
-    print("Running train.py")
+    observability.log("Running train.py")
 
     # Define training parameters
     ridge_args = {"alpha": 0.5}
@@ -77,7 +80,7 @@ def main():
     # Log the metrics for the model
     metrics = get_model_metrics(model, data)
     for (k, v) in metrics.items():
-        print(f"{k}: {v}")
+        observability.log_metric(name=k, value=v)
 
 
 if __name__ == '__main__':

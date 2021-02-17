@@ -31,10 +31,13 @@ import traceback
 import joblib
 from azureml.core import Run, Experiment, Workspace, Dataset
 from azureml.core.model import Model as AMLModel
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 def main():
-
     run = Run.get_context()
     if (run.id.startswith('OfflineRun')):
         from dotenv import load_dotenv
@@ -87,15 +90,17 @@ def main():
     model_name = args.model_name
     model_path = args.step_input
 
-    print("Getting registration parameters")
+    observability.log("Getting registration parameters")
 
     # Load the registration parameters from the parameters file
-    with open("parameters.json") as f:
+    with open("diabetes_regression/parameters.json") as f:
         pars = json.load(f)
     try:
         register_args = pars["registration"]
     except KeyError:
-        print("Could not load registration values from file")
+        observability.log(
+            description="Could not load registration values from file",
+            severity=Severity.ERROR)
         register_args = {"tags": []}
 
     model_tags = {}
@@ -104,10 +109,12 @@ def main():
             mtag = run.parent.get_metrics()[tag]
             model_tags[tag] = mtag
         except KeyError:
-            print(f"Could not find {tag} metric on parent run.")
+            observability.log(
+                description=f"Could not find {tag} metric on parent run.",
+                severity=Severity.ERROR)
 
     # load the model
-    print("Loading model from " + model_path)
+    observability.log("Loading model from " + model_path)
     model_file = os.path.join(model_path, model_name)
     model = joblib.load(model_file)
     parent_tags = run.parent.get_tags()
@@ -115,14 +122,18 @@ def main():
         build_id = parent_tags["BuildId"]
     except KeyError:
         build_id = None
-        print("BuildId tag not found on parent run.")
-        print(f"Tags present: {parent_tags}")
+        observability.log("BuildId tag not found on parent run.",
+                          severity=Severity.ERROR)
+        observability.log(description=f"Tags present: {parent_tags}",
+                          severity=Severity.ERROR)
     try:
         build_uri = parent_tags["BuildUri"]
     except KeyError:
         build_uri = None
-        print("BuildUri tag not found on parent run.")
-        print(f"Tags present: {parent_tags}")
+        observability.log(description="BuildUri tag not found on parent run.",
+                          severity=Severity.ERROR)
+        observability.log(description=f"Tags present: {parent_tags}",
+                          severity=Severity.ERROR)
 
     if (model is not None):
         dataset_id = parent_tags["dataset_id"]
@@ -154,7 +165,7 @@ def main():
                 build_id,
                 build_uri)
     else:
-        print("Model not found. Skipping model registration.")
+        observability.log("Model not found. Skipping model registration.")
         sys.exit(0)
 
 
@@ -163,21 +174,21 @@ def model_already_registered(model_name, exp, run_id):
     if len(model_list) >= 1:
         e = ("Model name:", model_name, "in workspace",
              exp.workspace, "with run_id ", run_id, "is already registered.")
-        print(e)
+        observability.log(description=e, severity=Severity.ERROR)
         raise Exception(e)
     else:
-        print("Model is not registered for this run.")
+        observability.log("Model is not registered for this run.")
 
 
 def register_aml_model(
-    model_path,
-    model_name,
-    model_tags,
-    exp,
-    run_id,
-    dataset_id,
-    build_id: str = 'none',
-    build_uri=None
+        model_path,
+        model_name,
+        model_tags,
+        exp,
+        run_id,
+        dataset_id,
+        build_id: str = 'none',
+        build_uri=None
 ):
     try:
         tagsValue = {"area": "diabetes_regression",
@@ -198,7 +209,7 @@ def register_aml_model(
             datasets=[('training data',
                        Dataset.get_by_id(exp.workspace, dataset_id))])
         os.chdir("..")
-        print(
+        observability.log(
             "Model registered: {} \nModel Description: {} "
             "\nModel Version: {}".format(
                 model.name, model.description, model.version
@@ -206,7 +217,8 @@ def register_aml_model(
         )
     except Exception:
         traceback.print_exc(limit=None, file=None, chain=True)
-        print("Model registration failed")
+        observability.log("Model registration failed",
+                          severity=Severity.ERROR)
         raise
 
 

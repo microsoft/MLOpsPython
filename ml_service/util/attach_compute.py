@@ -1,9 +1,13 @@
-
 from azureml.core import Workspace
 from azureml.core.compute import AmlCompute
 from azureml.core.compute import ComputeTarget
 from azureml.exceptions import ComputeTargetException
 from ml_service.util.env_variables import Env
+
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 def get_compute(workspace: Workspace, compute_name: str, vm_size: str, for_batch_scoring: bool = False):  # NOQA E501
@@ -11,7 +15,7 @@ def get_compute(workspace: Workspace, compute_name: str, vm_size: str, for_batch
         if compute_name in workspace.compute_targets:
             compute_target = workspace.compute_targets[compute_name]
             if compute_target and type(compute_target) is AmlCompute:
-                print("Found existing compute target " + compute_name + " so using it.") # NOQA
+                observability.log("Found existing compute target " + compute_name + " so using it.")  # NOQA
         else:
             e = Env()
             compute_config = AmlCompute.provisioning_configuration(
@@ -33,6 +37,7 @@ def get_compute(workspace: Workspace, compute_name: str, vm_size: str, for_batch
             )
         return compute_target
     except ComputeTargetException as ex:
-        print(ex)
-        print("An error occurred trying to provision compute.")
+        observability.log(ex, severity=Severity.ERROR)
+        observability.log("An error occurred trying to provision compute.",
+                          severity=Severity.ERROR)
         exit(1)

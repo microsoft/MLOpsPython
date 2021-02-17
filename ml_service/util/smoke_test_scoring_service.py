@@ -6,6 +6,9 @@ from azureml.core.webservice import AksWebservice, AciWebservice
 from ml_service.util.env_variables import Env
 import secrets
 
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 input = {"data": [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                   [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]]}
@@ -18,7 +21,7 @@ def call_web_service(e, service_type, service_name):
         subscription_id=e.subscription_id,
         resource_group=e.resource_group
     )
-    print("Fetching service")
+    observability.log("Fetching service")
     headers = {}
     if service_type == "ACI":
         service = AciWebservice(aml_workspace, service_name)
@@ -27,8 +30,8 @@ def call_web_service(e, service_type, service_name):
     if service.auth_enabled:
         service_keys = service.get_keys()
         headers['Authorization'] = 'Bearer ' + service_keys[0]
-    print("Testing service")
-    print(". url: %s" % service.scoring_uri)
+    observability.log("Testing service")
+    observability.log(". url: %s" % service.scoring_uri)
     output = call_web_app(service.scoring_uri, headers)
 
     return output
@@ -51,8 +54,8 @@ def call_web_app(url, headers):
         except requests.exceptions.HTTPError as e:
             if i == retries - 1:
                 raise e
-            print(e)
-            print("Retrying...")
+            observability.log(e)
+            observability.log("Retrying...")
             time.sleep(1)
 
 
@@ -80,11 +83,11 @@ def main():
         output = call_web_app(args.service, {})
     else:
         output = call_web_service(e, args.type, args.service)
-    print("Verifying service output")
+    observability.log("Verifying service output")
 
     assert "result" in output
     assert len(output["result"]) == output_len
-    print("Smoke test successful.")
+    observability.log("Smoke test successful.")
 
 
 if __name__ == '__main__':

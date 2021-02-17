@@ -31,6 +31,9 @@ from inference_schema.schema_decorators \
     import input_schema, output_schema
 from inference_schema.parameter_types.numpy_parameter_type \
     import NumpyParameterType
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 
 def init():
@@ -70,13 +73,13 @@ def run(data, request_headers):
     # The HTTP 'traceparent' header may be set by the caller to implement
     # distributed tracing (per the W3C Trace Context proposed specification)
     # and can be used to correlate the request to external systems.
-    print(('{{"RequestId":"{0}", '
-           '"TraceParent":"{1}", '
-           '"NumberOfPredictions":{2}}}'
-           ).format(
-               request_headers.get("X-Ms-Request-Id", ""),
-               request_headers.get("Traceparent", ""),
-               len(result)
+    observability.log(('{{"RequestId":"{0}", '
+                       '"TraceParent":"{1}", '
+                       '"NumberOfPredictions":{2}}}'
+                       ).format(
+        request_headers.get("X-Ms-Request-Id", ""),
+        request_headers.get("Traceparent", ""),
+        len(result)
     ))
 
     return {"result": result.tolist()}
@@ -87,4 +90,4 @@ if __name__ == "__main__":
     init()
     test_row = '{"data":[[1,2,3,4,5,6,7,8,9,10],[10,9,8,7,6,5,4,3,2,1]]}'
     prediction = run(test_row, {})
-    print("Test result: ", prediction)
+    observability.log("Test result: ", prediction)

@@ -29,8 +29,12 @@ import pandas as pd
 import joblib
 import sys
 from typing import List
-from util.model_helper import get_model
+from diabetes_regression.util.model_helper import get_model
 from azureml.core import Model
+from utils.logger.logger_interface import Severity
+from utils.logger.observability import Observability
+
+observability = Observability()
 
 model = None
 
@@ -68,7 +72,7 @@ def parse_args() -> List[str]:
     model_version = (
         None
         if len(model_version_param) < 1
-        or len(model_version_param[0][1].strip()) == 0  # NOQA: E501
+           or len(model_version_param[0][1].strip()) == 0  # NOQA: E501
         else model_version_param[0][1]
     )
 
@@ -80,7 +84,7 @@ def parse_args() -> List[str]:
     model_tag_name = (
         None
         if len(model_tag_name_param) < 1
-        or len(model_tag_name_param[0][1].strip()) == 0  # NOQA: E501
+           or len(model_tag_name_param[0][1].strip()) == 0  # NOQA: E501
         else model_tag_name_param[0][1]
     )
 
@@ -105,7 +109,7 @@ def init():
     line arguments and get the right model to use for scoring.
     """
     try:
-        print("Initializing batch scoring script...")
+        observability.log("Initializing batch scoring script...")
 
         # Get the model using name/version/tags filter
         model_filter = parse_args()
@@ -120,9 +124,10 @@ def init():
         modelpath = Model.get_model_path(
             model_name=amlmodel.name, version=amlmodel.version)
         model = joblib.load(modelpath)
-        print("Loaded model {}".format(model_filter[0]))
+        observability.log("Loaded model {}".format(model_filter[0]))
     except Exception as ex:
-        print("Error: {}".format(ex))
+        observability.log(description="Error: {}".format(ex),
+                          severity=Severity.ERROR)
 
 
 def run(mini_batch: pd.DataFrame) -> pd.DataFrame:
@@ -154,4 +159,4 @@ def run(mini_batch: pd.DataFrame) -> pd.DataFrame:
         )
 
     except Exception as ex:
-        print(ex)
+        observability.log(description=ex, severity=Severity.ERROR)

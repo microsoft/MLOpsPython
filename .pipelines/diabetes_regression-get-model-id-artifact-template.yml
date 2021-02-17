@@ -27,6 +27,8 @@ steps:
         runId: '${{ parameters.artifactBuildId }}'
       runBranch: '$(Build.SourceBranch)'
       path: $(Build.SourcesDirectory)/bin
+    env:
+      APP_INSIGHTS_CONNECTION_STRING: $(APP_INSIGHTS_CONNECTION_STRING)
   - task: Bash@3
     name: get_model
     displayName: Parse Json for Model Name and Version
