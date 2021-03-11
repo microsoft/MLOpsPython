@@ -313,14 +313,14 @@ Keep the Azure Container Instances deployment active because it's a lightweight 
 
 In the Variables tab, edit your variable group (`devopsforai-aml-vg`). In the variable group definition, add these variables:
 
-| Variable Name       | Suggested Value |
-| ------------------- | --------------- |
-| AKS_COMPUTE_NAME    | aks             |
-| AKS_DEPLOYMENT_NAME | mlops-aks       |
-
-Set **AKS_COMPUTE_NAME** to the _Compute name_ of the Inference Cluster that references the Azure Kubernetes Service cluster in your Azure ML Workspace.
+| Variable Name       | Suggested Value | Description | 
+| ------------------- | --------------- | ----------- |
+| AKS_COMPUTE_NAME    | aks             | The Compute name of the inference cluster, created in the Azure ML Workspace (ml.azure.com). This connection has to be created manually before setting the value! |
+| AKS_DEPLOYMENT_NAME | mlops-aks       | The name of the deployed aks cluster in your subscripttion. |
 
 After successfully deploying to Azure Container Instances, the next stage will deploy the model to Kubernetes and run a smoke test.
+
+Set **AKS_COMPUTE_NAME** to the _Compute name_ of the Inference Cluster that references the Azure Kubernetes Service cluster in your Azure ML Workspace.
 
 ![build](./images/multi-stage-aci-aks.png)
 
