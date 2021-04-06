@@ -36,6 +36,6 @@ def get_environment(
         if restored_environment is not None:
             print(restored_environment)
         return restored_environment
-    except Exception as e:
+    except Exception:
         traceback.print_exc()
         exit(1)
