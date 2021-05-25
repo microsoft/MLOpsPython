@@ -23,7 +23,7 @@ Install the required Python modules. [`install_requirements.sh`](https://github.
 To run your local ML pipeline code on Azure ML, run a command such as the following (in bash, all on one line):
 
 ```
-export BUILD_BUILDID=$(uuidgen); python ml_service/pipelines/diabetes_regression_build_train_pipeline.py && python ml_service/pipelines/run_train_pipeline.py
+export BUILD_BUILDID=$(uuidgen); python -m ml_service.pipelines.diabetes_regression_build_train_pipeline && python -m ml_service.pipelines.run_train_pipeline
 ```
 
 BUILD_BUILDID is a variable used to uniquely identify the ML pipeline between the
