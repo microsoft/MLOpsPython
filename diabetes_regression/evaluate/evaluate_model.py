@@ -129,9 +129,9 @@ try:
                 run.parent.cancel()
         else:
             print(
-                "Current Production model {metric_eval}: {}, "
-                "New trained model {metric_eval}: {}".format(
-                    metric_eval, production_model_mse, 
+                "Current Production model {}: {}, ".format(
+                    metric_eval, production_model_mse) +
+                "New trained model {}: {}".format(
                     metric_eval, new_model_mse
                 )
             )
