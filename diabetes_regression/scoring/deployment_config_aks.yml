@@ -5,7 +5,7 @@ autoScaler:
     maxReplicas: 3
     refreshPeriodInSeconds: 10
     targetUtilization: 70
-authEnabled: True
+authEnabled: false
 containerResourceRequirements:
     cpu: 1
     memoryInGB: 4
