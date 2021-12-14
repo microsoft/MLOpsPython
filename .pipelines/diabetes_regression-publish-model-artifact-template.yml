@@ -6,7 +6,7 @@ steps:
     azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
     scriptLocation: inlineScript
     workingDirectory: $(Build.SourcesDirectory)
-    inlineScript: 'az extension add -n azure-cli-ml'
+    inlineScript: 'az extension add --source https://azurecliext.blob.core.windows.net/release/azure_cli_ml-1.27.0-py3-none-any.whl --yes'
 - task: AzureCLI@1
   inputs:
     azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
