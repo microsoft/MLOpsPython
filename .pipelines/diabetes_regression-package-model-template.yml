@@ -40,3 +40,6 @@ steps:
         # Set environment variable using the last line of logs that has the package location
         IMAGE_LOCATION=$(tail -n 1 image_logs.txt)
         echo "##vso[task.setvariable variable=IMAGE_LOCATION]$IMAGE_LOCATION"
+        echo $IMAGE_LOCATION > image_location.txt
+        IMAGE_TAGGED="$(sed 's/@sha256.*/:latest/g' image_location.txt)"
+        echo "##vso[task.setvariable variable=IMAGE_TAGGED]$IMAGE_TAGGED"
