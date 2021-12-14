@@ -52,8 +52,8 @@ The repository provides a template with folders structure suitable for maintaini
 - `.pipelines/code-quality-template.yml` : a pipeline template used by the CI and PR pipelines. It contains steps performing linting, data and unit testing.
 - `.pipelines/diabetes_regression-ci-image.yml` : a pipeline building a scoring image for the diabetes regression model.
 - `.pipelines/diabetes_regression-ci.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
-- `.pipelines/diabetes_regression-cd.yml` : a pipeline triggered when the code is merged into **master** and the `.pipelines/diabetes_regression-ci.yml` completes. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
-- `.pipelines/diabetes_regression-package-model-template.yml` : a pipeline triggered when the code is merged into **master**. It deploys the registered model to a target.
+- `.pipelines/diabetes_regression-cd.yml` : a pipeline triggered when the code is merged into **master** and the `.pipelines/diabetes_regression-ci.yml` completes. Deploys the model to ACI, AKS or Webapp.
+- `.pipelines/diabetes_regression-package-model-template.yml` : Pipeline template that creates a model package and adds the package location to the environment for subsequent tasks to use.
 - `.pipelines/diabetes_regression-get-model-id-artifact-template.yml` : a pipeline template used by the `.pipelines/diabetes_regression-cd.yml` pipeline. It takes the model metadata artifact published by the previous pipeline and gets the model ID.
 - `.pipelines/diabetes_regression-publish-model-artifact-template.yml` : a pipeline template used by the `.pipelines/diabetes_regression-ci.yml` pipeline. It finds out if a new model was registered and publishes a pipeline artifact containing the model metadata.
 - `.pipelines/helm-*.yml` : pipeline templates used by the `.pipelines/abtest.yml` pipeline.
@@ -84,11 +84,11 @@ The repository provides a template with folders structure suitable for maintaini
 
 ### Evaluation Step
 
-- `diabetes_regression/evaluate/evaluate_model.py` : an evaluating step of an ML training pipeline which registers a new trained model if evaluation shows the new model is more performant than the previous one.
+- `diabetes_regression/evaluate/evaluate_model.py` : an evaluating step which cancels the pipeline in case of non-improvement.
 
 ### Registering Step
 
-- `diabetes_regression/evaluate/register_model.py` : registers a new trained model if evaluation shows the new model is more performant than the previous one.
+- `diabetes_regression/register/register_model.py` : registers a new trained model if evaluation shows the new model is more performant than the previous one.
 
 ### Scoring
 
