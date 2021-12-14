@@ -1,4 +1,5 @@
 
+import traceback
 from azureml.core import Workspace
 from azureml.core.compute import AmlCompute
 from azureml.core.compute import ComputeTarget
@@ -32,7 +33,7 @@ def get_compute(workspace: Workspace, compute_name: str, vm_size: str, for_batch
                 show_output=True, min_node_count=None, timeout_in_minutes=10
             )
         return compute_target
-    except ComputeTargetException as ex:
-        print(ex)
+    except ComputeTargetException:
+        traceback.print_exc()
         print("An error occurred trying to provision compute.")
         exit(1)
