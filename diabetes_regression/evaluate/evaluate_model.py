@@ -118,17 +118,21 @@ try:
         production_model_mse = 10000
         if (metric_eval in model.tags):
             production_model_mse = float(model.tags[metric_eval])
-        new_model_mse = float(run.parent.get_metrics().get(metric_eval))
+        try:
+            new_model_mse = float(run.parent.get_metrics().get(metric_eval))
+        except TypeError:
+            new_model_mse = None
         if (production_model_mse is None or new_model_mse is None):
-            print("Unable to find", metric_eval, "metrics, "
+            print("Unable to find ", metric_eval, " metrics, "
                   "exiting evaluation")
             if((allow_run_cancel).lower() == 'true'):
                 run.parent.cancel()
         else:
             print(
-                "Current Production model mse: {}, "
-                "New trained model mse: {}".format(
-                    production_model_mse, new_model_mse
+                "Current Production model {}: {}, ".format(
+                    metric_eval, production_model_mse) +
+                "New trained model {}: {}".format(
+                    metric_eval, new_model_mse
                 )
             )
 

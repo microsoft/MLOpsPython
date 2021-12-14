@@ -86,6 +86,6 @@ if __name__ == "__main__":
         or args.output_path is None
         or args.output_path.strip() == ""
     ):
-        print("Missing parameters")
+        print("Missing parameters in parallel_batchscore_copyoutput.py -- Not going to copy inferences to an output datastore") # NOQA E501
     else:
         copy_output(args)

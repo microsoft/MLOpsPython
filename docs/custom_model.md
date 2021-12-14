@@ -10,6 +10,7 @@ This document provides steps to follow when using this repository as a template 
 1. [Optional] Update the evaluation code
 1. Customize the build agent environment
 1. [If appropriate] Replace the score code
+1. [If appropriate] Configure batch scoring data
 
 ## Follow the Getting Started guide
 
@@ -34,6 +35,8 @@ To bootstrap from the existing MLOpsPython repository:
 `python bootstrap.py -d [dirpath] -n [projectname]`
     * `[dirpath]` is the absolute path to the root of the directory where MLOpsPython is cloned
     * `[projectname]` is the name of your ML project
+
+# Configure Custom Training
 
 ## Configure training data
 
@@ -77,11 +80,13 @@ To disable the evaluation step, either:
 
 ## Customize the build agent environment
 
-The DevOps pipeline definitions in the MLOpsPython template run several steps in a Docker container that contains the dependencies required to work through the Getting Started guide. If additional dependencies are required to run your unit tests or generate your Azure ML pipeline, there are a few options:
+The DevOps pipeline definitions in the MLOpsPython template run several steps in a Docker container that contains the dependencies required to work through the Getting Started guide. These dependencies may change over time and may not suit your project's needs. To manage your own dependencies, there are a few options:
 
 * Add a pipeline step to install dependencies required by unit tests to `.pipelines/code-quality-template.yml`. Recommended if you only have a small number of test dependencies.
 * Create a new Docker image containing your dependencies. See [docs/custom_container.md](custom_container.md). Recommended if you have a larger number of dependencies, or if the overhead of installing additional dependencies on each run is too high.
 * Remove the container references from the pipeline definition files and run the pipelines on self hosted agents with dependencies pre-installed.
+
+# Configure Custom Scoring
 
 ## Replace score code
 
@@ -92,3 +97,28 @@ If you want to keep scoring:
 1. Update or replace `[project name]/scoring/score.py`
 1. Add any dependencies required by scoring to `[project name]/conda_dependencies.yml`
 1. Modify the test cases in the `ml_service/util/smoke_test_scoring_service.py` script to match the schema of the training features in your data
+1. Check and modify [project name]/scoring/deployment_config_aks.yml if AKS deployment is planned. The deployment configuration shall suit custom model as well as AKS cluster size.
+
+# Configure Custom Batch Scoring
+
+## Configure input and output data
+
+The batch scoring pipeline is configured to use the default datastore for input and output. It will use sample data for scoring.
+
+In order to configure your own input datastore and output datastores, you will need to specify an Azure Blob Storage Account and set up input and output containers.
+
+Configure the variables below in your variable group. 
+
+**Note: The datastore storage resource, input/output containers, and scoring data is not created automatically. Make sure that you have manually provisioned these resources and placed your scoring data in your input container with the proper name.**
+
+
+| Variable Name            | Suggested Value           | Short description                                                                                                           |
+| ------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| SCORING_DATASTORE_STORAGE_NAME    |                  | [Azure Blob Storage Account](https://docs.microsoft.com/en-us/azure/storage/blobs/) name.                                     |
+| SCORING_DATASTORE_ACCESS_KEY      |                  | [Azure Storage Account Key](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-requests-to-azure-storage). You may want to consider linking this variable to Azure KeyVault to avoid storing the access key in plain text. |
+| SCORING_DATASTORE_INPUT_CONTAINER |                  | The name of the container for input data. Defaults to `input` if not set.  |
+| SCORING_DATASTORE_OUTPUT_CONTAINER|                  | The name of the container for output data. Defaults to `output` if not set.  |
+| SCORING_DATASTORE_INPUT_FILENAME  |                  | The filename of the input data in your container Defaults to `diabetes_scoring_input.csv` if not set.  |
+| SCORING_DATASET_NAME              |                  | The AzureML Dataset name to use. Defaults to `diabetes_scoring_ds` if not set (optional).  |
+| SCORING_DATASTORE_OUTPUT_FILENAME |                  | The filename to use for the output data. The pipeline will create this file. Defaults to `diabetes_scoring_output.csv` if not set (optional).  |
+
