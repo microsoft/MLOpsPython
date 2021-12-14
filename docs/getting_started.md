@@ -286,39 +286,49 @@ The pipeline has the following stage:
 
 ### Set up the Batch Scoring pipeline
 
-In your Azure DevOps project, create and run a new build pipeline based on the  [diabetes_regression-batchscoring-ci.yml](../.pipelines/diabetes_regression-batchscoring-ci.yml)
-pipeline definition in your forked repository. 
+In your Azure DevOps project, create and run a new build pipeline based on the  [.pipelines/diabetes_regression-batchscoring-ci.yml](../.pipelines/diabetes_regression-batchscoring-ci.yml)
+pipeline definition in your forked repository. Rename this pipeline to `Batch-Scoring`.
 
 Once the pipeline is finished, check the execution result:
 
 ![Build](./images/batchscoring-ci-result.png)
 
-Also check the published batch scoring pipeline in the **mlops-AML-WS** workspace in [Azure Portal](https://portal.azure.com/):
+Also check the published batch scoring pipeline in your AML workspace in the [Azure Portal](https://portal.azure.com/):
 
 ![Batch scoring pipeline](./images/batchscoring-pipeline.png)
 
 Great, you now have the build pipeline set up for batch scoring which automatically triggers every time there's a change in the master branch!
 
-The pipeline stages are summarized below:
+The pipeline stages are described below in detail -- and you must do further configurations to actually see the batch inferences:
 
 #### Batch Scoring CI
 
 - Linting (code quality analysis)
 - Unit tests and code coverage analysis
-- Build and publish *ML Batch Scoring Pipeline* in an *ML Workspace*
+- Build and publish *ML Batch Scoring Pipeline* in an *AML Workspace*
 
 #### Batch Score model
 
 - Determine the model to be used based on the model name (required), model version, model tag name and model tag value bound pipeline parameters.
   - If run via Azure DevOps pipeline, the batch scoring pipeline will take the model name and version from the `Model-Train-Register-CI` build used as input.
   - If run locally without the model version, the batch scoring pipeline will use the model's latest version.
-- Trigger the *ML Batch Scoring Pipeline* and waits for it to complete.
+- Trigger the *ML Batch Scoring Pipeline* and wait for it to complete.
   - This is an **agentless** job. The CI pipeline can wait for ML pipeline completion for hours or even days without using agent resources.
-- Use the scoring input data supplied via the SCORING_DATASTORE_INPUT_* configuration variables, or uses the default datastore and sample data.
-- Once scoring is completed, the scores are made available in the same blob storage at the locations specified via the SCORING_DATASTORE_OUTPUT_* configuration variables.
+- Create an Azure ML pipeline with two steps. The pipeline is created by the code in `ml_service\pipelines\diabetes_regression_build_parallel_batchscore_pipeline.py` and has two steps:
+  - `scoringstep` - this step is a **`ParallelRunStep`** that executes the code in `diabetes_regression\scoring\parallel_batchscore.py` with several different batches of the data to be scored.
+  - `scorecopystep` - this is a **`PythonScriptStep`** step that copies the output inferences from Azure ML's internal storage into a target location in a another storage account.
+    - If you run the instructions as defined above with no changes to variables, this step will be **not** executed. You'll see a message in the logs for the corresponding step saying `Missing Parameters`. In this case, you'll be able to find the file with the inferences in the same Storage Account associated with Azure ML, in a location similar to `azureml-blobstore-SomeGuid\azureml\SomeOtherGuid\defaultoutput\parallel_run_step.txt`. One way to find the right path is this:
+      - Open your experiment in Azure ML (by default called `mlopspython`).
+      - Open the run that you want to look at (named something like `neat_morning_qc10dzjy` or similar).
+      - In the graphical pipeline view with 2 steps, click the button to open the details tab: `Show run overview`.
+      - You'll see two steps (corresponding to `scoringstep`and `scorecopystep` as described above).
+      - Click the step with the with older "Submitted time".
+      - Click "Output + logs" at the top, and you'll see something like the following:
+        ![Outputs of `scoringstep`](./images/batch-child-run-scoringstep.png)
+      - The `defaultoutput` file will have JSON content with the path to a file called `parallel_run_step.txt` containing the scoring.
 
-To configure your own custom scoring data, see [Configure Custom Batch Scoring](custom_model.md#Configure-Custom-Batch-Scoring).
-
+To properly configure this step for your own custom scoring data, you must follow the instructions in [Configure Custom Batch Scoring](custom_model.md#Configure-Custom-Batch-Scoring), which let you specify both the location of the files to score (via the `SCORING_DATASTORE_INPUT_*` configuration variables) and where to store the inferences (via the `SCORING_DATASTORE_OUTPUT_*` configuration variables).
+  
 ## Further Exploration
 
 You should now have a working set of pipelines that can get you started with MLOpsPython. Below are some additional features offered that might suit your scenario.
