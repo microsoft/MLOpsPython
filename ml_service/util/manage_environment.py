@@ -1,5 +1,6 @@
 
 import os
+import traceback
 from azureml.core import Workspace, Environment
 from ml_service.util.env_variables import Env
 from azureml.core.runconfig import DEFAULT_CPU_IMAGE, DEFAULT_GPU_IMAGE
@@ -35,6 +36,6 @@ def get_environment(
         if restored_environment is not None:
             print(restored_environment)
         return restored_environment
-    except Exception as e:
-        print(e)
+    except Exception:
+        traceback.print_exc()
         exit(1)
