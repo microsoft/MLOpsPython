@@ -97,6 +97,7 @@ If you want to keep scoring:
 1. Update or replace `[project name]/scoring/score.py`
 1. Add any dependencies required by scoring to `[project name]/conda_dependencies.yml`
 1. Modify the test cases in the `ml_service/util/smoke_test_scoring_service.py` script to match the schema of the training features in your data
+1. Check and modify [project name]/scoring/deployment_config_aks.yml if AKS deployment is planned. The deployment configuration shall suit custom model as well as AKS cluster size.
 
 # Configure Custom Batch Scoring
 
