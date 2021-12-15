@@ -366,23 +366,46 @@ When deploying to Azure Kubernetes Service, key-based authentication is enabled 
 
 ### Deploy the model to Azure App Service (Azure Web App for containers)
 
-If you want to deploy your scoring service as an [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) instead of Azure Container Instances and Azure Kubernetes Service, follow these additional steps.
+If you want to deploy your scoring service as an [Azure App Service](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-deploy-app-service) instead of Azure Container Instances or Azure Kubernetes Service, follow these additional steps.
 
-In the Variables tab, edit your variable group (`devopsforai-aml-vg`) and add a variable:
+- First, you'll need to create an App Service Plan using Linux. The simplest way is to run this from your Azure CLI: `az appservice plan create --name nameOfAppServicePlan --resource-group nameOfYourResourceGroup --sku B1 --is-linux`.
 
-| Variable Name          | Suggested Value        |
-| ---------------------- | ---------------------- |
-| WEBAPP_DEPLOYMENT_NAME | _name of your web app_ |
+- Second, you'll need to create a webapp in this App Service Plan, and configure it to run a certain container. As currently there is no UI in the Azure Portal to do this, this has to be done from the command line. We'll come back to this.
 
-Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. This app must exist before you can deploy the model to it.
+- In the Variables tab, edit your variable group (`devopsforai-aml-vg`) and add a variable:
 
-Delete the **ACI_DEPLOYMENT_NAME** variable.
+  | Variable Name          | Suggested Value        |
+  | ---------------------- | ---------------------- |
+  | WEBAPP_DEPLOYMENT_NAME | _name of your web app_ |
 
-The pipeline uses the [Azure ML CLI](../.pipelines/diabetes_regression-package-model-template.yml) to create a scoring image. The image will be registered under an Azure Container Registry instance that belongs to the Azure Machine Learning Service. Any dependencies that the scoring file depends on can also be packaged with the container with an image config. Learn more about how to create a container using the Azure ML SDK with the [Image class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-) API documentation.
+  Set **WEBAPP_DEPLOYMENT_NAME** to the name of your Azure Web App. You have not yet created this webapp, so just use the name you're planning on giving it. 
 
-Make sure your webapp has the credentials to pull the image from the Azure Container Registry created by the Infrastructure as Code pipeline. Instructions can be found on the [Configure registry credentials in web app](https://docs.microsoft.com/en-us/azure/devops/pipelines/targets/webapp-on-container-linux?view=azure-devops&tabs=dotnet-core%2Cyaml#configure-registry-credentials-in-web-app) page. You'll need to run the pipeline once (including the Deploy to Webapp stage up to the `Create scoring image` step) so an image is present in the registry. After that, you can connect the Webapp to the Azure Container Registry in the Azure Portal.
+- Delete the **ACI_DEPLOYMENT_NAME** or any AKS-related variable.
 
-![build](./images/multi-stage-webapp.png)
+- Next, you'll need to run your `Model-Deploy-CD` pipeline
+
+  - The pipeline uses the [Azure ML CLI](../.pipelines/diabetes_regression-package-model-template.yml) to create a scoring image. The image will be registered under an Azure Container Registry instance that belongs to the Azure Machine Learning Service. Any dependencies that the scoring file depends on can also be packaged with the container with an image config. Learn more about how to create a container using the Azure ML SDK with the [Image class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-) API documentation.
+
+  - This pipeline will **fail** on the `Azure Web App on Container Deploy` step, with an error saying the webapp doesn't exist yet. This is expected. Go to the next step.
+
+- If you want to confirm that the scoring image has been created, open the Azure Container Registry mentioned above, which will be in the Resource Group of the Azure ML workspace, and look for the repositories. You'll have one that was created by the pipeline, called `package`, which was created by the CD pipeline:
+
+  ![Azure Container Registry repository list](./images/container-registry-webapp-image.png)
+
+- Notedown the name of the Login Server of your Azure Container Registry. It'll be something like `YourAcrName.azurecr.io`.
+
+- Going back to the Step Two, now you can create a Web App in you App Service Plan using this scoring image but with the `latest` tag. The easiest way to do this is to run this in the Azure CLI: `az webapp create --resource-group yourResourceGroup --plan nameOfAppServicePlan --name nameOfWebApp  --deployment-container-image-name YourAcrName.azurecr.io/package:latest`
+  - Here, `nameOfWebApp` is the same you put in your Azure DevOps `WEBAPP_DEPLOYMENT_NAME` variable.
+
+From now on, whenever you run the CD pipeline, it will update the image in the container registry and it'll automatically update the one used in the WebApp. CD pipeline runs will now succeed.
+
+![build](./images/ADO-CD-pipeline-to-webapp.png)
+
+To confirm, you can open the App Service Plan, open your new WebApp, and open the **Deployment Center**, where you'll see something like:
+
+![WebApp Deployment Center page](./images/appservice-webapp-deploymentcenter.png)
+
+If you run into problems, you may have to make sure your webapp has the credentials to pull the image from the Azure Container Registry created by the Infrastructure as Code pipeline. Instructions can be found on the [Configure registry credentials in web app](https://docs.microsoft.com/en-us/azure/devops/pipelines/targets/webapp-on-container-linux?view=azure-devops&tabs=dotnet-core%2Cyaml#configure-registry-credentials-in-web-app) page.
 
 ### Example pipelines using R
 
@@ -424,7 +447,7 @@ To remove the resources created for this project, use the [/environment_setup/ia
 
 - The [custom model](custom_model.md) guide includes information on bringing your own code to this repository template.
 - We recommend using a [custom container](custom_model.md#customize-the-build-agent-environment) to manage your pipeline environment and dependencies. The container provided with the getting started guide may not be suitable or up to date with your project needs.
-- Consider using [Azure Pipelines self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your Azure ML pipeline execution. The Docker container image for the Azure ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs.
+- Consider using [Azure Pipelines self-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser#install) to speed up your Azure ML pipeline execution. The Docker container image for the Azure ML pipeline is sizable, and having it cached on the agent between runs can trim several minutes from your runs. Additionally, for secure deployments of Azure Machine Learning, you'll probably need to have a self-hosted agent in a Virtual Network.
 
 ### Additional Variables and Configuration
 
@@ -434,7 +457,7 @@ There are more variables used in the project. They're defined in two places: one
 
 For using Azure Pipelines, all other variables are stored in the file `.pipelines/diabetes_regression-variables-template.yml`. Using the default values as a starting point, adjust the variables to suit your requirements.
 
-In that folder, you'll also find the `parameters.json` file that we recommend using to provide parameters for training, evaluation, and scoring scripts. The sample parameter that `diabetes_regression` uses is the ridge regression [_alpha_ hyperparameter](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We don't provide any serializers for this config file.
+In the `diabetes_regression` folder, you'll also find the `parameters.json` file that we recommend using to provide parameters for training, evaluation, and scoring scripts. The sample parameter that `diabetes_regression` uses is the ridge regression [_alpha_ hyperparameter](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html). We don't provide any serializers for this config file.
 
 #### Local configuration
 
