@@ -48,7 +48,7 @@ The repository provides a template with folders structure suitable for maintaini
 
 ### Pipelines
 
-- `.pipelines/abtest.yml` : a pipeline demonstrating [Canary deployment strategy](./docs/canary_ab_deployment.md).
+- `.pipelines/abtest.yml` : a pipeline demonstrating [Canary deployment strategy](./canary_ab_deployment.md).
 - `.pipelines/code-quality-template.yml` : a pipeline template used by the CI and PR pipelines. It contains steps performing linting, data and unit testing.
 - `.pipelines/diabetes_regression-ci-image.yml` : a pipeline building a scoring image for the diabetes regression model.
 - `.pipelines/diabetes_regression-ci.yml` : a pipeline triggered when the code is merged into **master**. It performs linting, data integrity testing, unit testing, building and publishing an ML pipeline.
