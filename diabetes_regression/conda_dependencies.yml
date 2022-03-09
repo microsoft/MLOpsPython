@@ -37,3 +37,6 @@ dependencies:
 
       # MLOps with R
       - azure-storage-blob
+  - scikit-learn
+  - numpy
+  - lightgbm
