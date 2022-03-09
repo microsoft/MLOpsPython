@@ -1,8 +1,15 @@
 {
     "training":
     {
-        "alpha": 0.4,
-        "learning_rate": 0.02
+        "learning_rate": 0.02,
+        "boosting_type": "gbdt",
+        "objective": "binary",
+        "metric": "auc",
+        "sub_feature": 0.7,
+        "num_leaves": 60,
+        "min_data": 100,
+        "min_hessian": 1,
+        "verbose": 0
     },
     "evaluation":
     {
