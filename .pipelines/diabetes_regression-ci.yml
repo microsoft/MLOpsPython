@@ -93,4 +93,6 @@ stages:
     displayName: "Publish artifact if new model was registered"
     timeoutInMinutes: 0
     steps:
+    - script: python -m pip install --user --upgrade azureml-sdk
+      displayName: 'upgrade Azure ML SDK'
     - template: diabetes_regression-publish-model-artifact-template.yml
