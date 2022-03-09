@@ -31,7 +31,7 @@ variables:
   - name: TRAINING_PIPELINE_NAME
     value: "diabetes-Training-Pipeline"
   - name: MODEL_NAME
-    value: diabetes_regression_model.pkl
+    value: porto_seguro_safe_driver_model.pkl
 
   # AML Compute Cluster Config
   - name: AML_ENV_NAME
