@@ -1,5 +1,7 @@
 # Pipeline template to check if a model was registered for the build and publishes an artifact with the model JSON
 steps:
+- script: python -m pip install --user --upgrade azureml-sdk
+  displayName: 'upgrade Azure ML SDK'
 - task: AzureCLI@1
   displayName: 'Install AzureML CLI'
   inputs:
