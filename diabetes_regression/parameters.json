@@ -1,7 +1,8 @@
 {
     "training":
     {
-        "alpha": 0.4
+        "alpha": 0.4,
+        "learning_rate": 0.02
     },
     "evaluation":
     {
@@ -15,4 +16,5 @@
     {
         
     }
+    
 }
