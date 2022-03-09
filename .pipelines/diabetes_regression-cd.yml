@@ -50,6 +50,8 @@ stages:
         scriptLocation: inlineScript
         workingDirectory: $(Build.SourcesDirectory)
         inlineScript: 'az extension add --source https://azurecliext.blob.core.windows.net/release/azure_cli_ml-1.27.0-py3-none-any.whl --yes'
+    - script: python -m pip install --user --upgrade azureml-sdk
+      displayName: 'upgrade Azure ML SDK'
     - task: AzureCLI@1
       displayName: "Deploy to ACI (CLI)"
       inputs:
