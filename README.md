@@ -9,6 +9,17 @@ products:
 description: "Code which demonstrates how to set up and operationalize an MLOps flow leveraging Azure Machine Learning and Azure DevOps."
 ---
 
+---
+**NOTE**
+
+We have a new working MLOps working repository thats now available in the [MLOps v2 Accelerator](https://github.com/Azure/mlops-v2). This repostitory supports all data science patterns (Tabular/Computer Vision (CV)/Natural Langauge (NLP). In addition, we actively support Azure DevOps (ADO) and GitHub Actions (GHA) and the deployment of the required infrastructure with it. The repository also shows an example of working with Feathr feature store.  The repository also has a ready to use [Azure DevOps (ADO) quick start example](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-setup-mlops-azureml?tabs=azure-shell) that can help you get started with MLOps with Azure Machine Learning. This repository is in active development and we are adding features on a regular basis. You may want to consider visting it. 
+
+[AzureML MLOps Accelerator](https://github.com/Azure/mlops-v2)
+
+And while you are there, dont forget to star it. 
+
+---
+
 # MLOps with Azure ML
 
 CI: [![Build Status](https://aidemos.visualstudio.com/MLOps/_apis/build/status/Model-Train-Register-CI?branchName=master)](https://aidemos.visualstudio.com/MLOps/_build/latest?definitionId=160&branchName=master)
