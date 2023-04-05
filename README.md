@@ -9,7 +9,7 @@ products:
 description: "Code which demonstrates how to set up and operationalize an MLOps flow leveraging Azure Machine Learning and Azure DevOps."
 ---
 
-# MLOps with Azure ML Demo
+# #MLOps with Azure ML Demo
 
 CI: [![Build Status](https://aidemos.visualstudio.com/MLOps/_apis/build/status/Model-Train-Register-CI?branchName=master)](https://aidemos.visualstudio.com/MLOps/_build/latest?definitionId=160&branchName=master)
 
