@@ -45,7 +45,7 @@ variables:
   - name: AML_CLUSTER_MIN_NODES
     value: 0
   - name: AML_CLUSTER_MAX_NODES
-    value: 4
+    value: 1
   - name: AML_CLUSTER_PRIORITY
     value: lowpriority
 
@@ -90,7 +90,7 @@ variables:
   - name: AML_CLUSTER_MIN_NODES_SCORING
     value: 0
   - name: AML_CLUSTER_MAX_NODES_SCORING
-    value: 4
+    value: 1
   - name: AML_CLUSTER_PRIORITY_SCORING
     value: lowpriority
   # The path to the batch scoring script relative to SOURCES_DIR_TRAIN
